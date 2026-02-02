@@ -448,6 +448,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div class="mo-t">🔧 Debug Log <span id="lCnt" style="font-size:.72rem;color:var(--tx3)">(0)</span></div>
   <div class="rw mb">
     <button class="bt bt-o bt-sm" id="bLE">📥 Export</button>
+    <button class="bt bt-p bt-sm" id="bLCopy">📋 Copy Log</button>
     <button class="bt bt-d bt-sm" id="bLC">Clear</button>
   </div>
   <div class="la" id="lA">Waiting for events...</div>
@@ -460,7 +461,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 // ══════════════════════════════════════════════════════
 //  WIZZ AYCF WEB v3.1 — Complete mobile web app
 // ══════════════════════════════════════════════════════
-const V='3.1.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
+const V='3.2.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
 const CC={
 TLV:'Israel',ETH:'Israel',VDA:'Israel',
 LTN:'UK',LGW:'UK',STN:'UK',LHR:'UK',BHX:'UK',BRS:'UK',MAN:'UK',EDI:'UK',GLA:'UK',LPL:'UK',NCL:'UK',EMA:'UK',ABZ:'UK',CWL:'UK',DSA:'UK',
@@ -483,7 +484,7 @@ TIA:'Albania',PRG:'Czechia',BTS:'Slovakia',LJU:'Slovenia',RIX:'Latvia',VNO:'Lith
 
 // STATE
 let db=null,airp=new Map(),favs=[],mode='dep',logs=[],
-    downloading=false,paused=false,stopped=false,cookies='';
+    downloading=false,paused=false,stopped=false;
 
 const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
@@ -571,22 +572,98 @@ async function upSt(){const all=await dbA('flights');const val=all.filter(d=>Dat
 }
 
 // ══ PROXY / API ══
+let cookieJar=''; // Track all cookies
+let xsrfToken=''; // Track XSRF token separately
+
+function getProxy(){return localStorage.getItem('wz_proxy')||''}
+
+// Enhanced proxy function with redirect following
 async function px(url,opts={}){
-  const proxy=getProxy();if(!proxy)throw new Error('Proxy not configured. Complete the setup above.');
-  const headers={'X-Target':url};
-  if(cookies)headers['X-Cookies']=cookies;
-  if(opts.contentType)headers['Content-Type']=opts.contentType;
-  const fOpts={method:opts.method||'GET',headers};
-  if(opts.body)fOpts.body=typeof opts.body==='string'?opts.body:JSON.stringify(opts.body);
-  LA(`${fOpts.method} ${url}`);
-  const resp=await fetch(proxy,fOpts);
-  // Capture cookies
-  const sc=resp.headers.get('X-Set-Cookies');
-  if(sc){try{const arr=JSON.parse(sc);const newC=arr.map(c=>c.split(';')[0]).join('; ');
-    cookies=cookies?cookies+'; '+newC:newC;L(`Got cookies: ${newC.substring(0,60)}...`)}catch{}}
-  const loc=resp.headers.get('X-Location');
-  if(loc)L(`Redirect to: ${loc}`);
-  return{status:resp.status,headers:resp.headers,text:()=>resp.text(),json:()=>resp.json(),loc};
+  const proxy=getProxy();if(!proxy)throw new Error('Proxy not configured');
+  const maxRedirects=opts.maxRedirects||5;
+  let currentUrl=url;
+  let attempt=0;
+
+  while(attempt<maxRedirects){
+    attempt++;
+    const headers={'X-Target':currentUrl};
+    if(cookieJar)headers['X-Cookies']=cookieJar;
+    if(opts.contentType)headers['Content-Type']=opts.contentType;
+    // Forward XSRF token if we have one
+    if(xsrfToken)headers['X-XSRF-TOKEN']=xsrfToken;
+    // Forward any extra headers
+    if(opts.extraHeaders){Object.entries(opts.extraHeaders).forEach(([k,v])=>{headers[k]=v})}
+
+    const fOpts={method:(attempt===1?opts.method:null)||'GET',headers};
+    // Only send body on first request (not on redirects)
+    if(attempt===1&&opts.body)fOpts.body=typeof opts.body==='string'?opts.body:JSON.stringify(opts.body);
+    
+    const meth=fOpts.method||'GET';
+    LA(`[${attempt}] ${meth} ${currentUrl}`);
+    L(`  Headers sent: ${Object.keys(headers).filter(h=>h!=='X-Cookies').join(', ')}`);
+    if(cookieJar)L(`  Cookies: ${cookieJar.substring(0,80)}${cookieJar.length>80?'...':''}`);
+    
+    const resp=await fetch(proxy,fOpts);
+    
+    // Capture ALL cookies from response
+    const sc=resp.headers.get('X-Set-Cookies');
+    if(sc){
+      try{
+        const arr=JSON.parse(sc);
+        arr.forEach(c=>{
+          const parts=c.split(';')[0];
+          const [name]=parts.split('=');
+          // Update or add cookie
+          const existing=cookieJar.split('; ').filter(x=>x&&!x.startsWith(name.trim()+'='));
+          existing.push(parts);
+          cookieJar=existing.join('; ');
+          // Extract XSRF token
+          if(name.trim()==='XSRF-TOKEN'){
+            xsrfToken=decodeURIComponent(parts.split('=').slice(1).join('='));
+            L(`  🔑 XSRF token captured: ${xsrfToken.substring(0,20)}...`);
+          }
+        });
+        L(`  🍪 Cookies updated (${arr.length} new): ${arr.map(c=>c.split('=')[0]).join(', ')}`);
+      }catch(e){LW(`Cookie parse error: ${e.message}`)}
+    }
+    
+    // Check for redirect
+    const loc=resp.headers.get('X-Location');
+    const xStatus=resp.headers.get('X-Status');
+    if(loc){
+      L(`  ↪ Redirect ${xStatus||'3xx'} → ${loc}`);
+      // Resolve relative URLs
+      if(loc.startsWith('/')){
+        const base=new URL(currentUrl);
+        currentUrl=base.origin+loc;
+      }else if(loc.startsWith('http')){
+        currentUrl=loc;
+      }else{
+        currentUrl=new URL(loc,currentUrl).href;
+      }
+      continue; // Follow redirect
+    }
+    
+    // Not a redirect — return response with metadata
+    const status=parseInt(xStatus)||resp.status;
+    const ct=resp.headers.get('Content-Type')||'';
+    
+    // Clone body so we can peek and still return it
+    const bodyText=await resp.text();
+    L(`  ✓ Response: HTTP ${status} | ${ct.split(';')[0]} | ${bodyText.length} bytes`);
+    L(`  Body preview: ${bodyText.substring(0,150).replace(/\n/g,' ')}${bodyText.length>150?'...':''}`);
+    
+    return{
+      status,
+      headers:resp.headers,
+      url:currentUrl,
+      redirected:attempt>1,
+      text:()=>Promise.resolve(bodyText),
+      json:()=>Promise.resolve(JSON.parse(bodyText)),
+      bodyText // Direct access for logging
+    };
+  }
+  throw new Error(`Too many redirects (${maxRedirects}) following ${url}`);
 }
 
 // ══ CLOUDFLARE WORKER CODE ══
@@ -594,21 +671,22 @@ function workerCode(){return`export default{
 async fetch(r,env,ctx){
 const cors={'Access-Control-Allow-Origin':'*',
 'Access-Control-Allow-Methods':'GET,POST,PUT,DELETE,OPTIONS',
-'Access-Control-Allow-Headers':'Content-Type,X-Target,X-Cookies',
+'Access-Control-Allow-Headers':'Content-Type,X-Target,X-Cookies,X-XSRF-TOKEN',
 'Access-Control-Expose-Headers':'X-Set-Cookies,X-Location,Content-Type,X-Status',
 'Access-Control-Max-Age':'86400'};
 if(r.method==='OPTIONS')return new Response(null,{headers:cors});
 const t=r.headers.get('X-Target');
-if(!t)return new Response(JSON.stringify({error:'Need X-Target header',usage:'Set X-Target header to the wizzair.com URL you want to proxy'}),{status:400,headers:{...cors,'Content-Type':'application/json'}});
+if(!t)return new Response(JSON.stringify({error:'Need X-Target header',ok:false}),{status:400,headers:{...cors,'Content-Type':'application/json'}});
 let url;
-try{url=new URL(t)}catch{return new Response(JSON.stringify({error:'Invalid URL in X-Target'}),{status:400,headers:{...cors,'Content-Type':'application/json'}})}
-if(!url.hostname.endsWith('wizzair.com'))return new Response(JSON.stringify({error:'Only wizzair.com domains allowed'}),{status:403,headers:{...cors,'Content-Type':'application/json'}});
+try{url=new URL(t)}catch{return new Response(JSON.stringify({error:'Invalid URL'}),{status:400,headers:{...cors,'Content-Type':'application/json'}})}
+if(!url.hostname.endsWith('wizzair.com'))return new Response(JSON.stringify({error:'Only wizzair.com allowed'}),{status:403,headers:{...cors,'Content-Type':'application/json'}});
 const h=new Headers();
 h.set('User-Agent','Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36');
 h.set('Accept',r.headers.get('Accept')||'text/html,application/xhtml+xml,application/json,*/*;q=0.8');
 h.set('Accept-Language','en-US,en;q=0.9');
 if(r.headers.get('Content-Type'))h.set('Content-Type',r.headers.get('Content-Type'));
 const ck=r.headers.get('X-Cookies');if(ck)h.set('Cookie',ck);
+const xsrf=r.headers.get('X-XSRF-TOKEN');if(xsrf)h.set('X-XSRF-TOKEN',xsrf);
 h.set('Referer','https://multipass.wizzair.com/');
 h.set('Origin','https://multipass.wizzair.com');
 try{
@@ -624,7 +702,7 @@ rh.set('Content-Type','application/json');
 return new Response(JSON.stringify({redirect:resp.headers.get('Location'),status:resp.status,cookies:sc.length}),{status:200,headers:rh})}
 const ct=resp.headers.get('Content-Type');if(ct)rh.set('Content-Type',ct);
 return new Response(resp.body,{status:resp.status,headers:rh});
-}catch(e){return new Response(JSON.stringify({error:'Fetch failed: '+e.message}),{status:502,headers:{...cors,'Content-Type':'application/json'}})}
+}catch(e){return new Response(JSON.stringify({error:e.message}),{status:502,headers:{...cors,'Content-Type':'application/json'}})}
 }
 };`}
 
@@ -636,52 +714,175 @@ async function loginAndDownload(){
   if(!getProxy()){showDM('e','Set up proxy first (see above).');return}
 
   downloading=true;paused=false;stopped=false;
+  // Reset cookie state for fresh login
+  cookieJar='';xsrfToken='';
   $('bLogin').disabled=true;$('bPause').classList.remove('hd-n');$('bStop').classList.remove('hd-n');
   $('dlProg').classList.remove('hd-n');showDL('Connecting to Wizz Air...');setDLProg(0);
 
   try{
-    // Step 1: Get the multipass page (may redirect to login)
-    L('Step 1: Fetching multipass page...');
-    showDL('Loading Wizz Air page...');
-    let pageHtml='';
-    try{
-      const r=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets');
-      pageHtml=await r.text();
-      L(`Page response: ${r.status}, length: ${pageHtml.length}`);
-    }catch(e){L(`Initial page fetch: ${e.message}`)}
-
-    // Step 2: Try to authenticate
-    // Try finding the login API from the page, or use known endpoints
-    L('Step 2: Authenticating...');
+    // ─── Step 1: Hit login page to get session + CSRF cookies ───
+    L('═══ Step 1: Fetching login page for CSRF token ═══');
+    showDL('Getting session...');
+    
+    const loginR=await px('https://multipass.wizzair.com/w6/subscriptions/auth/login');
+    const loginHtml=await loginR.text();
+    L(`Login page: ${loginR.status}, ${loginHtml.length} bytes, redirected: ${loginR.redirected}`);
+    L(`Final URL: ${loginR.url}`);
+    
+    // Extract CSRF from meta tag if not already in cookies
+    if(!xsrfToken){
+      const csrfMeta=loginHtml.match(/<meta\s+name="csrf-token"\s+content="([^"]+)"/);
+      if(csrfMeta){xsrfToken=csrfMeta[1];L(`🔑 CSRF from meta tag: ${xsrfToken.substring(0,20)}...`)}
+      // Also try content="..." name="csrf-token" order
+      if(!xsrfToken){const m2=loginHtml.match(/content="([^"]+)"[^>]*name="csrf-token"/);
+        if(m2){xsrfToken=m2[1];L(`🔑 CSRF from meta (alt): ${xsrfToken.substring(0,20)}...`)}}
+    }
+    
+    // Find JS bundle URLs (for endpoint discovery)
+    const jsUrls=[];
+    const jsRe=/(?:src|href)="([^"]*\.js[^"]*)"/g;
+    let jm;while((jm=jsRe.exec(loginHtml))!==null){
+      let u=jm[1];
+      if(u.startsWith('/'))u='https://multipass.wizzair.com'+u;
+      if(u.includes('wizzair'))jsUrls.push(u);
+    }
+    L(`Found ${jsUrls.length} JS bundles: ${jsUrls.map(u=>u.split('/').pop()).join(', ')}`);
+    
+    // ─── Step 2: Discover login endpoint from JS bundles ───
+    L('═══ Step 2: Discovering login API endpoint ═══');
+    showDL('Discovering API...');
+    
+    let discoveredLoginEndpoint=null;
+    let discoveredApiBase=null;
+    
+    // Try fetching JS to find login endpoint
+    for(const jsUrl of jsUrls.slice(0,3)){
+      try{
+        L(`Fetching JS: ${jsUrl.split('/').pop()}`);
+        const jsR=await px(jsUrl);
+        const jsCode=await jsR.text();
+        L(`JS bundle: ${jsCode.length} bytes`);
+        
+        // Search for login-related API patterns
+        const patterns=[
+          /["']([^"']*auth\/login[^"']*)["']/g,
+          /["']([^"']*\/login[^"']*)["']/g,
+          /["']([^"']*\/api\/[^"']*auth[^"']*)["']/g,
+          /login[^{]*url\s*[:=]\s*["']([^"']+)["']/gi,
+          /["'](\/w6\/subscriptions\/[^"']*login[^"']*)["']/g,
+          /["'](\/w6\/subscriptions\/[^"']*auth[^"']*)["']/g,
+        ];
+        
+        const found=new Set();
+        patterns.forEach(p=>{let m;while((m=p.exec(jsCode))!==null){
+          const ep=m[1];
+          if(ep.length<100&&ep.includes('/')&&!ep.includes('.css')&&!ep.includes('.js')&&!ep.includes('.png')){
+            found.add(ep)}}});
+        
+        if(found.size>0){
+          L(`Found potential endpoints in ${jsUrl.split('/').pop()}: ${[...found].join(', ')}`);
+          // Prefer json/auth patterns
+          for(const ep of found){
+            if(ep.includes('json')&&ep.includes('login')){discoveredLoginEndpoint=ep;break}
+            if(ep.includes('auth')&&ep.includes('login')&&!discoveredLoginEndpoint)discoveredLoginEndpoint=ep;
+          }
+        }
+        
+        // Also look for flight search URL pattern
+        const searchPat=/["'](\/w6\/subscriptions\/[^"']*(?:availability|search|flight)[^"']*)["']/g;
+        let sm;while((sm=searchPat.exec(jsCode))!==null){
+          L(`Potential flight API: ${sm[1]}`);}
+          
+        // Look for base API URL
+        const basePat=/["'](https?:\/\/multipass\.wizzair\.com\/w6\/subscriptions\/[^"']*)["']/g;
+        let bm;while((bm=basePat.exec(jsCode))!==null){
+          if(!discoveredApiBase&&bm[1].includes('json'))discoveredApiBase=bm[1];
+        }
+        
+      }catch(e){LW(`JS fetch error: ${e.message}`)}
+    }
+    
+    if(discoveredLoginEndpoint)L(`✅ Discovered login endpoint: ${discoveredLoginEndpoint}`);
+    if(discoveredApiBase)L(`✅ Discovered API base: ${discoveredApiBase}`);
+    
+    // ─── Step 3: Try to authenticate ───
+    L('═══ Step 3: Authenticating ═══');
     showDL('Logging in...');
-
-    // Try multipass login endpoints
-    const loginEndpoints=[
+    
+    // Build list of endpoints to try (discovered first, then known patterns)
+    const loginEndpoints=[];
+    if(discoveredLoginEndpoint){
+      const ep=discoveredLoginEndpoint.startsWith('http')?discoveredLoginEndpoint:
+        'https://multipass.wizzair.com'+discoveredLoginEndpoint;
+      loginEndpoints.push(ep);
+    }
+    loginEndpoints.push(
+      'https://multipass.wizzair.com/w6/subscriptions/auth/login',
       'https://multipass.wizzair.com/w6/subscriptions/json/auth/login',
       'https://multipass.wizzair.com/w6/subscriptions/api/auth/login',
       'https://multipass.wizzair.com/w6/subscriptions/json/login',
-    ];
-
+      'https://multipass.wizzair.com/w6/subscriptions/api/login',
+    );
+    // De-duplicate
+    const uniqueEndpoints=[...new Set(loginEndpoints)];
+    
     let loggedIn=false;
-    for(const ep of loginEndpoints){
+    
+    // Try each endpoint with multiple body formats
+    for(const ep of uniqueEndpoints){
       if(loggedIn)break;
-      try{
-        L(`Trying login at: ${ep}`);
-        const r=await px(ep,{method:'POST',contentType:'application/json',
-          body:JSON.stringify({email,password:pass})});
-        const txt=await r.text();
-        L(`Login response ${r.status}: ${txt.substring(0,300)}`);
-        if(r.status>=200&&r.status<300){loggedIn=true;LS(`Login succeeded at ${ep}`)}
-        else if(r.status===401||r.status===403){LW(`Auth rejected at ${ep}`)}
-      }catch(e){LW(`Login endpoint ${ep}: ${e.message}`)}
+      
+      // Format 1: JSON with _token
+      const bodies=[
+        {email,password:pass,_token:xsrfToken},
+        {email,password:pass},
+        {username:email,password:pass,_token:xsrfToken},
+      ];
+      
+      for(const body of bodies){
+        if(loggedIn)break;
+        try{
+          L(`Trying: POST ${ep}`);
+          L(`  Body: ${JSON.stringify(body).substring(0,100)}`);
+          const r=await px(ep,{method:'POST',contentType:'application/json',
+            body:JSON.stringify(body),maxRedirects:3});
+          const txt=await r.text();
+          L(`  Response: ${r.status} | ${txt.length} bytes`);
+          L(`  Body: ${txt.substring(0,300)}`);
+          
+          // Success indicators
+          if(r.status>=200&&r.status<300&&!txt.includes('"error"')&&!txt.includes('<!DOCTYPE')){
+            loggedIn=true;LS(`✅ Login succeeded at ${ep}`);break}
+          // Redirect to authenticated page = success
+          if(r.redirected&&r.url&&!r.url.includes('/login')&&!r.url.includes('/auth')){
+            loggedIn=true;LS(`✅ Login succeeded (redirected to ${r.url})`);break}
+        }catch(e){LW(`  ${ep}: ${e.message}`)}
+      }
+      
+      // Format 2: Form-urlencoded
+      if(!loggedIn){
+        try{
+          L(`Trying form-encoded: POST ${ep}`);
+          const formBody=`email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&_token=${encodeURIComponent(xsrfToken||'')}`;
+          const r=await px(ep,{method:'POST',contentType:'application/x-www-form-urlencoded',
+            body:formBody,maxRedirects:3});
+          const txt=await r.text();
+          L(`  Response: ${r.status} | ${txt.length} bytes`);
+          L(`  Body: ${txt.substring(0,300)}`);
+          
+          if(r.status>=200&&r.status<300&&!txt.includes('/login')){
+            loggedIn=true;LS(`✅ Login (form) succeeded at ${ep}`)}
+          if(r.redirected&&r.url&&!r.url.includes('/login')&&!r.url.includes('/auth')){
+            loggedIn=true;LS(`✅ Login (form) succeeded (redirect to ${r.url})`)}
+        }catch(e){LW(`  Form ${ep}: ${e.message}`)}
+      }
     }
 
-    // Also try the main Wizz Air API login
+    // Also try the main Wizz Air API login (different domain, may help with some cookie sharing)
     if(!loggedIn){
-      L('Trying main wizzair.com API login...');
+      L('Trying main wizzair.com API...');
       try{
-        // Get API version
-        const metaR=await px('https://wizzair.com/static/metadata.json');
+        const metaR=await px('https://www.wizzair.com/static/metadata.json');
         const meta=await metaR.json();
         const apiUrl=meta.apiUrl||`https://be.wizzair.com/${meta.appVersion||'19.3.0'}/Api`;
         L(`API URL: ${apiUrl}`);
@@ -689,20 +890,35 @@ async function loginAndDownload(){
         const loginR=await px(`${apiUrl}/customer/login`,{method:'POST',contentType:'application/json',
           body:JSON.stringify({email,password:pass,isGoogleLogin:false})});
         const loginTxt=await loginR.text();
-        L(`Main API login response ${loginR.status}: ${loginTxt.substring(0,300)}`);
-        if(loginR.status>=200&&loginR.status<300){loggedIn=true;LS('Main API login succeeded')}
-      }catch(e){LW(`Main API login: ${e.message}`)}
+        L(`Main API: ${loginR.status} | ${loginTxt.substring(0,300)}`);
+        if(loginR.status>=200&&loginR.status<300&&loginR.status!==429){loggedIn=true;LS('Main API login OK')}
+        else if(loginR.status===429){LW('Main API rate limited (429). Wait a minute and retry.')}
+      }catch(e){LW(`Main API: ${e.message}`)}
     }
 
-    // Try fetching the authenticated page regardless (cookies may have been set)
-    L('Step 3: Fetching authenticated page...');
+    // ─── Step 4: Fetch authenticated page ───
+    L('═══ Step 4: Fetching authenticated page ═══');
     showDL('Fetching route data...');
+    L(`Cookie jar before auth page: ${cookieJar.substring(0,120)}...`);
+    
     const authR=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets');
-    pageHtml=await authR.text();
-    L(`Auth page: ${authR.status}, length: ${pageHtml.length}`);
+    let pageHtml=await authR.text();
+    L(`Auth page: ${authR.status} | ${pageHtml.length} bytes | redirected: ${authR.redirected} | final URL: ${authR.url}`);
 
-    // Step 4: Parse routes
-    L('Step 4: Parsing routes...');
+    // If redirected to login, auth failed
+    if(authR.url&&authR.url.includes('/auth/login')){
+      L(`⚠️ Still redirected to login page — authentication failed`);
+      L(`Page HTML snippet: ${pageHtml.substring(0,500)}`);
+      
+      // Try one more thing: maybe we need to hit the wallets page without following redirects
+      // and the page actually has data embedded even before redirect
+    }
+
+    // Log full page for debugging (first 2000 chars)
+    L(`Page content (first 2000 chars): ${pageHtml.substring(0,2000).replace(/\n/g,'\\n')}`);
+
+    // ─── Step 5: Parse routes ───
+    L('═══ Step 5: Parsing routes ═══');
     showDL('Parsing route data...');
     let routes=null;
 
@@ -711,44 +927,79 @@ async function loginAndDownload(){
     let hm=pageHtml.match(rp);
     if(hm&&hm[0]){
       try{const j=`{"routes":${hm[0].split('"routes":')[1].split(',"isOneWayFlightsOnly"')[0]}}`;
-        routes=JSON.parse(j).routes;L(`Routes from pattern 1: ${routes.length} origins`)}
+        routes=JSON.parse(j).routes;LS(`Routes from pattern 1: ${routes.length} origins`)}
       catch(e){LE(`Parse routes p1: ${e.message}`)}
     }
     // Pattern 2: window.CVO.routes
     if(!routes){const bp=/window\.CVO\.routes\s*=\s*(\[.*?\]);/s;const bm=pageHtml.match(bp);
-      if(bm&&bm[1]){try{routes=JSON.parse(bm[1]);L(`Routes from pattern 2: ${routes.length}`)}catch(e){LE(`Parse p2: ${e.message}`)}}}
-    // Pattern 3: try JSON in script tags
-    if(!routes){const sm=pageHtml.match(/"departureStation":\s*\{[^}]*"id"\s*:\s*"[A-Z]{3}"/g);
-      if(sm)L(`Found ${sm.length} departureStation references but couldn't parse full routes`)}
+      if(bm&&bm[1]){try{routes=JSON.parse(bm[1]);LS(`Routes from pattern 2: ${routes.length}`)}catch(e){LE(`Parse p2: ${e.message}`)}}}
+    // Pattern 3: Look for route data in any JSON blob
+    if(!routes){
+      const jsonBlobs=pageHtml.match(/\{[^{}]*"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"[A-Z]{3}"[^}]*\}[^{}]*"arrivalStations"\s*:\s*\[[^\]]*\][^{}]*\}/g);
+      if(jsonBlobs){L(`Found ${jsonBlobs.length} route JSON blobs via pattern 3`);
+        try{routes=jsonBlobs.map(b=>JSON.parse(b));LS(`Routes from pattern 3: ${routes.length}`)}
+        catch(e){LE(`Parse p3: ${e.message}`)}
+      }
+    }
+    // Pattern 4: Search in all script tags
+    if(!routes){
+      const scripts=pageHtml.match(/<script[^>]*>([\s\S]*?)<\/script>/g);
+      if(scripts){
+        L(`Scanning ${scripts.length} script tags for route data...`);
+        for(const s of scripts){
+          const inner=s.replace(/<\/?script[^>]*>/g,'');
+          if(inner.includes('departureStation')||inner.includes('routes')){
+            L(`Found potential route script (${inner.length} bytes): ${inner.substring(0,200)}`);
+          }
+        }
+      }
+    }
 
     if(!routes||!routes.length){
-      LE('Could not find routes in page');
-      showDM('e',`Could not extract routes from Wizz Air page. Login may have failed or the page structure changed. Check the debug log (🔧) for details.`);
+      LE('❌ Could not find routes in page');
+      L('═══ DIAGNOSTIC SUMMARY ═══');
+      L(`Logged in: ${loggedIn}`);
+      L(`Cookie jar: ${cookieJar}`);
+      L(`XSRF token: ${xsrfToken?'present':'missing'}`);
+      L(`Final page URL: ${authR.url}`);
+      L(`Page size: ${pageHtml.length} bytes`);
+      L(`Contains "routes": ${pageHtml.includes('"routes"')}`);
+      L(`Contains "departureStation": ${pageHtml.includes('departureStation')}`);
+      L(`Contains "arrivalStations": ${pageHtml.includes('arrivalStations')}`);
+      L(`Contains "login": ${pageHtml.includes('/login')}`);
+      L(`Contains "wallets": ${pageHtml.includes('wallets')}`);
+      L('Full page HTML logged above. Export debug log and share for troubleshooting.');
+      L('═══════════════════════════');
+      showDM('e',`Login or route extraction failed. Please export the debug log (🔧 button) and share it for troubleshooting.`);
       throw new Error('No routes found')}
 
     LS(`Found ${routes.length} route origins`);
 
-    // Step 5: Get flight search API URL
-    L('Step 5: Finding flight search API URL...');
+    // ─── Step 6: Get flight search API URL ───
+    L('═══ Step 6: Finding flight search API URL ═══');
     let apiUrl=null;
+    // Pattern A: Direct URL
     const hp=/"searchFlight":"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
     const hm2=pageHtml.match(hp);
-    if(hm2&&hm2[1]){apiUrl=hm2[1];L(`API URL from pattern: ${apiUrl}`)}
-    else{
-      const hp2=/"searchFlight":"https:\/\/multipass\.wizzair\.com[^"]+\/([^"]+)"/;
+    if(hm2&&hm2[1]){apiUrl=hm2[1];L(`API URL (pattern A): ${apiUrl}`)}
+    // Pattern B: UUID extraction
+    if(!apiUrl){const hp2=/"searchFlight":"https:\/\/multipass\.wizzair\.com[^"]+\/([^"]+)"/;
       const hm3=pageHtml.match(hp2);
-      if(hm3&&hm3[1]){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${hm3[1]}`;L(`API URL from UUID: ${apiUrl}`)}
-    }
+      if(hm3&&hm3[1]){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${hm3[1]}`;L(`API URL (pattern B/UUID): ${apiUrl}`)}}
+    // Pattern C: CVO variable
     if(!apiUrl){const bp2=/window\.CVO\.flightSearchUrlJson\s*=\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
-      const bm2=pageHtml.match(bp2);if(bm2&&bm2[1]){apiUrl=bm2[1];L(`API URL from CVO: ${apiUrl}`)}}
+      const bm2=pageHtml.match(bp2);if(bm2&&bm2[1]){apiUrl=bm2[1];L(`API URL (pattern C/CVO): ${apiUrl}`)}}
+    // Pattern D: Search in script tags
+    if(!apiUrl){const scripts=pageHtml.match(/<script[^>]*>([\s\S]*?)<\/script>/g)||[];
+      for(const s of scripts){const m=s.match(/availability\/([a-f0-9-]{36})/i);
+        if(m){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${m[1]}`;L(`API URL (pattern D/script UUID): ${apiUrl}`);break}}}
 
-    if(!apiUrl){LE('Could not find flight search API URL');
-      showDM('e','Routes found but flight API URL not found. Check debug log.');throw new Error('No API URL')}
-
+    if(!apiUrl){LE('Flight search API URL not found');
+      showDM('e','Routes found but API URL missing. Export log for troubleshooting.');throw new Error('No API URL')}
     LS(`Flight API: ${apiUrl}`);
 
-    // Step 6: Build tasks & download
-    L('Step 6: Building download tasks...');
+    // ─── Step 7: Build tasks & download ───
+    L('═══ Step 7: Downloading flights ═══');
     const dates=[];const today=new Date();
     for(let i=0;i<4;i++){const d=new Date(today);d.setDate(today.getDate()+i);dates.push(fD(d))}
     L(`Dates: ${dates.join(', ')}`);
@@ -787,6 +1038,7 @@ async function loginAndDownload(){
             duration:f.duration||f.flightDuration||'',flightCode:f.flightCode||f.flightNumber||''}));
           await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:fl,timestamp:Date.now()});
           done++;flights+=fl.length;
+          if(i<3||fl.length>0)L(`  ${t.o}→${t.d}: ${fl.length} flights`);
         }else{
           await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:[],timestamp:Date.now()});
           done++;errors++}
@@ -801,7 +1053,7 @@ async function loginAndDownload(){
     showDM('s',`Downloaded ${flights} flights from ${done} routes.`);
     await upSt();
 
-  }catch(e){LE(`Download failed: ${e.message}`);if(!$('loginMsg').innerHTML)showDM('e',e.message)}
+  }catch(e){LE(`Download failed: ${e.message}`);if(!$('loginMsg').innerHTML.includes('log'))showDM('e',e.message)}
   finally{downloading=false;$('bLogin').disabled=false;$('bPause').classList.add('hd-n');$('bStop').classList.add('hd-n')}
 }
 
@@ -1094,9 +1346,39 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('bCL').onclick=()=>$('mLog').classList.remove('op');
   $('mLog').onclick=e=>{if(e.target===$('mLog'))$('mLog').classList.remove('op')};
   $('bLC').onclick=()=>{logs=[];$('lA').innerHTML='';$('lCnt').textContent='(0)'};
-  $('bLE').onclick=()=>{const blob=new Blob([logs.map(l=>l.l).join('\n')],{type:'text/plain'});
+  
+  // Enhanced log export with full diagnostics
+  function buildLogExport(){
+    const divider='═'.repeat(60);
+    let out=`${divider}\nWIZZ AYCF DEBUG LOG — ${new Date().toISOString()}\n${divider}\n\n`;
+    out+=`Version: ${V}\n`;
+    out+=`User Agent: ${navigator.userAgent}\n`;
+    out+=`Screen: ${screen.width}x${screen.height} | Window: ${innerWidth}x${innerHeight}\n`;
+    out+=`Proxy: ${getProxy()||'NOT SET'}\n`;
+    out+=`Cookies: ${cookieJar?cookieJar.substring(0,200)+'...':'NONE'}\n`;
+    out+=`XSRF Token: ${xsrfToken?xsrfToken.substring(0,30)+'...':'NONE'}\n`;
+    out+=`Favorites: ${favs.map(f=>f.code).join(', ')||'none'}\n`;
+    out+=`Airports loaded: ${airp.size}\n`;
+    out+=`Mode: ${mode}\n\n`;
+    out+=`${divider}\nLOG ENTRIES (${logs.length})\n${divider}\n\n`;
+    out+=logs.map(l=>l.l).join('\n');
+    out+=`\n\n${divider}\nEND OF LOG\n${divider}\n`;
+    return out;
+  }
+  
+  $('bLE').onclick=()=>{const blob=new Blob([buildLogExport()],{type:'text/plain'});
     const url=URL.createObjectURL(blob);const a=document.createElement('a');
     a.href=url;a.download=`aycf-log-${fD(new Date())}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a)};
+  
+  // Copy log to clipboard
+  if($('bLCopy'))$('bLCopy').onclick=()=>{
+    navigator.clipboard.writeText(buildLogExport()).then(()=>{
+      $('bLCopy').textContent='✅ Copied!';setTimeout(()=>{$('bLCopy').textContent='📋 Copy Log'},2000)
+    }).catch(()=>{
+      // Fallback: select text
+      const ta=document.createElement('textarea');ta.value=buildLogExport();document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      $('bLCopy').textContent='✅ Copied!';setTimeout(()=>{$('bLCopy').textContent='📋 Copy Log'},2000)
+    })};
 
   init()});
 </script>
