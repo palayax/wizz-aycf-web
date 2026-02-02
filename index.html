@@ -107,7 +107,7 @@ select.ip{-webkit-appearance:none;appearance:none;
 .ap-gb{display:none;padding:5px;flex-wrap:wrap;gap:4px}.ap-gb.op{display:flex}
 .ap-c{display:inline-flex;align-items:center;gap:3px;padding:7px 9px;border-radius:5px;
   background:var(--s1);border:1px solid var(--bdr);cursor:pointer;font-size:.74rem;
-  user-select:none;min-height:34px}
+  user-select:none;min-height:34px;flex-direction:column;align-items:flex-start}
 .ap-c:active{transform:scale(.96)}
 .ap-c.sl{background:rgba(88,166,255,.15);border-color:var(--acc);color:var(--acc)}
 .ap-c .ac{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.78rem}
@@ -140,6 +140,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   background:rgba(88,166,255,.06);border-radius:var(--rs);border-left:3px solid var(--acc)}
 .deh{font-size:.82rem;font-weight:700;padding:9px 12px;margin:12px 0 6px;border-radius:var(--rs);
   background:var(--acc);color:#0d1117}
+
 .fc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px;margin-bottom:6px}
 .fc-r{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .fc-r .rt{font-weight:700;font-size:.84rem}
@@ -195,13 +196,26 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 .gh-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 @media(max-width:380px){.gh-g{grid-template-columns:1fr}}
 .lbl{font-size:.68rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
+.filter-box{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:10px;margin-bottom:10px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.filter-row:last-child{margin-bottom:0}
+.filter-label{font-size:.72rem;font-weight:600;color:var(--tx2);min-width:60px}
+.date-warn{font-size:.68rem;color:var(--ylw);margin-top:4px}
+.flight-detail{background:var(--s2);border-radius:5px;padding:10px;margin-top:8px}
+.flight-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.74rem}
+.flight-loc{margin-bottom:6px}
+.flight-loc .country{color:var(--acc);font-weight:600;font-size:.72rem}
+.flight-loc .city{color:var(--tx);font-weight:600}
+.flight-loc .airport{color:var(--tx3);font-size:.68rem}
+.flight-time{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--grn)}
+.flight-num{font-family:'JetBrains Mono',monospace;color:var(--acc2);font-size:.72rem}
 </style>
 </head>
 <body>
 
 <header class="hd">
 <div class="hd-r">
-  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.3</span></div>
+  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.4</span></div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
     <button class="ib" id="bGH" title="Settings">⚙️</button>
@@ -260,8 +274,29 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div class="ip-row">
     <input class="ip" id="wizPass" type="password" placeholder="Password" autocomplete="current-password">
   </div>
+
+  <div class="filter-box">
+    <div class="cd-t" style="margin-bottom:8px">🎯 Download Filters (Optional)</div>
+    <div class="filter-row">
+      <span class="filter-label">Origin:</span>
+      <input class="ip" id="dlOriginFilter" placeholder="Filter by airport, city, or country..." style="flex:1">
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Destination:</span>
+      <input class="ip" id="dlDestFilter" placeholder="Filter by airport, city, or country..." style="flex:1">
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Dates:</span>
+      <input type="date" class="ip" id="dlDateStart" style="width:140px">
+      <span style="color:var(--tx3)">to</span>
+      <input type="date" class="ip" id="dlDateEnd" style="width:140px">
+    </div>
+    <div class="date-warn" id="dateWarn"></div>
+    <p style="font-size:.68rem;color:var(--tx3);margin-top:6px">Leave empty to download all. Max 4 days range.</p>
+  </div>
+
   <div class="rw mb">
-    <button class="bt bt-p" id="bLogin">🚀 Login & Download All</button>
+    <button class="bt bt-p" id="bLogin">🚀 Login & Download</button>
     <button class="bt bt-o hd-n" id="bPause">⏸ Pause</button>
     <button class="bt bt-d hd-n" id="bStop">⏹ Stop</button>
   </div>
@@ -296,13 +331,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <button class="t on" data-m="dep">✈️ From</button>
   <button class="t" data-m="dest">🎯 To</button>
   <button class="t" data-m="rt">🔄 Round Trip</button>
-  <button class="t" data-m="trip">🗓️ Multi-Hop</button>
 </div>
 
 <div class="pn on" id="p-dep">
   <div class="cd">
     <div class="cd-t">🛫 Origin Airports</div>
-    <input class="ip" id="dSr" placeholder="Search airports..." style="margin-bottom:6px">
+    <input class="ip" id="dSr" placeholder="Search by airport, city, or country..." style="margin-bottom:6px">
     <div class="rw mb">
       <button class="bt bt-o bt-sm sf" data-l="dL">⭐</button>
       <button class="bt bt-o bt-sm sa" data-l="dL">All</button>
@@ -312,14 +346,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
   <div class="dg">
     <div><label>From</label><input type="date" id="dS"></div>
-    <div><label>To</label><input type="date" id="dE"></div>
+    <div><label>To (max 4 days)</label><input type="date" id="dE"></div>
   </div>
+  <div id="searchDateWarn" class="date-warn"></div>
 </div>
 
 <div class="pn" id="p-dest">
   <div class="cd">
     <div class="cd-t">🎯 Destination Airports</div>
-    <input class="ip" id="sSr" placeholder="Search airports..." style="margin-bottom:6px">
+    <input class="ip" id="sSr" placeholder="Search by airport, city, or country..." style="margin-bottom:6px">
     <div class="rw mb">
       <button class="bt bt-o bt-sm sf" data-l="sL">⭐</button>
       <button class="bt bt-o bt-sm sa" data-l="sL">All</button>
@@ -329,52 +364,26 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
   <div class="dg">
     <div><label>From</label><input type="date" id="sS"></div>
-    <div><label>To</label><input type="date" id="sE"></div>
+    <div><label>To (max 4 days)</label><input type="date" id="sE"></div>
   </div>
 </div>
 
 <div class="pn" id="p-rt">
   <div class="cd">
-    <div class="cd-t">🔄 Round Trip — Anywhere ↔ Anywhere</div>
-    <p style="font-size:.76rem;color:var(--tx2);margin-bottom:8px">Find all round-trip combos in cached data.</p>
-    <div class="or"><label>Origin:</label><input class="ip ip-m" id="rtO" placeholder="Any (or TLV,BUD)" style="width:140px" autocapitalize="characters"></div>
-    <div class="or"><label>Dest:</label><input class="ip ip-m" id="rtD" placeholder="Any (or BCN,ATH)" style="width:140px" autocapitalize="characters"></div>
+    <div class="cd-t">🔄 Round Trip Search</div>
+    <p style="font-size:.76rem;color:var(--tx2);margin-bottom:8px">Find round-trip flights in cached data.</p>
+    <div class="or"><label>Origin:</label><input class="ip" id="rtO" placeholder="Airport, city or country" style="width:200px"></div>
+    <div class="or"><label>Dest:</label><input class="ip" id="rtD" placeholder="Airport, city or country" style="width:200px"></div>
   </div>
   <div class="dg">
     <div><label>Depart after</label><input type="date" id="rtS"></div>
-    <div><label>Return before</label><input type="date" id="rtE"></div>
+    <div><label>Return before (max 4 days)</label><input type="date" id="rtE"></div>
   </div>
   <div class="or">
     <label>Min stay:</label>
     <select class="ip" id="rtMn" style="width:90px"><option value="0">Any</option><option value="1">1d</option><option value="2" selected>2d</option><option value="3">3d</option><option value="5">5d</option><option value="7">7d</option></select>
     <label>Max:</label>
     <select class="ip" id="rtMx" style="width:90px"><option value="3">3d</option><option value="5">5d</option><option value="7" selected>7d</option><option value="14">14d</option><option value="30">30d</option><option value="99">Any</option></select>
-  </div>
-</div>
-
-<div class="pn" id="p-trip">
-  <div class="cd">
-    <div class="cd-t">🏠 Home Airports</div>
-    <p style="font-size:.76rem;color:var(--tx2);margin-bottom:6px">Trip starts & ends here.</p>
-    <input class="ip" id="tSr" placeholder="Search airports..." style="margin-bottom:6px">
-    <div class="rw mb">
-      <button class="bt bt-o bt-sm sf" data-l="tL">⭐</button>
-      <button class="bt bt-o bt-sm sa" data-l="tL">All</button>
-      <button class="bt bt-o bt-sm sc" data-l="tL">Clear</button>
-    </div>
-    <div class="ap-b" id="tL"></div>
-  </div>
-  <div class="dg">
-    <div><label>From</label><input type="date" id="tS"></div>
-    <div><label>To</label><input type="date" id="tE"></div>
-  </div>
-  <div class="or">
-    <label>Stops:</label>
-    <select class="ip" id="tH" style="width:180px"><option value="0">Direct (A→B→A)</option><option value="1" selected>1 extra (A→B→C→A)</option><option value="2">2 extra</option></select>
-  </div>
-  <div class="or">
-    <label>Min days:</label>
-    <select class="ip" id="tMn" style="width:80px"><option value="0">Any</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="5">5</option><option value="7">7</option></select>
   </div>
 </div>
 
@@ -427,27 +436,172 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  WIZZ AYCF WEB v3.3 — Fixed Keycloak authentication
+//  WIZZ AYCF WEB v3.4 — Enhanced filters & display
 // ══════════════════════════════════════════════════════
-const V='3.3.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
-const CC={
-TLV:'Israel',ETH:'Israel',VDA:'Israel',
-LTN:'UK',LGW:'UK',STN:'UK',LHR:'UK',BHX:'UK',BRS:'UK',MAN:'UK',EDI:'UK',GLA:'UK',LPL:'UK',NCL:'UK',EMA:'UK',ABZ:'UK',CWL:'UK',DSA:'UK',
-FCO:'Italy',CIA:'Italy',MXP:'Italy',BGY:'Italy',VCE:'Italy',TSF:'Italy',NAP:'Italy',BRI:'Italy',CTA:'Italy',PMO:'Italy',BLQ:'Italy',TRN:'Italy',PSA:'Italy',VRN:'Italy',GOA:'Italy',TRS:'Italy',
-BCN:'Spain',MAD:'Spain',AGP:'Spain',ALC:'Spain',PMI:'Spain',IBZ:'Spain',VLC:'Spain',SVQ:'Spain',BIO:'Spain',TFS:'Spain',LPA:'Spain',ACE:'Spain',FUE:'Spain',
-BER:'Germany',CGN:'Germany',DTM:'Germany',DUS:'Germany',FRA:'Germany',HHN:'Germany',HAM:'Germany',HAJ:'Germany',MUC:'Germany',NUE:'Germany',STR:'Germany',FMM:'Germany',
-WAW:'Poland',WMI:'Poland',KRK:'Poland',KTW:'Poland',GDN:'Poland',POZ:'Poland',WRO:'Poland',LUZ:'Poland',RZE:'Poland',SZZ:'Poland',BZG:'Poland',LCJ:'Poland',
-OTP:'Romania',CLJ:'Romania',TSR:'Romania',IAS:'Romania',SBZ:'Romania',SUJ:'Romania',CRA:'Romania',BCM:'Romania',OMR:'Romania',
-BUD:'Hungary',VIE:'Austria',
-ATH:'Greece',SKG:'Greece',HER:'Greece',RHO:'Greece',CFU:'Greece',ZTH:'Greece',KGS:'Greece',CHQ:'Greece',
-LCA:'Cyprus',PFO:'Cyprus',DXB:'UAE',AUH:'UAE',
-SOF:'Bulgaria',VAR:'Bulgaria',BOJ:'Bulgaria',
-CDG:'France',ORY:'France',BVA:'France',NCE:'France',MRS:'France',LYS:'France',TLS:'France',BOD:'France',NTE:'France',
-LIS:'Portugal',OPO:'Portugal',FAO:'Portugal',AMS:'Netherlands',EIN:'Netherlands',
-BRU:'Belgium',CRL:'Belgium',GVA:'Switzerland',ZRH:'Switzerland',BSL:'Switzerland',
-ARN:'Sweden',GOT:'Sweden',CPH:'Denmark',OSL:'Norway',BGO:'Norway',TRD:'Norway',HEL:'Finland',TMP:'Finland',
-BEG:'Serbia',PRN:'Kosovo',SKP:'N.Macedonia',TGD:'Montenegro',SJJ:'Bosnia',ZAG:'Croatia',SPU:'Croatia',DBV:'Croatia',
-TIA:'Albania',PRG:'Czechia',BTS:'Slovakia',LJU:'Slovenia',RIX:'Latvia',VNO:'Lithuania',TLL:'Estonia',KIV:'Moldova',KBP:'Ukraine',IEV:'Ukraine'
+const V='3.4.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120,MAX_DAYS=4;
+
+// Extended airport database with full names
+const AIRPORTS={
+// Israel
+TLV:{city:'Tel Aviv',airport:'Ben Gurion International',country:'Israel'},
+ETH:{city:'Eilat',airport:'Ramon Airport',country:'Israel'},
+VDA:{city:'Ovda',airport:'Ovda Airport',country:'Israel'},
+// UK
+LTN:{city:'London',airport:'Luton Airport',country:'United Kingdom'},
+LGW:{city:'London',airport:'Gatwick Airport',country:'United Kingdom'},
+STN:{city:'London',airport:'Stansted Airport',country:'United Kingdom'},
+LHR:{city:'London',airport:'Heathrow Airport',country:'United Kingdom'},
+BHX:{city:'Birmingham',airport:'Birmingham Airport',country:'United Kingdom'},
+BRS:{city:'Bristol',airport:'Bristol Airport',country:'United Kingdom'},
+MAN:{city:'Manchester',airport:'Manchester Airport',country:'United Kingdom'},
+EDI:{city:'Edinburgh',airport:'Edinburgh Airport',country:'United Kingdom'},
+GLA:{city:'Glasgow',airport:'Glasgow Airport',country:'United Kingdom'},
+LPL:{city:'Liverpool',airport:'John Lennon Airport',country:'United Kingdom'},
+NCL:{city:'Newcastle',airport:'Newcastle Airport',country:'United Kingdom'},
+EMA:{city:'East Midlands',airport:'East Midlands Airport',country:'United Kingdom'},
+ABZ:{city:'Aberdeen',airport:'Aberdeen Airport',country:'United Kingdom'},
+CWL:{city:'Cardiff',airport:'Cardiff Airport',country:'United Kingdom'},
+DSA:{city:'Doncaster',airport:'Doncaster Sheffield',country:'United Kingdom'},
+// Italy
+FCO:{city:'Rome',airport:'Fiumicino Airport',country:'Italy'},
+CIA:{city:'Rome',airport:'Ciampino Airport',country:'Italy'},
+MXP:{city:'Milan',airport:'Malpensa Airport',country:'Italy'},
+BGY:{city:'Milan',airport:'Bergamo Orio al Serio',country:'Italy'},
+VCE:{city:'Venice',airport:'Marco Polo Airport',country:'Italy'},
+TSF:{city:'Venice',airport:'Treviso Airport',country:'Italy'},
+NAP:{city:'Naples',airport:'Naples International',country:'Italy'},
+BRI:{city:'Bari',airport:'Karol Wojtyla Airport',country:'Italy'},
+CTA:{city:'Catania',airport:'Fontanarossa Airport',country:'Italy'},
+PMO:{city:'Palermo',airport:'Falcone Borsellino',country:'Italy'},
+BLQ:{city:'Bologna',airport:'Guglielmo Marconi',country:'Italy'},
+TRN:{city:'Turin',airport:'Turin Airport',country:'Italy'},
+PSA:{city:'Pisa',airport:'Galileo Galilei Airport',country:'Italy'},
+VRN:{city:'Verona',airport:'Villafranca Airport',country:'Italy'},
+GOA:{city:'Genoa',airport:'Cristoforo Colombo',country:'Italy'},
+TRS:{city:'Trieste',airport:'Friuli Venezia Giulia',country:'Italy'},
+// Spain
+BCN:{city:'Barcelona',airport:'El Prat Airport',country:'Spain'},
+MAD:{city:'Madrid',airport:'Barajas Airport',country:'Spain'},
+AGP:{city:'Malaga',airport:'Costa del Sol Airport',country:'Spain'},
+ALC:{city:'Alicante',airport:'Alicante-Elche Airport',country:'Spain'},
+PMI:{city:'Palma de Mallorca',airport:'Son Sant Joan',country:'Spain'},
+IBZ:{city:'Ibiza',airport:'Ibiza Airport',country:'Spain'},
+VLC:{city:'Valencia',airport:'Valencia Airport',country:'Spain'},
+SVQ:{city:'Seville',airport:'San Pablo Airport',country:'Spain'},
+BIO:{city:'Bilbao',airport:'Bilbao Airport',country:'Spain'},
+TFS:{city:'Tenerife',airport:'Tenerife South',country:'Spain'},
+LPA:{city:'Gran Canaria',airport:'Gran Canaria Airport',country:'Spain'},
+ACE:{city:'Lanzarote',airport:'Cesar Manrique Airport',country:'Spain'},
+FUE:{city:'Fuerteventura',airport:'Fuerteventura Airport',country:'Spain'},
+// Germany
+BER:{city:'Berlin',airport:'Brandenburg Airport',country:'Germany'},
+CGN:{city:'Cologne',airport:'Cologne Bonn Airport',country:'Germany'},
+DTM:{city:'Dortmund',airport:'Dortmund Airport',country:'Germany'},
+DUS:{city:'Dusseldorf',airport:'Dusseldorf Airport',country:'Germany'},
+FRA:{city:'Frankfurt',airport:'Frankfurt Airport',country:'Germany'},
+HHN:{city:'Frankfurt',airport:'Hahn Airport',country:'Germany'},
+HAM:{city:'Hamburg',airport:'Hamburg Airport',country:'Germany'},
+HAJ:{city:'Hanover',airport:'Hanover Airport',country:'Germany'},
+MUC:{city:'Munich',airport:'Franz Josef Strauss',country:'Germany'},
+NUE:{city:'Nuremberg',airport:'Nuremberg Airport',country:'Germany'},
+STR:{city:'Stuttgart',airport:'Stuttgart Airport',country:'Germany'},
+FMM:{city:'Memmingen',airport:'Allgau Airport',country:'Germany'},
+// Poland
+WAW:{city:'Warsaw',airport:'Chopin Airport',country:'Poland'},
+WMI:{city:'Warsaw',airport:'Modlin Airport',country:'Poland'},
+KRK:{city:'Krakow',airport:'John Paul II Airport',country:'Poland'},
+KTW:{city:'Katowice',airport:'Pyrzowice Airport',country:'Poland'},
+GDN:{city:'Gdansk',airport:'Lech Walesa Airport',country:'Poland'},
+POZ:{city:'Poznan',airport:'Lawica Airport',country:'Poland'},
+WRO:{city:'Wroclaw',airport:'Copernicus Airport',country:'Poland'},
+LUZ:{city:'Lublin',airport:'Lublin Airport',country:'Poland'},
+RZE:{city:'Rzeszow',airport:'Jasionka Airport',country:'Poland'},
+SZZ:{city:'Szczecin',airport:'Goleniow Airport',country:'Poland'},
+BZG:{city:'Bydgoszcz',airport:'Bydgoszcz Airport',country:'Poland'},
+LCJ:{city:'Lodz',airport:'Wladyslaw Reymont',country:'Poland'},
+// Romania
+OTP:{city:'Bucharest',airport:'Henri Coanda Airport',country:'Romania'},
+CLJ:{city:'Cluj-Napoca',airport:'Avram Iancu Airport',country:'Romania'},
+TSR:{city:'Timisoara',airport:'Traian Vuia Airport',country:'Romania'},
+IAS:{city:'Iasi',airport:'Iasi Airport',country:'Romania'},
+SBZ:{city:'Sibiu',airport:'Sibiu Airport',country:'Romania'},
+SUJ:{city:'Satu Mare',airport:'Satu Mare Airport',country:'Romania'},
+CRA:{city:'Craiova',airport:'Craiova Airport',country:'Romania'},
+BCM:{city:'Bacau',airport:'George Enescu Airport',country:'Romania'},
+OMR:{city:'Oradea',airport:'Oradea Airport',country:'Romania'},
+// Hungary & Austria
+BUD:{city:'Budapest',airport:'Ferenc Liszt Airport',country:'Hungary'},
+VIE:{city:'Vienna',airport:'Vienna International',country:'Austria'},
+// Greece
+ATH:{city:'Athens',airport:'Eleftherios Venizelos',country:'Greece'},
+SKG:{city:'Thessaloniki',airport:'Macedonia Airport',country:'Greece'},
+HER:{city:'Heraklion',airport:'Nikos Kazantzakis',country:'Greece'},
+RHO:{city:'Rhodes',airport:'Diagoras Airport',country:'Greece'},
+CFU:{city:'Corfu',airport:'Ioannis Kapodistrias',country:'Greece'},
+ZTH:{city:'Zakynthos',airport:'Dionysios Solomos',country:'Greece'},
+KGS:{city:'Kos',airport:'Hippocrates Airport',country:'Greece'},
+CHQ:{city:'Chania',airport:'Daskalogiannis Airport',country:'Greece'},
+// Cyprus & UAE
+LCA:{city:'Larnaca',airport:'Larnaca Airport',country:'Cyprus'},
+PFO:{city:'Paphos',airport:'Paphos Airport',country:'Cyprus'},
+DXB:{city:'Dubai',airport:'Dubai International',country:'UAE'},
+AUH:{city:'Abu Dhabi',airport:'Abu Dhabi Airport',country:'UAE'},
+// Bulgaria
+SOF:{city:'Sofia',airport:'Sofia Airport',country:'Bulgaria'},
+VAR:{city:'Varna',airport:'Varna Airport',country:'Bulgaria'},
+BOJ:{city:'Burgas',airport:'Burgas Airport',country:'Bulgaria'},
+// France
+CDG:{city:'Paris',airport:'Charles de Gaulle',country:'France'},
+ORY:{city:'Paris',airport:'Orly Airport',country:'France'},
+BVA:{city:'Paris',airport:'Beauvais-Tille',country:'France'},
+NCE:{city:'Nice',airport:'Cote d Azur Airport',country:'France'},
+MRS:{city:'Marseille',airport:'Provence Airport',country:'France'},
+LYS:{city:'Lyon',airport:'Saint-Exupery Airport',country:'France'},
+TLS:{city:'Toulouse',airport:'Blagnac Airport',country:'France'},
+BOD:{city:'Bordeaux',airport:'Merignac Airport',country:'France'},
+NTE:{city:'Nantes',airport:'Atlantique Airport',country:'France'},
+// Portugal
+LIS:{city:'Lisbon',airport:'Humberto Delgado',country:'Portugal'},
+OPO:{city:'Porto',airport:'Francisco Sa Carneiro',country:'Portugal'},
+FAO:{city:'Faro',airport:'Faro Airport',country:'Portugal'},
+// Netherlands & Belgium
+AMS:{city:'Amsterdam',airport:'Schiphol Airport',country:'Netherlands'},
+EIN:{city:'Eindhoven',airport:'Eindhoven Airport',country:'Netherlands'},
+BRU:{city:'Brussels',airport:'Brussels Airport',country:'Belgium'},
+CRL:{city:'Brussels',airport:'Charleroi Airport',country:'Belgium'},
+// Switzerland
+GVA:{city:'Geneva',airport:'Geneva Airport',country:'Switzerland'},
+ZRH:{city:'Zurich',airport:'Zurich Airport',country:'Switzerland'},
+BSL:{city:'Basel',airport:'EuroAirport',country:'Switzerland'},
+// Scandinavia
+ARN:{city:'Stockholm',airport:'Arlanda Airport',country:'Sweden'},
+GOT:{city:'Gothenburg',airport:'Landvetter Airport',country:'Sweden'},
+CPH:{city:'Copenhagen',airport:'Kastrup Airport',country:'Denmark'},
+OSL:{city:'Oslo',airport:'Gardermoen Airport',country:'Norway'},
+BGO:{city:'Bergen',airport:'Flesland Airport',country:'Norway'},
+TRD:{city:'Trondheim',airport:'Vaernes Airport',country:'Norway'},
+HEL:{city:'Helsinki',airport:'Helsinki-Vantaa',country:'Finland'},
+TMP:{city:'Tampere',airport:'Pirkkala Airport',country:'Finland'},
+// Balkans
+BEG:{city:'Belgrade',airport:'Nikola Tesla Airport',country:'Serbia'},
+PRN:{city:'Pristina',airport:'Adem Jashari Airport',country:'Kosovo'},
+SKP:{city:'Skopje',airport:'Skopje Airport',country:'North Macedonia'},
+TGD:{city:'Podgorica',airport:'Podgorica Airport',country:'Montenegro'},
+SJJ:{city:'Sarajevo',airport:'Sarajevo Airport',country:'Bosnia'},
+ZAG:{city:'Zagreb',airport:'Franjo Tudman Airport',country:'Croatia'},
+SPU:{city:'Split',airport:'Split Airport',country:'Croatia'},
+DBV:{city:'Dubrovnik',airport:'Dubrovnik Airport',country:'Croatia'},
+// Other Europe
+TIA:{city:'Tirana',airport:'Mother Teresa Airport',country:'Albania'},
+PRG:{city:'Prague',airport:'Vaclav Havel Airport',country:'Czechia'},
+BTS:{city:'Bratislava',airport:'M.R. Stefanik Airport',country:'Slovakia'},
+LJU:{city:'Ljubljana',airport:'Joze Pucnik Airport',country:'Slovenia'},
+RIX:{city:'Riga',airport:'Riga Airport',country:'Latvia'},
+VNO:{city:'Vilnius',airport:'Vilnius Airport',country:'Lithuania'},
+TLL:{city:'Tallinn',airport:'Lennart Meri Airport',country:'Estonia'},
+KIV:{city:'Chisinau',airport:'Chisinau Airport',country:'Moldova'},
+KBP:{city:'Kyiv',airport:'Boryspil Airport',country:'Ukraine'},
+IEV:{city:'Kyiv',airport:'Zhuliany Airport',country:'Ukraine'}
 };
 
 let db=null,airp=new Map(),favs=[],mode='dep',logs=[],
@@ -461,19 +615,56 @@ function L(m,c=''){const ts=new Date().toISOString().slice(11,23);const l=`[${ts
   $('lCnt').textContent=`(${logs.length})`}
 function LE(m){L('❌ '+m,'e')}function LW(m){L('⚠️ '+m,'w')}function LS(m){L('✅ '+m,'s')}function LA(m){L('🌐 '+m,'a')}
 
+// Get full airport info
+function getAirportInfo(code){
+  const info=AIRPORTS[code];
+  if(info)return{code,...info};
+  return{code,city:code,airport:code,country:'Unknown'};
+}
+
 function fD(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function fDMY(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}-${m}-${y}`}
-function fDD(s){if(!s)return'';const[y,m,d]=s.split('-');const dt=new Date(+y,+m-1,+d);return`${dt.toLocaleDateString('en',{weekday:'short'})} ${d}-${m}-${y}`}
+function fDT(dt,tm){
+  // Format as HH:MM DD/MM/YYYY
+  if(!dt)return'';
+  const[y,m,d]=dt.split('-');
+  const time=tm?fT(tm):'00:00';
+  return`${time} ${d}/${m}/${y}`;
+}
 function fT(t){if(!t)return'';if(t.includes('T'))t=t.split('T')[1];if(t.includes(':')&&!t.includes('AM')&&!t.includes('PM')){const p=t.split(':');return String(+p[0]).padStart(2,'0')+':'+String(+(p[1]||0)).padStart(2,'0')}return t}
 function pT(t){if(!t)return 0;if(t.includes('T'))t=t.split('T')[1];const p=t.split(':');return(+p[0])*60+(+(p[1]||0))}
 function dRng(s,e){const r=[];const[sy,sm,sd]=s.split('-').map(Number);const[ey,em,ed]=e.split('-').map(Number);
   let c=new Date(sy,sm-1,sd);const end=new Date(ey,em-1,ed);while(c<=end){r.push(fD(c));c.setDate(c.getDate()+1)}return r}
-function aD(c){const i=airp.get(c);if(!i)return c;return[c,i.n!==c?i.n:'',i.c].filter(Boolean).join(' · ')}
-function aS(c){const i=airp.get(c);return i&&i.n&&i.n!==c?`${c} (${i.n})`:c}
-function bU(o,d,dt){return`https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`}
 function dB(d1,d2){const[y1,m1,dd1]=d1.split('-').map(Number);const[y2,m2,dd2]=d2.split('-').map(Number);return Math.floor((new Date(y2,m2-1,dd2)-new Date(y1,m1-1,dd1))/864e5)}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function getProxy(){return localStorage.getItem('wz_proxy')||''}
+
+// Booking URL
+function bU(o,d,dt){return`https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`}
+
+// Filter matching - check if text matches airport, city, or country
+function matchesFilter(code,filter){
+  if(!filter||!filter.trim())return true;
+  const f=filter.toLowerCase().trim();
+  const info=getAirportInfo(code);
+  return code.toLowerCase().includes(f)||
+         info.city.toLowerCase().includes(f)||
+         info.country.toLowerCase().includes(f)||
+         info.airport.toLowerCase().includes(f);
+}
+
+// Validate date range (max 4 days)
+function validateDateRange(startId,endId,warnId){
+  const s=$(startId).value,e=$(endId).value;
+  if(!s||!e)return true;
+  const days=dB(s,e);
+  const warn=$(warnId);
+  if(days>MAX_DAYS-1){
+    if(warn)warn.textContent=`⚠️ Date range exceeds ${MAX_DAYS} days. Please select a shorter range.`;
+    return false;
+  }
+  if(warn)warn.textContent='';
+  return true;
+}
 
 function initDB(){return new Promise((ok,no)=>{L('Opening IndexedDB...');const r=indexedDB.open(DB_N,DB_V);
   r.onerror=()=>{LE('DB error');no(r.error)};r.onsuccess=()=>{db=r.result;LS('DB ready');ok(db)};
@@ -487,13 +678,25 @@ function loadF(){try{favs=JSON.parse(localStorage.getItem('wz_fav3')||'[]')}catc
 function saveF(){localStorage.setItem('wz_fav3',JSON.stringify(favs))}
 function addF(c){c=c.toUpperCase().trim();if(!c||c.length<2||c.length>3)return false;
   if(favs.some(f=>f.code===c))return false;
-  favs.push({code:c,name:c,country:CC[c]||''});saveF();renderF();renderAL();LS(`Fav +${c}`);return true}
+  const info=getAirportInfo(c);
+  favs.push({code:c,name:info.city,country:info.country});saveF();renderF();renderAL();LS(`Fav +${c}`);return true}
 function rmF(c){favs=favs.filter(f=>f.code!==c);saveF();renderF();renderAL()}
 function renderF(){const c=$('favC');if(!favs.length){c.innerHTML='<span class="fav-e">No favorites</span>';return}
   c.innerHTML=favs.map(f=>`<span class="fav"><span class="c">${f.code}</span><span class="n">${f.country||''}</span><button class="x" data-c="${f.code}">×</button></span>`).join('');
   c.querySelectorAll('.x').forEach(b=>b.onclick=e=>{e.stopPropagation();rmF(b.dataset.c)})}
 
-function buildAI(data){airp=new Map();data.forEach(d=>{[d.origin,d.dest].forEach(c=>{if(!airp.has(c))airp.set(c,{code:c,n:c,c:CC[c]||''})})});L(`${airp.size} airports`)}
+function buildAI(data){
+  airp=new Map();
+  data.forEach(d=>{
+    [d.origin,d.dest].forEach(c=>{
+      if(!airp.has(c)){
+        const info=getAirportInfo(c);
+        airp.set(c,{code:c,n:info.city,c:info.country,airport:info.airport});
+      }
+    });
+  });
+  L(`${airp.size} airports`);
+}
 
 function renderL(cid,sid){const c=$(cid);if(!c)return;
   if(!airp.size){c.innerHTML='<div style="padding:14px;text-align:center;color:var(--tx3);font-size:.78rem">No airports. Import or download data.</div>';return}
@@ -504,17 +707,25 @@ function renderL(cid,sid){const c=$(cid);if(!c)return;
     const hf=ap.some(a=>favs.some(f=>f.code===a.code));
     h+=`<div class="ap-g" data-co="${co}"><div class="ap-gh" data-co="${co}"><span>${hf?'⭐ ':''}${co} (${ap.length})</span><span class="ar">▶</span></div><div class="ap-gb">`;
     ap.forEach(a=>{const fv=favs.some(f=>f.code===a.code);
-      h+=`<div class="ap-c${fv?' fv':''}" data-code="${a.code}" data-co="${co}" data-name="${a.n}"><span class="ac">${a.code}</span>${a.n!==a.code?`<span class="an">${a.n}</span>`:''}</div>`});
+      h+=`<div class="ap-c${fv?' fv':''}" data-code="${a.code}" data-co="${co}" data-name="${a.n}" data-airport="${a.airport||''}">
+        <span class="ac">${a.code}</span>
+        <span class="an">${a.n}, ${a.c}</span>
+      </div>`});
     h+='</div></div>'});
   c.innerHTML=h;
   c.querySelectorAll('.ap-gh').forEach(h=>h.addEventListener('click',()=>{h.classList.toggle('op');h.nextElementSibling.classList.toggle('op')}));
   c.querySelectorAll('.ap-c').forEach(ch=>ch.addEventListener('click',()=>ch.classList.toggle('sl')));
   if(sid){const inp=$(sid);if(inp)inp.oninput=()=>{const q=inp.value.toLowerCase();
-    c.querySelectorAll('.ap-c').forEach(ch=>{const m=ch.dataset.code.toLowerCase().includes(q)||ch.dataset.co.toLowerCase().includes(q)||(ch.dataset.name||'').toLowerCase().includes(q);ch.style.display=m?'':'none'});
+    c.querySelectorAll('.ap-c').forEach(ch=>{
+      const m=ch.dataset.code.toLowerCase().includes(q)||
+              ch.dataset.co.toLowerCase().includes(q)||
+              (ch.dataset.name||'').toLowerCase().includes(q)||
+              (ch.dataset.airport||'').toLowerCase().includes(q);
+      ch.style.display=m?'':'none'});
     c.querySelectorAll('.ap-g').forEach(g=>{const vis=[...g.querySelectorAll('.ap-c')].some(ch=>ch.style.display!=='none');g.style.display=vis?'':'none';
       if(q&&vis){g.querySelector('.ap-gh').classList.add('op');g.querySelector('.ap-gb').classList.add('op')}})}}
 }
-function renderAL(){renderL('dL','dSr');renderL('sL','sSr');renderL('tL','tSr')}
+function renderAL(){renderL('dL','dSr');renderL('sL','sSr')}
 function gSel(cid){const c=$(cid);return c?[...c.querySelectorAll('.ap-c.sl')].map(ch=>ch.dataset.code):[]}
 function sSel(cid,codes){const c=$(cid);if(!c)return;const s=new Set(codes);c.querySelectorAll('.ap-c').forEach(ch=>ch.classList.toggle('sl',s.has(ch.dataset.code)))}
 
@@ -525,7 +736,8 @@ async function upSt(){const all=await dbA('flights');const val=all.filter(d=>Dat
   else{const tf=val.reduce((s,d)=>s+(d.flights?.length||0),0);
     const ori=new Set(val.map(d=>d.origin)),dts=new Set(val.map(d=>d.date));
     $('stC').className='st st-o';$('stI').textContent='✅';$('stH').textContent='Flight Data Ready';
-    $('stD').textContent=`Dates: ${[...dts].sort().map(fDMY).join(', ')}`;
+    const sortedDates=[...dts].sort();
+    $('stD').textContent=`Dates: ${sortedDates[0]} to ${sortedDates[sortedDates.length-1]}`;
     $('stS').classList.remove('hd-n');$('s1').textContent=tf.toLocaleString();$('s2').textContent=ori.size;
     $('s3').textContent=val.length.toLocaleString();$('s4').textContent=dts.size;
     buildAI(val);renderAL();LS(`Data: ${tf} flights, ${ori.size} origins`)}
@@ -629,12 +841,23 @@ return new Response(resp.body,{status:resp.status,headers:rh});
 }catch(e){return new Response(JSON.stringify({error:e.message}),{status:502,headers:{...cors,'Content-Type':'application/json'}})}
 }};`}
 
-// ══ AUTH & DOWNLOAD — FIXED KEYCLOAK ══
+// ══ AUTH & DOWNLOAD — WITH FILTERS ══
 async function loginAndDownload(){
   if(downloading)return;
   const email=$('wizEmail').value.trim();const pass=$('wizPass').value;
   if(!email||!pass){showDM('e','Enter email and password.');return}
   if(!getProxy()){showDM('e','Set up proxy first.');return}
+
+  // Validate date range
+  const dlStart=$('dlDateStart').value;
+  const dlEnd=$('dlDateEnd').value;
+  if(dlStart&&dlEnd&&dB(dlStart,dlEnd)>MAX_DAYS-1){
+    showDM('e',`Date range exceeds ${MAX_DAYS} days. Please select a shorter range.`);return;
+  }
+
+  // Get filters
+  const originFilter=$('dlOriginFilter').value.trim();
+  const destFilter=$('dlDestFilter').value.trim();
 
   downloading=true;paused=false;stopped=false;
   cookieJar='';xsrfToken='';
@@ -651,7 +874,6 @@ async function loginAndDownload(){
     L(`Login page: ${loginR.status}, ${loginHtml.length} bytes`);
     L(`Final URL: ${loginR.url}`);
 
-    // Check if this is the Keycloak login page
     const isKeycloak=loginR.url.includes('/auth/realms/')||loginHtml.includes('kc-form-login');
     L(`Is Keycloak page: ${isKeycloak}`);
 
@@ -664,8 +886,6 @@ async function loginAndDownload(){
     L('═══ Step 2: Submitting Keycloak credentials ═══');
     showDL('Logging in...');
 
-    // Find the form action URL - Keycloak forms look like:
-    // <form id="kc-form-login" action="https://multipass.wizzair.com/auth/realms/w6/login-actions/authenticate?..." method="post">
     const formMatch=loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i)||
                     loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i)||
                     loginHtml.match(/<form[^>]*action="([^"]*authenticate[^"]*)"/i);
@@ -679,12 +899,10 @@ async function loginAndDownload(){
     let formAction=formMatch[1].replace(/&amp;/g,'&');
     L(`Form action: ${formAction}`);
 
-    // Make it absolute URL if needed
     if(formAction.startsWith('/')){
       formAction='https://multipass.wizzair.com'+formAction;
     }
 
-    // Submit credentials
     const formBody=`username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&credentialId=`;
     L(`Posting to: ${formAction}`);
 
@@ -699,14 +917,12 @@ async function loginAndDownload(){
     L(`Auth response: ${authR.status}, ${authHtml.length} bytes`);
     L(`Auth final URL: ${authR.url}`);
 
-    // Check for login errors
     if(authHtml.includes('Invalid username or password')||authHtml.includes('Invalid credentials')){
       LE('Invalid username or password');
       showDM('e','Invalid username or password. Please check your Wizz Air credentials.');
       throw new Error('Invalid credentials');
     }
 
-    // Check if we're still on login page (auth failed)
     if(authR.url.includes('/auth/realms/')&&authR.url.includes('login-actions')){
       L(`Still on login page - checking for errors`);
       const errorMatch=authHtml.match(/class="[^"]*error[^"]*"[^>]*>([^<]+)/i);
@@ -716,7 +932,6 @@ async function loginAndDownload(){
       }
     }
 
-    // Check if authentication succeeded (redirected to app)
     const authenticated=!authR.url.includes('/auth/realms/')&&!authR.url.includes('/login');
     L(`Authenticated: ${authenticated}`);
 
@@ -735,7 +950,6 @@ async function loginAndDownload(){
     L(`Wallets: ${walletsR.status}, ${walletsHtml.length} bytes`);
     L(`Wallets URL: ${walletsR.url}`);
 
-    // If redirected back to login, auth failed
     if(walletsR.url.includes('/auth/')&&walletsR.url.includes('/login')){
       LE('Redirected back to login - authentication failed');
       showDM('e','Authentication failed. Please check your credentials.');
@@ -748,9 +962,6 @@ async function loginAndDownload(){
 
     let routes=[];
 
-    // Try multiple patterns to find route data
-
-    // Pattern 1: "routes":[...] in JSON
     const routesMatch=walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
     if(routesMatch){
       try{
@@ -762,7 +973,6 @@ async function loginAndDownload(){
       }catch(e){LW(`Parse routes: ${e.message}`)}
     }
 
-    // Pattern 2: window.CVO.routes = [...]
     if(!routes.length){
       const cvoMatch=walletsHtml.match(/window\.CVO\.routes\s*=\s*(\[[\s\S]*?\]);/);
       if(cvoMatch){
@@ -770,14 +980,12 @@ async function loginAndDownload(){
       }
     }
 
-    // Pattern 3: Look in script tags for routes data
     if(!routes.length){
       const scriptMatches=walletsHtml.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g);
       for(const sm of scriptMatches){
         const script=sm[1];
         if(script.includes('departureStation')||script.includes('"routes"')){
           L(`Found potential route script (${script.length} bytes)`);
-          // Try to extract routes from this script
           const rm=script.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
           if(rm){
             try{routes=JSON.parse(rm[1]);LS(`Routes from script: ${routes.length}`);break}catch(e){}
@@ -786,7 +994,6 @@ async function loginAndDownload(){
       }
     }
 
-    // Pattern 4: Look for individual route objects
     if(!routes.length){
       const routeBlobs=walletsHtml.matchAll(/\{"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"[^}]*\}[^}]*"arrivalStations"\s*:\s*(\[[^\]]*\])/g);
       for(const rb of routeBlobs){
@@ -798,7 +1005,6 @@ async function loginAndDownload(){
       if(routes.length)LS(`Routes from blobs: ${routes.length}`);
     }
 
-    // Parse routes into normalized format
     const parsedRoutes=[];
     routes.forEach(r=>{
       let origin=null,destinations=[];
@@ -810,14 +1016,21 @@ async function loginAndDownload(){
         destinations=r.destinations||[];
       }
       if(origin&&destinations.length){
-        parsedRoutes.push({origin,destinations});
+        // Apply origin filter
+        if(originFilter&&!matchesFilter(origin,originFilter))return;
+        // Apply destination filter
+        if(destFilter){
+          destinations=destinations.filter(d=>matchesFilter(d,destFilter));
+        }
+        if(destinations.length){
+          parsedRoutes.push({origin,destinations});
+        }
       }
     });
 
-    L(`Parsed ${parsedRoutes.length} route origins`);
+    L(`Parsed ${parsedRoutes.length} route origins (after filters)`);
 
     if(!parsedRoutes.length){
-      // Log diagnostic info
       L('═══ DIAGNOSTIC ═══');
       L(`Page contains "routes": ${walletsHtml.includes('"routes"')}`);
       L(`Page contains "departureStation": ${walletsHtml.includes('departureStation')}`);
@@ -833,17 +1046,14 @@ async function loginAndDownload(){
 
     let flightApiUrl=null;
 
-    // Pattern 1: searchFlight URL
     const searchMatch=walletsHtml.match(/"searchFlight"\s*:\s*"([^"]+)"/);
     if(searchMatch){flightApiUrl=searchMatch[1];L(`API from searchFlight: ${flightApiUrl}`)}
 
-    // Pattern 2: flightSearchUrlJson
     if(!flightApiUrl){
       const urlMatch=walletsHtml.match(/flightSearchUrlJson\s*[=:]\s*["']([^"']+)["']/);
       if(urlMatch){flightApiUrl=urlMatch[1];L(`API from flightSearchUrlJson: ${flightApiUrl}`)}
     }
 
-    // Pattern 3: availability UUID
     if(!flightApiUrl){
       const uuidMatch=walletsHtml.match(/availability\/([a-f0-9-]{36})/i);
       if(uuidMatch){
@@ -852,7 +1062,6 @@ async function loginAndDownload(){
       }
     }
 
-    // Fallback endpoints
     const apiEndpoints=flightApiUrl?[flightApiUrl]:[
       'https://multipass.wizzair.com/w6/subscriptions/json/flight-search',
       'https://multipass.wizzair.com/w6/subscriptions/api/flight-search'
@@ -861,8 +1070,15 @@ async function loginAndDownload(){
     // ─── Step 6: Download flights ───
     L('═══ Step 6: Downloading flights ═══');
 
-    const dates=[];const today=new Date();
-    for(let i=0;i<4;i++){const d=new Date(today);d.setDate(today.getDate()+i);dates.push(fD(d))}
+    // Use custom date range or default to 4 days
+    const dates=[];
+    if(dlStart&&dlEnd){
+      const range=dRng(dlStart,dlEnd);
+      dates.push(...range.slice(0,MAX_DAYS));
+    }else{
+      const today=new Date();
+      for(let i=0;i<MAX_DAYS;i++){const d=new Date(today);d.setDate(today.getDate()+i);dates.push(fD(d))}
+    }
     L(`Dates: ${dates.join(', ')}`);
 
     const tasks=[];const seen=new Set();
@@ -887,7 +1103,9 @@ async function loginAndDownload(){
 
       const t=tasks[i];
       setDLProg((i/tasks.length)*100);
-      showDL(`${t.o}→${t.d} ${fDMY(t.dt)} [${i+1}/${tasks.length}]`);
+      const oInfo=getAirportInfo(t.o);
+      const dInfo=getAirportInfo(t.d);
+      showDL(`${oInfo.city}→${dInfo.city} [${i+1}/${tasks.length}]`);
 
       try{
         await sleep(400+Math.random()*400);
@@ -1025,29 +1243,40 @@ async function doSearch(){
   const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
   if(!val.length){sR('mg-w','No data.');return}
   const lu=buildLU(val);
-  switch(mode){case'dep':sDep(lu);break;case'dest':sDest(lu);break;case'rt':sRT(lu);break;case'trip':sTrip(lu);break}}
+  switch(mode){case'dep':sDep(lu);break;case'dest':sDest(lu);break;case'rt':sRT(lu);break}}
 
-function sDep(lu){const ori=gSel('dL'),s=$('dS').value,e=$('dE').value;
-  if(!ori.length){sR('mg-w','Select origins.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+function sDep(lu){
+  const ori=gSel('dL'),s=$('dS').value,e=$('dE').value;
+  if(!ori.length){sR('mg-w','Select origins.');return}
+  if(!s||!e){sR('mg-w','Set dates.');return}
+  if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
   const dates=dRng(s,e),fl=[];
   ori.forEach(o=>{(lu.bO.get(o)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{fl.push({o,d:r.d,dt:r.dt,f})})})});
   dispDep(fl)}
 
-function sDest(lu){const dst=gSel('sL'),s=$('sS').value,e=$('sE').value;
-  if(!dst.length){sR('mg-w','Select destinations.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+function sDest(lu){
+  const dst=gSel('sL'),s=$('sS').value,e=$('sE').value;
+  if(!dst.length){sR('mg-w','Select destinations.');return}
+  if(!s||!e){sR('mg-w','Set dates.');return}
+  if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
   const dates=dRng(s,e),rl=[];
   dst.forEach(d=>{(lu.bD.get(d)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{rl.push({o:r.o,d,dt:r.dt,f})})})});
   dispDest(rl,dst)}
 
-function sRT(lu){const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=+$('rtMx').value;
+function sRT(lu){
+  const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=+$('rtMx').value;
   if(!s||!e){sR('mg-w','Set dates.');return}
-  const oF=$('rtO').value.toUpperCase().trim(),dF=$('rtD').value.toUpperCase().trim();
-  const oS=oF?new Set(oF.split(/[,;\s]+/).filter(Boolean)):null;
-  const dS=dF?new Set(dF.split(/[,;\s]+/).filter(Boolean)):null;
+  if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
+  const oF=$('rtO').value.trim(),dF=$('rtD').value.trim();
   sR('mg-i','<span class="sp-n"></span> Searching...');
   setTimeout(()=>{const dates=dRng(s,e),res=[],seen=new Set();
-    lu.bO.forEach((routes,orig)=>{if(oS&&!oS.has(orig))return;
-      routes.forEach(r=>{if(dS&&!dS.has(r.d))return;if(!r.fl.length||!dates.includes(r.dt))return;
+    lu.bO.forEach((routes,orig)=>{
+      // Filter by origin (airport, city, or country)
+      if(oF&&!matchesFilter(orig,oF))return;
+      routes.forEach(r=>{
+        // Filter by destination
+        if(dF&&!matchesFilter(r.d,dF))return;
+        if(!r.fl.length||!dates.includes(r.dt))return;
         r.fl.forEach(of=>{(lu.bO.get(r.d)||[]).forEach(rr=>{if(rr.d!==orig||!dates.includes(rr.dt))return;
           const stay=dB(r.dt,rr.dt);if(stay<mn||stay>mx)return;if(!rr.fl.length)return;
           rr.fl.forEach(rf=>{const k=`${orig}|${r.d}|${r.dt}|${rr.dt}`;
@@ -1055,61 +1284,116 @@ function sRT(lu){const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=
             res.push({o:orig,d:r.d,oD:r.dt,rD:rr.dt,oF:of,rF:rf,stay})})})})})});
     res.sort((a,b)=>a.stay-b.stay);dispRT(res)},50)}
 
-function sTrip(lu){const homes=gSel('tL'),s=$('tS').value,e=$('tE').value,mE=+$('tH').value,mD=+$('tMn').value;
-  if(!homes.length){sR('mg-w','Select homes.');return}if(!s||!e){sR('mg-w','Set dates.');return}
-  sR('mg-i','<span class="sp-n"></span> Searching...');
-  setTimeout(()=>{const dates=dRng(s,e),trips=[];
-    const gF=(a,b,d)=>lu.bK.get(`${a}|${b}|${d}`)||[];
-    function vC(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return pT(f2.departure)>=pT(f1.arrival)+MIN_LAY}
-    homes.forEach(h=>{const hR=lu.bO.get(h)||[];const dd=new Set(hR.map(r=>r.d));
-      dd.forEach(d1=>{if(!(lu.bO.get(d1)||[]).some(r=>r.d===h))return;
-        dates.forEach(dt1=>{gF(h,d1,dt1).forEach(f1=>{dates.forEach(dt2=>{if(dt2<dt1)return;
-          gF(d1,h,dt2).forEach(f2=>{if(!vC(f1,dt1,f2,dt2))return;const dy=dB(dt1,dt2);if(dy<mD)return;
-            trips.push({h,hops:1,path:[h,d1,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:h,dt:dt2,f:f2}]})})})})})});
-      if(mE>=1)dd.forEach(d1=>{(lu.bO.get(d1)||[]).forEach(r=>{const d2=r.d;if(d2===h)return;
-        if(!(lu.bO.get(d2)||[]).some(rr=>rr.d===h))return;
-        dates.forEach(dt1=>{const l1=gF(h,d1,dt1);if(!l1.length)return;const f1=l1[0];
-          dates.forEach(dt2=>{if(dt2<dt1)return;for(const f2 of gF(d1,d2,dt2)){if(!vC(f1,dt1,f2,dt2))continue;
-            dates.forEach(dt3=>{if(dt3<dt2)return;for(const f3 of gF(d2,h,dt3)){if(!vC(f2,dt2,f3,dt3))continue;
-              const dy=dB(dt1,dt3);if(dy<mD)continue;
-              trips.push({h,hops:2,path:[h,d1,d2,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:d2,dt:dt2,f:f2},{from:d2,to:h,dt:dt3,f:f3}]});return}});break}})})})})});
-    dispTrip(trips)},50)}
-
 function sR(c,h){$('res').innerHTML=`<div class="mg ${c}">${h}</div>`}
+
+// Enhanced flight card with full details
+function fC(o,d,dt,f){
+  const oInfo=getAirportInfo(o);
+  const dInfo=getAirportInfo(d);
+  const depTime=fDT(dt,f.departure);
+  const arrTime=fDT(dt,f.arrival);
+
+  return`<div class="fc">
+    <div class="fc-r">
+      <span class="rt">${oInfo.city} → ${dInfo.city}</span>
+      <span class="bg bg-d">Direct</span>
+    </div>
+    <div class="flight-detail">
+      <div class="flight-info">
+        <div class="flight-loc">
+          <div class="country">🌍 ${oInfo.country}</div>
+          <div class="city">${oInfo.city}</div>
+          <div class="airport">${oInfo.airport} (${o})</div>
+          <div class="flight-time">🛫 ${depTime}</div>
+        </div>
+        <div class="flight-loc">
+          <div class="country">🌍 ${dInfo.country}</div>
+          <div class="city">${dInfo.city}</div>
+          <div class="airport">${dInfo.airport} (${d})</div>
+          <div class="flight-time">🛬 ${arrTime}</div>
+        </div>
+      </div>
+      ${f.flightCode?`<div style="margin-top:8px"><span class="flight-num">✈️ Flight: ${f.flightCode}</span></div>`:''}
+    </div>
+    <a href="${bU(o,d,dt)}" target="_blank" class="bk">🎫 Book Flight</a>
+  </div>`;
+}
 
 function dispDep(fl){const R=$('res');if(!fl.length){sR('mg-w','No flights.');return}
   const bD={};fl.forEach(f=>{if(!bD[f.dt])bD[f.dt]=[];bD[f.dt].push(f)});
   let h=`<div class="mg mg-s">Found <strong>${fl.length}</strong> flights</div>`;
-  Object.keys(bD).sort().forEach(d=>{h+=`<div class="dh">${fDD(d)} — ${bD[d].length}</div>`;bD[d].forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
+  Object.keys(bD).sort().forEach(d=>{
+    const[y,m,day]=d.split('-');
+    h+=`<div class="dh">📅 ${day}/${m}/${y} — ${bD[d].length} flights</div>`;
+    bD[d].forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});
+  R.innerHTML=h}
 
 function dispDest(rl,dst){const R=$('res');if(!rl.length){sR('mg-w','No routes.');return}
   const bD={};rl.forEach(f=>{if(!bD[f.d])bD[f.d]=[];bD[f.d].push(f)});
   let h=`<div class="mg mg-s">Found <strong>${rl.length}</strong> routes</div>`;
-  Object.keys(bD).sort().forEach(d=>{h+=`<div class="deh">🎯 ${aD(d)} (${bD[d].length})</div>`;bD[d].slice(0,30).forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
+  Object.keys(bD).sort().forEach(d=>{
+    const dInfo=getAirportInfo(d);
+    h+=`<div class="deh">🎯 ${dInfo.city}, ${dInfo.country} (${bD[d].length})</div>`;
+    bD[d].slice(0,30).forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});
+  R.innerHTML=h}
 
 function dispRT(res){const R=$('res');if(!res.length){sR('mg-w','No round trips.');return}
   let h=`<div class="mg mg-s">Found <strong>${res.length}</strong> round trips</div>`;
-  res.slice(0,100).forEach(r=>{h+=`<div class="fc"><div class="fc-r"><span class="rt">${aS(r.o)} ↔ ${aS(r.d)}</span><span class="bg bg-d">${r.stay}d</span></div>
-    <div class="lb"><strong>Out:</strong> ${fDD(r.oD)} · <span class="m">${fT(r.oF.departure)}</span>→<span class="m">${fT(r.oF.arrival)}</span>
-    <a href="${bU(r.o,r.d,r.oD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a><br>
-    <strong>Ret:</strong> ${fDD(r.rD)} · <span class="m">${fT(r.rF.departure)}</span>→<span class="m">${fT(r.rF.arrival)}</span>
-    <a href="${bU(r.d,r.o,r.rD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a></div></div>`});
-  R.innerHTML=h}
+  res.slice(0,100).forEach(r=>{
+    const oInfo=getAirportInfo(r.o);
+    const dInfo=getAirportInfo(r.d);
+    const outDep=fDT(r.oD,r.oF.departure);
+    const outArr=fDT(r.oD,r.oF.arrival);
+    const retDep=fDT(r.rD,r.rF.departure);
+    const retArr=fDT(r.rD,r.rF.arrival);
 
-function dispTrip(trips){const R=$('res');if(!trips.length){sR('mg-w','No trips.');return}
-  const bH={1:[],2:[]};trips.forEach(t=>{if(bH[t.hops])bH[t.hops].push(t)});
-  let h=`<div class="mg mg-s">Found <strong>${trips.length}</strong> trips</div>`;
-  [1,2].forEach(hp=>{if(!bH[hp].length)return;
-    h+=`<div class="deh" style="background:var(--acc2)">${hp===1?'Direct':'+1 Stop'} (${bH[hp].length})</div>`;
-    bH[hp].slice(0,20).forEach(t=>{
-      h+=`<div class="fc" style="border-left:3px solid var(--acc2)"><div style="margin-bottom:6px">${t.path.map(p=>`<span class="m" style="color:var(--acc)">${p}</span>`).join(' → ')}</div>`;
-      t.legs.forEach((l,i)=>{h+=`<div style="font-size:.74rem;padding:2px 0">${fDD(l.dt)} ${l.from}→${l.to} <span class="m">${fT(l.f.departure)}</span></div>`});
-      h+='</div>'})});
+    h+=`<div class="fc">
+      <div class="fc-r">
+        <span class="rt">${oInfo.city} ↔ ${dInfo.city}</span>
+        <span class="bg bg-d">${r.stay} days</span>
+      </div>
+      <div class="flight-detail">
+        <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bdr)">
+          <strong style="color:var(--acc)">Outbound Flight</strong>
+          <div class="flight-info" style="margin-top:6px">
+            <div class="flight-loc">
+              <div class="country">🌍 ${oInfo.country}</div>
+              <div class="city">${oInfo.city}</div>
+              <div class="airport">${oInfo.airport} (${r.o})</div>
+              <div class="flight-time">🛫 ${outDep}</div>
+            </div>
+            <div class="flight-loc">
+              <div class="country">🌍 ${dInfo.country}</div>
+              <div class="city">${dInfo.city}</div>
+              <div class="airport">${dInfo.airport} (${r.d})</div>
+              <div class="flight-time">🛬 ${outArr}</div>
+            </div>
+          </div>
+          ${r.oF.flightCode?`<div style="margin-top:6px"><span class="flight-num">✈️ ${r.oF.flightCode}</span></div>`:''}
+          <a href="${bU(r.o,r.d,r.oD)}" target="_blank" class="bk" style="margin-top:6px">🎫 Book Outbound</a>
+        </div>
+        <div>
+          <strong style="color:var(--acc2)">Return Flight</strong>
+          <div class="flight-info" style="margin-top:6px">
+            <div class="flight-loc">
+              <div class="country">🌍 ${dInfo.country}</div>
+              <div class="city">${dInfo.city}</div>
+              <div class="airport">${dInfo.airport} (${r.d})</div>
+              <div class="flight-time">🛫 ${retDep}</div>
+            </div>
+            <div class="flight-loc">
+              <div class="country">🌍 ${oInfo.country}</div>
+              <div class="city">${oInfo.city}</div>
+              <div class="airport">${oInfo.airport} (${r.o})</div>
+              <div class="flight-time">🛬 ${retArr}</div>
+            </div>
+          </div>
+          ${r.rF.flightCode?`<div style="margin-top:6px"><span class="flight-num">✈️ ${r.rF.flightCode}</span></div>`:''}
+          <a href="${bU(r.d,r.o,r.rD)}" target="_blank" class="bk" style="margin-top:6px">🎫 Book Return</a>
+        </div>
+      </div>
+    </div>`});
   R.innerHTML=h}
-
-function fC(o,d,dt,f){return`<div class="fc"><div class="fc-r"><span class="rt">${aS(o)} → ${aS(d)}</span><span class="bg bg-d">Direct</span></div>
-  <div class="fc-i">📅 ${fDD(dt)} · ✈️ <span class="m">${fT(f.departure)}</span> → 🛬 <span class="m">${fT(f.arrival)}</span></div>
-  <a href="${bU(o,d,dt)}" target="_blank" class="bk">🎫 Book</a></div>`}
 
 async function init(){
   L(`Init v${V}`);await initDB();loadF();renderF();loadGH();
@@ -1117,9 +1401,9 @@ async function init(){
   if(proxy){$('proxySetup').classList.add('hd-n');$('proxyUrl').value=proxy;$('gPx').value=proxy}
   else{$('loginCard').style.opacity='.5'}
   $('workerCode').textContent=workerCode();
-  const today=fD(new Date()),mx=fD((()=>{const d=new Date();d.setDate(d.getDate()+3);return d})());
-  ['dS','sS','tS','rtS'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
-  ['dE','sE','tE','rtE'].forEach(id=>{const e=$(id);if(e){e.value=mx;e.min=today}});
+  const today=fD(new Date()),mx=fD((()=>{const d=new Date();d.setDate(d.getDate()+MAX_DAYS-1);return d})());
+  ['dS','sS','rtS','dlDateStart'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
+  ['dE','sE','rtE','dlDateEnd'].forEach(id=>{const e=$(id);if(e){e.value=mx;e.min=today}});
   await upSt();LS('Ready')}
 
 document.addEventListener('DOMContentLoaded',()=>{
@@ -1172,6 +1456,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   function buildLog(){return`WIZZ AYCF LOG — ${new Date().toISOString()}\nVersion: ${V}\nProxy: ${getProxy()||'NOT SET'}\nCookies: ${cookieJar.substring(0,200)}\n\n${logs.map(l=>l.l).join('\n')}`}
   $('bLE').onclick=()=>{const b=new Blob([buildLog()],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`aycf-log.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a)};
   $('bLCopy').onclick=()=>{navigator.clipboard.writeText(buildLog()).then(()=>{$('bLCopy').textContent='✅';setTimeout(()=>{$('bLCopy').textContent='📋 Copy'},1500)})};
+
+  // Date range validation
+  ['dlDateStart','dlDateEnd'].forEach(id=>{
+    $(id).onchange=()=>validateDateRange('dlDateStart','dlDateEnd','dateWarn');
+  });
+  ['dS','dE'].forEach(id=>{
+    $(id).onchange=()=>validateDateRange('dS','dE','searchDateWarn');
+  });
+
   init()});
 </script>
 </body>
