@@ -27,7 +27,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   min-height:100dvh;overflow-x:hidden;padding-bottom:calc(16px + var(--sab));
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 
-/* Header */
 .hd{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--bdr);padding:10px 14px}
@@ -40,15 +39,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem}
 .ib:active{background:var(--s2);border-color:var(--acc)}
 
-/* Container */
 .ct{max-width:680px;margin:0 auto;padding:10px 12px}
 
-/* Cards */
 .cd{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;margin-bottom:10px}
 .cd-t{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
   color:var(--tx2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 
-/* Status */
 .st{border-radius:var(--r);padding:14px;margin-bottom:10px;border:1px solid}
 .st-e{background:rgba(248,81,73,.06);border-color:rgba(248,81,73,.3)}
 .st-o{background:rgba(63,185,80,.06);border-color:rgba(63,185,80,.3)}
@@ -60,7 +56,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sn{font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:600;color:var(--grn)}
 .sl{font-size:.6rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em}
 
-/* Buttons */
 .bt{display:inline-flex;align-items:center;gap:4px;padding:10px 14px;border-radius:var(--rs);
   border:none;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;
   transition:all .15s;white-space:nowrap;min-height:40px;-webkit-tap-highlight-color:transparent}
@@ -76,7 +71,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .bt-f{width:100%;justify-content:center}
 .rw{display:flex;gap:6px;flex-wrap:wrap}.rw.mb{margin-bottom:10px}
 
-/* Inputs */
 .ip{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);
   padding:11px 12px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.88rem;min-height:42px}
 .ip::placeholder{color:var(--tx3)}.ip:focus{outline:none;border-color:var(--acc)}
@@ -86,7 +80,6 @@ select.ip{-webkit-appearance:none;appearance:none;
   background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 .ip-row{display:flex;gap:8px;margin-bottom:8px}.ip-row .ip{flex:1}
 
-/* Favorites */
 .fav-c{display:flex;flex-wrap:wrap;gap:5px;min-height:28px}
 .fav{display:inline-flex;align-items:center;gap:3px;background:rgba(88,166,255,.1);
   border:1px solid rgba(88,166,255,.2);border-radius:14px;padding:4px 8px 4px 10px;font-size:.76rem}
@@ -96,7 +89,6 @@ select.ip{-webkit-appearance:none;appearance:none;
   color:var(--red);border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
 .fav-e{color:var(--tx3);font-size:.78rem;font-style:italic}
 
-/* Tabs */
 .tb{display:flex;background:var(--s1);border-radius:var(--r);padding:3px;
   margin-bottom:10px;border:1px solid var(--bdr);overflow-x:auto;gap:2px}
 .t{flex:1;min-width:0;padding:9px 4px;border:none;background:none;color:var(--tx3);
@@ -105,7 +97,6 @@ select.ip{-webkit-appearance:none;appearance:none;
 .t.on{background:var(--acc);color:#0d1117;font-weight:700}
 .pn{display:none}.pn.on{display:block}
 
-/* Airport list */
 .ap-b{max-height:220px;overflow-y:auto;border:1px solid var(--bdr);border-radius:var(--rs);
   background:var(--bg);-webkit-overflow-scrolling:touch}
 .ap-gh{position:sticky;top:0;z-index:2;background:var(--s2);padding:8px 10px;font-size:.72rem;
@@ -123,7 +114,6 @@ select.ip{-webkit-appearance:none;appearance:none;
 .ap-c .an{color:var(--tx3);font-size:.64rem}
 .ap-c.fv{border-color:var(--ylw)}
 
-/* Date grid */
 .dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
 .dg label{display:block;font-size:.68rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
 .dg input[type="date"]{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);
@@ -131,18 +121,15 @@ select.ip{-webkit-appearance:none;appearance:none;
 .dg input[type="date"]:focus{outline:none;border-color:var(--acc)}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
-/* Options */
 .or{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .or label{font-size:.76rem;font-weight:600;color:var(--tx2)}
 
-/* Search button */
 .sb{width:100%;padding:14px;border:none;border-radius:var(--r);background:var(--acc);color:#0d1117;
   font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin:12px 0;
   min-height:48px}
 .sb:active{filter:brightness(.8);transform:scale(.99)}
 .sb:disabled{opacity:.3;cursor:not-allowed}
 
-/* Results */
 .rs{margin-top:8px}
 .mg{padding:12px;border-radius:var(--rs);margin-bottom:8px;font-size:.82rem;line-height:1.5}
 .mg-i{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);color:#79c0ff}
@@ -166,7 +153,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 .bk:active{filter:brightness(.8)}
 .lb{background:var(--s2);border-radius:5px;padding:8px;margin-top:6px;font-size:.74rem;line-height:1.6;color:var(--tx2)}
 
-/* Modal */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center}
 .mo.op{display:flex}
 .mo-s{width:100%;max-width:520px;background:var(--s1);border-radius:14px 14px 0 0;
@@ -175,30 +161,25 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 .mo-h{width:36px;height:3px;background:var(--tx3);border-radius:2px;margin:0 auto 12px}
 .mo-t{font-size:1rem;font-weight:700;margin-bottom:12px}
 
-/* Progress */
 .pg{height:4px;background:rgba(88,166,255,.12);border-radius:2px;overflow:hidden;margin:6px 0}
 .pg .fl{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px;transition:width .3s;width:0%}
 
-/* Log */
 .la{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);max-height:280px;
   overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;font-size:.65rem;
   line-height:1.5;color:var(--tx3);white-space:pre-wrap;word-break:break-all}
 .la .e{color:var(--red)}.la .w{color:var(--ylw)}.la .s{color:var(--grn)}.la .a{color:var(--acc)}
 
-/* Collapsible */
 .cl-h{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
 .cl-h .tg{font-size:.65rem;color:var(--tx3);transition:transform .2s}
 .cl-h.op .tg{transform:rotate(180deg)}
 .cl-b{display:none;margin-top:10px}.cl-b.op{display:block}
 
-/* Steps */
 .stp{counter-reset:step;margin:10px 0}
 .sp{counter-increment:step;padding-left:30px;position:relative;margin-bottom:10px;font-size:.8rem;line-height:1.5;color:var(--tx2)}
 .sp::before{content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;
   background:var(--acc);color:var(--bg);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
 .sp strong{color:var(--tx)}
 
-/* Misc */
 .hd-n{display:none!important}
 .sep{border:none;border-top:1px solid var(--bdr);margin:12px 0}
 .sp-n{display:inline-block;width:14px;height:14px;border:2px solid rgba(88,166,255,.2);
@@ -218,10 +199,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="hd">
 <div class="hd-r">
-  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.1</span></div>
+  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.3</span></div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
     <button class="ib" id="bGH" title="Settings">⚙️</button>
@@ -231,7 +211,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <main class="ct">
 
-<!-- STATUS -->
 <div class="st st-e" id="stC">
   <div class="st-i" id="stI">📭</div>
   <div class="st-h" id="stH">No Flight Data</div>
@@ -244,7 +223,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
 </div>
 
-<!-- PROXY SETUP (shown when no proxy configured) -->
 <div class="cd" id="proxySetup">
   <div class="cd-t">🔧 One-Time Setup (required)</div>
   <p style="font-size:.8rem;color:var(--tx2);margin-bottom:10px">
@@ -274,7 +252,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div id="proxyMsg" style="margin-top:6px"></div>
 </div>
 
-<!-- LOGIN & DOWNLOAD -->
 <div class="cd" id="loginCard">
   <div class="cd-t">🔑 Wizz Air Login & Download</div>
   <div class="ip-row">
@@ -293,7 +270,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div id="loginMsg"></div>
 </div>
 
-<!-- DATA MANAGEMENT -->
 <div class="cd">
   <div class="cd-t">📦 Data Management</div>
   <div class="rw mb">
@@ -307,7 +283,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div id="dMsg"></div>
 </div>
 
-<!-- FAVORITES -->
 <div class="cd">
   <div class="cd-t">⭐ Favorites</div>
   <div class="ip-row">
@@ -317,7 +292,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div class="fav-c" id="favC"><span class="fav-e">No favorites</span></div>
 </div>
 
-<!-- MODE TABS -->
 <div class="tb">
   <button class="t on" data-m="dep">✈️ From</button>
   <button class="t" data-m="dest">🎯 To</button>
@@ -325,7 +299,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <button class="t" data-m="trip">🗓️ Multi-Hop</button>
 </div>
 
-<!-- FROM ORIGIN -->
 <div class="pn on" id="p-dep">
   <div class="cd">
     <div class="cd-t">🛫 Origin Airports</div>
@@ -343,7 +316,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
 </div>
 
-<!-- TO DESTINATION -->
 <div class="pn" id="p-dest">
   <div class="cd">
     <div class="cd-t">🎯 Destination Airports</div>
@@ -361,7 +333,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
 </div>
 
-<!-- ROUND TRIP -->
 <div class="pn" id="p-rt">
   <div class="cd">
     <div class="cd-t">🔄 Round Trip — Anywhere ↔ Anywhere</div>
@@ -381,7 +352,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
 </div>
 
-<!-- MULTI-HOP -->
 <div class="pn" id="p-trip">
   <div class="cd">
     <div class="cd-t">🏠 Home Airports</div>
@@ -411,10 +381,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 <button class="sb" id="bSrch">🔍 Search Flights</button>
 <div class="rs" id="res"></div>
 
-<div class="ft">Not affiliated with Wizz Air. <a href="https://github.com/vloss3/wizz-aycf-route-finder" target="_blank">GitHub</a> · <a href="https://discord.gg/k3eRaSBez4" target="_blank">Discord</a></div>
+<div class="ft">Not affiliated with Wizz Air. <a href="https://github.com/palayax/wizz-aycf-web" target="_blank">GitHub</a></div>
 </main>
 
-<!-- SETTINGS MODAL -->
 <div class="mo" id="mGH">
 <div class="mo-s">
   <div class="mo-h"></div>
@@ -441,7 +410,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 </div>
 </div>
 
-<!-- LOG MODAL -->
 <div class="mo" id="mLog">
 <div class="mo-s">
   <div class="mo-h"></div>
@@ -459,9 +427,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  WIZZ AYCF WEB v3.1 — Complete mobile web app
+//  WIZZ AYCF WEB v3.3 — Fixed Keycloak authentication
 // ══════════════════════════════════════════════════════
-const V='3.2.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
+const V='3.3.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
 const CC={
 TLV:'Israel',ETH:'Israel',VDA:'Israel',
 LTN:'UK',LGW:'UK',STN:'UK',LHR:'UK',BHX:'UK',BRS:'UK',MAN:'UK',EDI:'UK',GLA:'UK',LPL:'UK',NCL:'UK',EMA:'UK',ABZ:'UK',CWL:'UK',DSA:'UK',
@@ -482,20 +450,17 @@ BEG:'Serbia',PRN:'Kosovo',SKP:'N.Macedonia',TGD:'Montenegro',SJJ:'Bosnia',ZAG:'C
 TIA:'Albania',PRG:'Czechia',BTS:'Slovakia',LJU:'Slovenia',RIX:'Latvia',VNO:'Lithuania',TLL:'Estonia',KIV:'Moldova',KBP:'Ukraine',IEV:'Ukraine'
 };
 
-// STATE
 let db=null,airp=new Map(),favs=[],mode='dep',logs=[],
     downloading=false,paused=false,stopped=false;
 
 const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
-// ══ LOGGING ══
 function L(m,c=''){const ts=new Date().toISOString().slice(11,23);const l=`[${ts}] ${m}`;logs.push({l,c});
   if(logs.length>5000)logs=logs.slice(-5000);console.log('[AYCF]',m);
   const a=$('lA');if(a){const d=document.createElement('div');d.className=c;d.textContent=l;a.appendChild(d);a.scrollTop=a.scrollHeight}
   $('lCnt').textContent=`(${logs.length})`}
 function LE(m){L('❌ '+m,'e')}function LW(m){L('⚠️ '+m,'w')}function LS(m){L('✅ '+m,'s')}function LA(m){L('🌐 '+m,'a')}
 
-// ══ UTILS ══
 function fD(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function fDMY(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}-${m}-${y}`}
 function fDD(s){if(!s)return'';const[y,m,d]=s.split('-');const dt=new Date(+y,+m-1,+d);return`${dt.toLocaleDateString('en',{weekday:'short'})} ${d}-${m}-${y}`}
@@ -510,7 +475,6 @@ function dB(d1,d2){const[y1,m1,dd1]=d1.split('-').map(Number);const[y2,m2,dd2]=d
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function getProxy(){return localStorage.getItem('wz_proxy')||''}
 
-// ══ INDEXEDDB ══
 function initDB(){return new Promise((ok,no)=>{L('Opening IndexedDB...');const r=indexedDB.open(DB_N,DB_V);
   r.onerror=()=>{LE('DB error');no(r.error)};r.onsuccess=()=>{db=r.result;LS('DB ready');ok(db)};
   r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('flights'))d.createObjectStore('flights',{keyPath:'id'});
@@ -519,7 +483,6 @@ function dbP(s,d){return new Promise((ok,no)=>{const t=db.transaction(s,'readwri
 function dbA(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readonly');const r=t.objectStore(s).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}
 function dbC(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readwrite');t.objectStore(s).clear().onsuccess=ok;t.onerror=()=>no(t.error)})}
 
-// ══ FAVORITES ══
 function loadF(){try{favs=JSON.parse(localStorage.getItem('wz_fav3')||'[]')}catch{favs=[]}L(`Loaded ${favs.length} favorites`)}
 function saveF(){localStorage.setItem('wz_fav3',JSON.stringify(favs))}
 function addF(c){c=c.toUpperCase().trim();if(!c||c.length<2||c.length>3)return false;
@@ -530,10 +493,8 @@ function renderF(){const c=$('favC');if(!favs.length){c.innerHTML='<span class="
   c.innerHTML=favs.map(f=>`<span class="fav"><span class="c">${f.code}</span><span class="n">${f.country||''}</span><button class="x" data-c="${f.code}">×</button></span>`).join('');
   c.querySelectorAll('.x').forEach(b=>b.onclick=e=>{e.stopPropagation();rmF(b.dataset.c)})}
 
-// ══ AIRPORT INFO ══
 function buildAI(data){airp=new Map();data.forEach(d=>{[d.origin,d.dest].forEach(c=>{if(!airp.has(c))airp.set(c,{code:c,n:c,c:CC[c]||''})})});L(`${airp.size} airports`)}
 
-// ══ AIRPORT LIST ══
 function renderL(cid,sid){const c=$(cid);if(!c)return;
   if(!airp.size){c.innerHTML='<div style="padding:14px;text-align:center;color:var(--tx3);font-size:.78rem">No airports. Import or download data.</div>';return}
   const bc={};airp.forEach((i,k)=>{const co=i.c||'Other';if(!bc[co])bc[co]=[];bc[co].push(i)});
@@ -557,7 +518,6 @@ function renderAL(){renderL('dL','dSr');renderL('sL','sSr');renderL('tL','tSr')}
 function gSel(cid){const c=$(cid);return c?[...c.querySelectorAll('.ap-c.sl')].map(ch=>ch.dataset.code):[]}
 function sSel(cid,codes){const c=$(cid);if(!c)return;const s=new Set(codes);c.querySelectorAll('.ap-c').forEach(ch=>ch.classList.toggle('sl',s.has(ch.dataset.code)))}
 
-// ══ STATUS ══
 async function upSt(){const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
   L(`DB: ${all.length} total, ${val.length} valid`);
   if(!val.length){$('stC').className='st st-e';$('stI').textContent='📭';$('stH').textContent='No Flight Data';
@@ -572,12 +532,9 @@ async function upSt(){const all=await dbA('flights');const val=all.filter(d=>Dat
 }
 
 // ══ PROXY / API ══
-let cookieJar=''; // Track all cookies
-let xsrfToken=''; // Track XSRF token separately
+let cookieJar='';
+let xsrfToken='';
 
-function getProxy(){return localStorage.getItem('wz_proxy')||''}
-
-// Enhanced proxy function with redirect following
 async function px(url,opts={}){
   const proxy=getProxy();if(!proxy)throw new Error('Proxy not configured');
   const maxRedirects=opts.maxRedirects||5;
@@ -589,23 +546,15 @@ async function px(url,opts={}){
     const headers={'X-Target':currentUrl};
     if(cookieJar)headers['X-Cookies']=cookieJar;
     if(opts.contentType)headers['Content-Type']=opts.contentType;
-    // Forward XSRF token if we have one
     if(xsrfToken)headers['X-XSRF-TOKEN']=xsrfToken;
-    // Forward any extra headers
-    if(opts.extraHeaders){Object.entries(opts.extraHeaders).forEach(([k,v])=>{headers[k]=v})}
 
     const fOpts={method:(attempt===1?opts.method:null)||'GET',headers};
-    // Only send body on first request (not on redirects)
     if(attempt===1&&opts.body)fOpts.body=typeof opts.body==='string'?opts.body:JSON.stringify(opts.body);
-    
-    const meth=fOpts.method||'GET';
-    LA(`[${attempt}] ${meth} ${currentUrl}`);
-    L(`  Headers sent: ${Object.keys(headers).filter(h=>h!=='X-Cookies').join(', ')}`);
-    if(cookieJar)L(`  Cookies: ${cookieJar.substring(0,80)}${cookieJar.length>80?'...':''}`);
-    
+
+    LA(`[${attempt}] ${fOpts.method||'GET'} ${currentUrl.substring(0,100)}${currentUrl.length>100?'...':''}`);
+
     const resp=await fetch(proxy,fOpts);
-    
-    // Capture ALL cookies from response
+
     const sc=resp.headers.get('X-Set-Cookies');
     if(sc){
       try{
@@ -613,60 +562,38 @@ async function px(url,opts={}){
         arr.forEach(c=>{
           const parts=c.split(';')[0];
           const [name]=parts.split('=');
-          // Update or add cookie
           const existing=cookieJar.split('; ').filter(x=>x&&!x.startsWith(name.trim()+'='));
           existing.push(parts);
           cookieJar=existing.join('; ');
-          // Extract XSRF token
           if(name.trim()==='XSRF-TOKEN'){
             xsrfToken=decodeURIComponent(parts.split('=').slice(1).join('='));
-            L(`  🔑 XSRF token captured: ${xsrfToken.substring(0,20)}...`);
+            L(`  🔑 XSRF: ${xsrfToken.substring(0,20)}...`);
           }
         });
-        L(`  🍪 Cookies updated (${arr.length} new): ${arr.map(c=>c.split('=')[0]).join(', ')}`);
-      }catch(e){LW(`Cookie parse error: ${e.message}`)}
+        L(`  🍪 +${arr.length} cookies`);
+      }catch(e){}
     }
-    
-    // Check for redirect
+
     const loc=resp.headers.get('X-Location');
     const xStatus=resp.headers.get('X-Status');
     if(loc){
-      L(`  ↪ Redirect ${xStatus||'3xx'} → ${loc}`);
-      // Resolve relative URLs
-      if(loc.startsWith('/')){
-        const base=new URL(currentUrl);
-        currentUrl=base.origin+loc;
-      }else if(loc.startsWith('http')){
-        currentUrl=loc;
-      }else{
-        currentUrl=new URL(loc,currentUrl).href;
-      }
-      continue; // Follow redirect
+      L(`  ↪ ${xStatus||'3xx'} → ${loc.substring(0,80)}...`);
+      if(loc.startsWith('/'))currentUrl=new URL(currentUrl).origin+loc;
+      else if(loc.startsWith('http'))currentUrl=loc;
+      else currentUrl=new URL(loc,currentUrl).href;
+      continue;
     }
-    
-    // Not a redirect — return response with metadata
+
     const status=parseInt(xStatus)||resp.status;
-    const ct=resp.headers.get('Content-Type')||'';
-    
-    // Clone body so we can peek and still return it
     const bodyText=await resp.text();
-    L(`  ✓ Response: HTTP ${status} | ${ct.split(';')[0]} | ${bodyText.length} bytes`);
-    L(`  Body preview: ${bodyText.substring(0,150).replace(/\n/g,' ')}${bodyText.length>150?'...':''}`);
-    
-    return{
-      status,
-      headers:resp.headers,
-      url:currentUrl,
-      redirected:attempt>1,
-      text:()=>Promise.resolve(bodyText),
-      json:()=>Promise.resolve(JSON.parse(bodyText)),
-      bodyText // Direct access for logging
-    };
+    L(`  ✓ ${status} | ${bodyText.length} bytes`);
+
+    return{status,headers:resp.headers,url:currentUrl,redirected:attempt>1,
+      text:()=>Promise.resolve(bodyText),json:()=>Promise.resolve(JSON.parse(bodyText)),bodyText};
   }
-  throw new Error(`Too many redirects (${maxRedirects}) following ${url}`);
+  throw new Error(`Too many redirects`);
 }
 
-// ══ CLOUDFLARE WORKER CODE ══
 function workerCode(){return`export default{
 async fetch(r,env,ctx){
 const cors={'Access-Control-Allow-Origin':'*',
@@ -676,12 +603,11 @@ const cors={'Access-Control-Allow-Origin':'*',
 'Access-Control-Max-Age':'86400'};
 if(r.method==='OPTIONS')return new Response(null,{headers:cors});
 const t=r.headers.get('X-Target');
-if(!t)return new Response(JSON.stringify({error:'Need X-Target header',ok:false}),{status:400,headers:{...cors,'Content-Type':'application/json'}});
-let url;
-try{url=new URL(t)}catch{return new Response(JSON.stringify({error:'Invalid URL'}),{status:400,headers:{...cors,'Content-Type':'application/json'}})}
-if(!url.hostname.endsWith('wizzair.com'))return new Response(JSON.stringify({error:'Only wizzair.com allowed'}),{status:403,headers:{...cors,'Content-Type':'application/json'}});
+if(!t)return new Response(JSON.stringify({error:'Need X-Target header'}),{status:400,headers:{...cors,'Content-Type':'application/json'}});
+let url;try{url=new URL(t)}catch{return new Response(JSON.stringify({error:'Invalid URL'}),{status:400,headers:{...cors,'Content-Type':'application/json'}})}
+if(!url.hostname.endsWith('wizzair.com'))return new Response(JSON.stringify({error:'Only wizzair.com'}),{status:403,headers:{...cors,'Content-Type':'application/json'}});
 const h=new Headers();
-h.set('User-Agent','Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36');
+h.set('User-Agent','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
 h.set('Accept',r.headers.get('Accept')||'text/html,application/xhtml+xml,application/json,*/*;q=0.8');
 h.set('Accept-Language','en-US,en;q=0.9');
 if(r.headers.get('Content-Type'))h.set('Content-Type',r.headers.get('Content-Type'));
@@ -690,330 +616,272 @@ const xsrf=r.headers.get('X-XSRF-TOKEN');if(xsrf)h.set('X-XSRF-TOKEN',xsrf);
 h.set('Referer','https://multipass.wizzair.com/');
 h.set('Origin','https://multipass.wizzair.com');
 try{
-const resp=await fetch(t,{method:r.method,headers:h,
-body:['GET','HEAD'].includes(r.method)?undefined:await r.arrayBuffer(),redirect:'manual'});
+const resp=await fetch(t,{method:r.method,headers:h,body:['GET','HEAD'].includes(r.method)?undefined:await r.arrayBuffer(),redirect:'manual'});
 const rh=new Headers(cors);
 rh.set('X-Status',String(resp.status));
 const sc=resp.headers.getSetCookie?resp.headers.getSetCookie():[];
 if(sc.length)rh.set('X-Set-Cookies',JSON.stringify(sc));
 if(resp.status>=300&&resp.status<400){
 rh.set('X-Location',resp.headers.get('Location')||'');
-rh.set('Content-Type','application/json');
-return new Response(JSON.stringify({redirect:resp.headers.get('Location'),status:resp.status,cookies:sc.length}),{status:200,headers:rh})}
+return new Response(JSON.stringify({redirect:resp.headers.get('Location')}),{status:200,headers:rh})}
 const ct=resp.headers.get('Content-Type');if(ct)rh.set('Content-Type',ct);
 return new Response(resp.body,{status:resp.status,headers:rh});
 }catch(e){return new Response(JSON.stringify({error:e.message}),{status:502,headers:{...cors,'Content-Type':'application/json'}})}
-}
-};`}
+}};`}
 
-// ══ AUTH & DOWNLOAD ══
+// ══ AUTH & DOWNLOAD — FIXED KEYCLOAK ══
 async function loginAndDownload(){
   if(downloading)return;
   const email=$('wizEmail').value.trim();const pass=$('wizPass').value;
   if(!email||!pass){showDM('e','Enter email and password.');return}
-  if(!getProxy()){showDM('e','Set up proxy first (see above).');return}
+  if(!getProxy()){showDM('e','Set up proxy first.');return}
 
   downloading=true;paused=false;stopped=false;
-  // Reset cookie state for fresh login
   cookieJar='';xsrfToken='';
   $('bLogin').disabled=true;$('bPause').classList.remove('hd-n');$('bStop').classList.remove('hd-n');
-  $('dlProg').classList.remove('hd-n');showDL('Connecting to Wizz Air...');setDLProg(0);
+  $('dlProg').classList.remove('hd-n');showDL('Connecting...');setDLProg(0);
 
   try{
-    // ─── Step 1: Hit login page to get session + CSRF cookies ───
-    L('═══ Step 1: Fetching login page for CSRF token ═══');
-    showDL('Getting session...');
-    
-    const loginR=await px('https://multipass.wizzair.com/w6/subscriptions/auth/login');
-    const loginHtml=await loginR.text();
-    L(`Login page: ${loginR.status}, ${loginHtml.length} bytes, redirected: ${loginR.redirected}`);
+    // ─── Step 1: Navigate to login page (will redirect to Keycloak) ───
+    L('═══ Step 1: Getting Keycloak login page ═══');
+    showDL('Getting login page...');
+
+    const loginR=await px('https://multipass.wizzair.com/w6/subscriptions/auth/login',{maxRedirects:10});
+    const loginHtml=loginR.bodyText;
+    L(`Login page: ${loginR.status}, ${loginHtml.length} bytes`);
     L(`Final URL: ${loginR.url}`);
-    
-    // Extract CSRF from meta tag if not already in cookies
-    if(!xsrfToken){
-      const csrfMeta=loginHtml.match(/<meta\s+name="csrf-token"\s+content="([^"]+)"/);
-      if(csrfMeta){xsrfToken=csrfMeta[1];L(`🔑 CSRF from meta tag: ${xsrfToken.substring(0,20)}...`)}
-      // Also try content="..." name="csrf-token" order
-      if(!xsrfToken){const m2=loginHtml.match(/content="([^"]+)"[^>]*name="csrf-token"/);
-        if(m2){xsrfToken=m2[1];L(`🔑 CSRF from meta (alt): ${xsrfToken.substring(0,20)}...`)}}
+
+    // Check if this is the Keycloak login page
+    const isKeycloak=loginR.url.includes('/auth/realms/')||loginHtml.includes('kc-form-login');
+    L(`Is Keycloak page: ${isKeycloak}`);
+
+    if(!isKeycloak){
+      LE('Did not reach Keycloak login page');
+      throw new Error('Could not reach login page');
     }
-    
-    // Find JS bundle URLs (for endpoint discovery)
-    const jsUrls=[];
-    const jsRe=/(?:src|href)="([^"]*\.js[^"]*)"/g;
-    let jm;while((jm=jsRe.exec(loginHtml))!==null){
-      let u=jm[1];
-      if(u.startsWith('/'))u='https://multipass.wizzair.com'+u;
-      if(u.includes('wizzair'))jsUrls.push(u);
-    }
-    L(`Found ${jsUrls.length} JS bundles: ${jsUrls.map(u=>u.split('/').pop()).join(', ')}`);
-    
-    // ─── Step 2: Discover login endpoint from JS bundles ───
-    L('═══ Step 2: Discovering login API endpoint ═══');
-    showDL('Discovering API...');
-    
-    let discoveredLoginEndpoint=null;
-    let discoveredApiBase=null;
-    
-    // Try fetching JS to find login endpoint
-    for(const jsUrl of jsUrls.slice(0,3)){
-      try{
-        L(`Fetching JS: ${jsUrl.split('/').pop()}`);
-        const jsR=await px(jsUrl);
-        const jsCode=await jsR.text();
-        L(`JS bundle: ${jsCode.length} bytes`);
-        
-        // Search for login-related API patterns
-        const patterns=[
-          /["']([^"']*auth\/login[^"']*)["']/g,
-          /["']([^"']*\/login[^"']*)["']/g,
-          /["']([^"']*\/api\/[^"']*auth[^"']*)["']/g,
-          /login[^{]*url\s*[:=]\s*["']([^"']+)["']/gi,
-          /["'](\/w6\/subscriptions\/[^"']*login[^"']*)["']/g,
-          /["'](\/w6\/subscriptions\/[^"']*auth[^"']*)["']/g,
-        ];
-        
-        const found=new Set();
-        patterns.forEach(p=>{let m;while((m=p.exec(jsCode))!==null){
-          const ep=m[1];
-          if(ep.length<100&&ep.includes('/')&&!ep.includes('.css')&&!ep.includes('.js')&&!ep.includes('.png')){
-            found.add(ep)}}});
-        
-        if(found.size>0){
-          L(`Found potential endpoints in ${jsUrl.split('/').pop()}: ${[...found].join(', ')}`);
-          // Prefer json/auth patterns
-          for(const ep of found){
-            if(ep.includes('json')&&ep.includes('login')){discoveredLoginEndpoint=ep;break}
-            if(ep.includes('auth')&&ep.includes('login')&&!discoveredLoginEndpoint)discoveredLoginEndpoint=ep;
-          }
-        }
-        
-        // Also look for flight search URL pattern
-        const searchPat=/["'](\/w6\/subscriptions\/[^"']*(?:availability|search|flight)[^"']*)["']/g;
-        let sm;while((sm=searchPat.exec(jsCode))!==null){
-          L(`Potential flight API: ${sm[1]}`);}
-          
-        // Look for base API URL
-        const basePat=/["'](https?:\/\/multipass\.wizzair\.com\/w6\/subscriptions\/[^"']*)["']/g;
-        let bm;while((bm=basePat.exec(jsCode))!==null){
-          if(!discoveredApiBase&&bm[1].includes('json'))discoveredApiBase=bm[1];
-        }
-        
-      }catch(e){LW(`JS fetch error: ${e.message}`)}
-    }
-    
-    if(discoveredLoginEndpoint)L(`✅ Discovered login endpoint: ${discoveredLoginEndpoint}`);
-    if(discoveredApiBase)L(`✅ Discovered API base: ${discoveredApiBase}`);
-    
-    // ─── Step 3: Try to authenticate ───
-    L('═══ Step 3: Authenticating ═══');
+
+    // ─── Step 2: Extract and submit Keycloak form ───
+    L('═══ Step 2: Submitting Keycloak credentials ═══');
     showDL('Logging in...');
-    
-    // Build list of endpoints to try (discovered first, then known patterns)
-    const loginEndpoints=[];
-    if(discoveredLoginEndpoint){
-      const ep=discoveredLoginEndpoint.startsWith('http')?discoveredLoginEndpoint:
-        'https://multipass.wizzair.com'+discoveredLoginEndpoint;
-      loginEndpoints.push(ep);
+
+    // Find the form action URL - Keycloak forms look like:
+    // <form id="kc-form-login" action="https://multipass.wizzair.com/auth/realms/w6/login-actions/authenticate?..." method="post">
+    const formMatch=loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i)||
+                    loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i)||
+                    loginHtml.match(/<form[^>]*action="([^"]*authenticate[^"]*)"/i);
+
+    if(!formMatch){
+      L(`Page HTML (first 3000): ${loginHtml.substring(0,3000)}`);
+      LE('Could not find Keycloak login form');
+      throw new Error('Login form not found');
     }
-    loginEndpoints.push(
-      'https://multipass.wizzair.com/w6/subscriptions/auth/login',
-      'https://multipass.wizzair.com/w6/subscriptions/json/auth/login',
-      'https://multipass.wizzair.com/w6/subscriptions/api/auth/login',
-      'https://multipass.wizzair.com/w6/subscriptions/json/login',
-      'https://multipass.wizzair.com/w6/subscriptions/api/login',
-    );
-    // De-duplicate
-    const uniqueEndpoints=[...new Set(loginEndpoints)];
-    
-    let loggedIn=false;
-    
-    // Try each endpoint with multiple body formats
-    for(const ep of uniqueEndpoints){
-      if(loggedIn)break;
-      
-      // Format 1: JSON with _token
-      const bodies=[
-        {email,password:pass,_token:xsrfToken},
-        {email,password:pass},
-        {username:email,password:pass,_token:xsrfToken},
-      ];
-      
-      for(const body of bodies){
-        if(loggedIn)break;
-        try{
-          L(`Trying: POST ${ep}`);
-          L(`  Body: ${JSON.stringify(body).substring(0,100)}`);
-          const r=await px(ep,{method:'POST',contentType:'application/json',
-            body:JSON.stringify(body),maxRedirects:3});
-          const txt=await r.text();
-          L(`  Response: ${r.status} | ${txt.length} bytes`);
-          L(`  Body: ${txt.substring(0,300)}`);
-          
-          // Success indicators
-          if(r.status>=200&&r.status<300&&!txt.includes('"error"')&&!txt.includes('<!DOCTYPE')){
-            loggedIn=true;LS(`✅ Login succeeded at ${ep}`);break}
-          // Redirect to authenticated page = success
-          if(r.redirected&&r.url&&!r.url.includes('/login')&&!r.url.includes('/auth')){
-            loggedIn=true;LS(`✅ Login succeeded (redirected to ${r.url})`);break}
-        }catch(e){LW(`  ${ep}: ${e.message}`)}
-      }
-      
-      // Format 2: Form-urlencoded
-      if(!loggedIn){
-        try{
-          L(`Trying form-encoded: POST ${ep}`);
-          const formBody=`email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&_token=${encodeURIComponent(xsrfToken||'')}`;
-          const r=await px(ep,{method:'POST',contentType:'application/x-www-form-urlencoded',
-            body:formBody,maxRedirects:3});
-          const txt=await r.text();
-          L(`  Response: ${r.status} | ${txt.length} bytes`);
-          L(`  Body: ${txt.substring(0,300)}`);
-          
-          if(r.status>=200&&r.status<300&&!txt.includes('/login')){
-            loggedIn=true;LS(`✅ Login (form) succeeded at ${ep}`)}
-          if(r.redirected&&r.url&&!r.url.includes('/login')&&!r.url.includes('/auth')){
-            loggedIn=true;LS(`✅ Login (form) succeeded (redirect to ${r.url})`)}
-        }catch(e){LW(`  Form ${ep}: ${e.message}`)}
+
+    let formAction=formMatch[1].replace(/&amp;/g,'&');
+    L(`Form action: ${formAction}`);
+
+    // Make it absolute URL if needed
+    if(formAction.startsWith('/')){
+      formAction='https://multipass.wizzair.com'+formAction;
+    }
+
+    // Submit credentials
+    const formBody=`username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&credentialId=`;
+    L(`Posting to: ${formAction}`);
+
+    const authR=await px(formAction,{
+      method:'POST',
+      contentType:'application/x-www-form-urlencoded',
+      body:formBody,
+      maxRedirects:10
+    });
+
+    const authHtml=authR.bodyText;
+    L(`Auth response: ${authR.status}, ${authHtml.length} bytes`);
+    L(`Auth final URL: ${authR.url}`);
+
+    // Check for login errors
+    if(authHtml.includes('Invalid username or password')||authHtml.includes('Invalid credentials')){
+      LE('Invalid username or password');
+      showDM('e','Invalid username or password. Please check your Wizz Air credentials.');
+      throw new Error('Invalid credentials');
+    }
+
+    // Check if we're still on login page (auth failed)
+    if(authR.url.includes('/auth/realms/')&&authR.url.includes('login-actions')){
+      L(`Still on login page - checking for errors`);
+      const errorMatch=authHtml.match(/class="[^"]*error[^"]*"[^>]*>([^<]+)/i);
+      if(errorMatch){
+        LE(`Login error: ${errorMatch[1]}`);
+        throw new Error(errorMatch[1]);
       }
     }
 
-    // Also try the main Wizz Air API login (different domain, may help with some cookie sharing)
-    if(!loggedIn){
-      L('Trying main wizzair.com API...');
+    // Check if authentication succeeded (redirected to app)
+    const authenticated=!authR.url.includes('/auth/realms/')&&!authR.url.includes('/login');
+    L(`Authenticated: ${authenticated}`);
+
+    if(!authenticated){
+      LW('May not be fully authenticated, continuing anyway...');
+    }else{
+      LS('Keycloak login successful!');
+    }
+
+    // ─── Step 3: Fetch the wallets/private page to get routes ───
+    L('═══ Step 3: Fetching authenticated page ═══');
+    showDL('Getting routes...');
+
+    const walletsR=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets',{maxRedirects:10});
+    const walletsHtml=walletsR.bodyText;
+    L(`Wallets: ${walletsR.status}, ${walletsHtml.length} bytes`);
+    L(`Wallets URL: ${walletsR.url}`);
+
+    // If redirected back to login, auth failed
+    if(walletsR.url.includes('/auth/')&&walletsR.url.includes('/login')){
+      LE('Redirected back to login - authentication failed');
+      showDM('e','Authentication failed. Please check your credentials.');
+      throw new Error('Authentication failed');
+    }
+
+    // ─── Step 4: Parse routes from the page ───
+    L('═══ Step 4: Parsing routes ═══');
+    showDL('Parsing routes...');
+
+    let routes=[];
+
+    // Try multiple patterns to find route data
+
+    // Pattern 1: "routes":[...] in JSON
+    const routesMatch=walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
+    if(routesMatch){
       try{
-        const metaR=await px('https://www.wizzair.com/static/metadata.json');
-        const meta=await metaR.json();
-        const apiUrl=meta.apiUrl||`https://be.wizzair.com/${meta.appVersion||'19.3.0'}/Api`;
-        L(`API URL: ${apiUrl}`);
-
-        const loginR=await px(`${apiUrl}/customer/login`,{method:'POST',contentType:'application/json',
-          body:JSON.stringify({email,password:pass,isGoogleLogin:false})});
-        const loginTxt=await loginR.text();
-        L(`Main API: ${loginR.status} | ${loginTxt.substring(0,300)}`);
-        if(loginR.status>=200&&loginR.status<300&&loginR.status!==429){loggedIn=true;LS('Main API login OK')}
-        else if(loginR.status===429){LW('Main API rate limited (429). Wait a minute and retry.')}
-      }catch(e){LW(`Main API: ${e.message}`)}
+        const parsed=JSON.parse(routesMatch[1]);
+        if(Array.isArray(parsed)&&parsed.length>0){
+          routes=parsed;
+          LS(`Routes from "routes": ${routes.length}`);
+        }
+      }catch(e){LW(`Parse routes: ${e.message}`)}
     }
 
-    // ─── Step 4: Fetch authenticated page ───
-    L('═══ Step 4: Fetching authenticated page ═══');
-    showDL('Fetching route data...');
-    L(`Cookie jar before auth page: ${cookieJar.substring(0,120)}...`);
-    
-    const authR=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets');
-    let pageHtml=await authR.text();
-    L(`Auth page: ${authR.status} | ${pageHtml.length} bytes | redirected: ${authR.redirected} | final URL: ${authR.url}`);
-
-    // If redirected to login, auth failed
-    if(authR.url&&authR.url.includes('/auth/login')){
-      L(`⚠️ Still redirected to login page — authentication failed`);
-      L(`Page HTML snippet: ${pageHtml.substring(0,500)}`);
-      
-      // Try one more thing: maybe we need to hit the wallets page without following redirects
-      // and the page actually has data embedded even before redirect
-    }
-
-    // Log full page for debugging (first 2000 chars)
-    L(`Page content (first 2000 chars): ${pageHtml.substring(0,2000).replace(/\n/g,'\\n')}`);
-
-    // ─── Step 5: Parse routes ───
-    L('═══ Step 5: Parsing routes ═══');
-    showDL('Parsing route data...');
-    let routes=null;
-
-    // Pattern 1: "routes":[...] from head
-    const rp=/"routes":\[(.*?)\].*?"isOneWayFlightsOnly"/gms;
-    let hm=pageHtml.match(rp);
-    if(hm&&hm[0]){
-      try{const j=`{"routes":${hm[0].split('"routes":')[1].split(',"isOneWayFlightsOnly"')[0]}}`;
-        routes=JSON.parse(j).routes;LS(`Routes from pattern 1: ${routes.length} origins`)}
-      catch(e){LE(`Parse routes p1: ${e.message}`)}
-    }
-    // Pattern 2: window.CVO.routes
-    if(!routes){const bp=/window\.CVO\.routes\s*=\s*(\[.*?\]);/s;const bm=pageHtml.match(bp);
-      if(bm&&bm[1]){try{routes=JSON.parse(bm[1]);LS(`Routes from pattern 2: ${routes.length}`)}catch(e){LE(`Parse p2: ${e.message}`)}}}
-    // Pattern 3: Look for route data in any JSON blob
-    if(!routes){
-      const jsonBlobs=pageHtml.match(/\{[^{}]*"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"[A-Z]{3}"[^}]*\}[^{}]*"arrivalStations"\s*:\s*\[[^\]]*\][^{}]*\}/g);
-      if(jsonBlobs){L(`Found ${jsonBlobs.length} route JSON blobs via pattern 3`);
-        try{routes=jsonBlobs.map(b=>JSON.parse(b));LS(`Routes from pattern 3: ${routes.length}`)}
-        catch(e){LE(`Parse p3: ${e.message}`)}
+    // Pattern 2: window.CVO.routes = [...]
+    if(!routes.length){
+      const cvoMatch=walletsHtml.match(/window\.CVO\.routes\s*=\s*(\[[\s\S]*?\]);/);
+      if(cvoMatch){
+        try{routes=JSON.parse(cvoMatch[1]);LS(`Routes from CVO.routes: ${routes.length}`)}catch(e){}
       }
     }
-    // Pattern 4: Search in all script tags
-    if(!routes){
-      const scripts=pageHtml.match(/<script[^>]*>([\s\S]*?)<\/script>/g);
-      if(scripts){
-        L(`Scanning ${scripts.length} script tags for route data...`);
-        for(const s of scripts){
-          const inner=s.replace(/<\/?script[^>]*>/g,'');
-          if(inner.includes('departureStation')||inner.includes('routes')){
-            L(`Found potential route script (${inner.length} bytes): ${inner.substring(0,200)}`);
+
+    // Pattern 3: Look in script tags for routes data
+    if(!routes.length){
+      const scriptMatches=walletsHtml.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g);
+      for(const sm of scriptMatches){
+        const script=sm[1];
+        if(script.includes('departureStation')||script.includes('"routes"')){
+          L(`Found potential route script (${script.length} bytes)`);
+          // Try to extract routes from this script
+          const rm=script.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
+          if(rm){
+            try{routes=JSON.parse(rm[1]);LS(`Routes from script: ${routes.length}`);break}catch(e){}
           }
         }
       }
     }
 
-    if(!routes||!routes.length){
-      LE('❌ Could not find routes in page');
-      L('═══ DIAGNOSTIC SUMMARY ═══');
-      L(`Logged in: ${loggedIn}`);
-      L(`Cookie jar: ${cookieJar}`);
-      L(`XSRF token: ${xsrfToken?'present':'missing'}`);
-      L(`Final page URL: ${authR.url}`);
-      L(`Page size: ${pageHtml.length} bytes`);
-      L(`Contains "routes": ${pageHtml.includes('"routes"')}`);
-      L(`Contains "departureStation": ${pageHtml.includes('departureStation')}`);
-      L(`Contains "arrivalStations": ${pageHtml.includes('arrivalStations')}`);
-      L(`Contains "login": ${pageHtml.includes('/login')}`);
-      L(`Contains "wallets": ${pageHtml.includes('wallets')}`);
-      L('Full page HTML logged above. Export debug log and share for troubleshooting.');
-      L('═══════════════════════════');
-      showDM('e',`Login or route extraction failed. Please export the debug log (🔧 button) and share it for troubleshooting.`);
-      throw new Error('No routes found')}
+    // Pattern 4: Look for individual route objects
+    if(!routes.length){
+      const routeBlobs=walletsHtml.matchAll(/\{"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"[^}]*\}[^}]*"arrivalStations"\s*:\s*(\[[^\]]*\])/g);
+      for(const rb of routeBlobs){
+        try{
+          const dests=JSON.parse(rb[2]);
+          routes.push({departureStation:{id:rb[1]},arrivalStations:dests});
+        }catch(e){}
+      }
+      if(routes.length)LS(`Routes from blobs: ${routes.length}`);
+    }
 
-    LS(`Found ${routes.length} route origins`);
+    // Parse routes into normalized format
+    const parsedRoutes=[];
+    routes.forEach(r=>{
+      let origin=null,destinations=[];
+      if(r.departureStation&&r.departureStation.id){
+        origin=r.departureStation.id;
+        destinations=(r.arrivalStations||[]).map(a=>a.id||a).filter(Boolean);
+      }else if(r.origin){
+        origin=r.origin;
+        destinations=r.destinations||[];
+      }
+      if(origin&&destinations.length){
+        parsedRoutes.push({origin,destinations});
+      }
+    });
 
-    // ─── Step 6: Get flight search API URL ───
-    L('═══ Step 6: Finding flight search API URL ═══');
-    let apiUrl=null;
-    // Pattern A: Direct URL
-    const hp=/"searchFlight":"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
-    const hm2=pageHtml.match(hp);
-    if(hm2&&hm2[1]){apiUrl=hm2[1];L(`API URL (pattern A): ${apiUrl}`)}
-    // Pattern B: UUID extraction
-    if(!apiUrl){const hp2=/"searchFlight":"https:\/\/multipass\.wizzair\.com[^"]+\/([^"]+)"/;
-      const hm3=pageHtml.match(hp2);
-      if(hm3&&hm3[1]){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${hm3[1]}`;L(`API URL (pattern B/UUID): ${apiUrl}`)}}
-    // Pattern C: CVO variable
-    if(!apiUrl){const bp2=/window\.CVO\.flightSearchUrlJson\s*=\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
-      const bm2=pageHtml.match(bp2);if(bm2&&bm2[1]){apiUrl=bm2[1];L(`API URL (pattern C/CVO): ${apiUrl}`)}}
-    // Pattern D: Search in script tags
-    if(!apiUrl){const scripts=pageHtml.match(/<script[^>]*>([\s\S]*?)<\/script>/g)||[];
-      for(const s of scripts){const m=s.match(/availability\/([a-f0-9-]{36})/i);
-        if(m){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${m[1]}`;L(`API URL (pattern D/script UUID): ${apiUrl}`);break}}}
+    L(`Parsed ${parsedRoutes.length} route origins`);
 
-    if(!apiUrl){LE('Flight search API URL not found');
-      showDM('e','Routes found but API URL missing. Export log for troubleshooting.');throw new Error('No API URL')}
-    LS(`Flight API: ${apiUrl}`);
+    if(!parsedRoutes.length){
+      // Log diagnostic info
+      L('═══ DIAGNOSTIC ═══');
+      L(`Page contains "routes": ${walletsHtml.includes('"routes"')}`);
+      L(`Page contains "departureStation": ${walletsHtml.includes('departureStation')}`);
+      L(`Page contains "wallets": ${walletsHtml.includes('wallets')}`);
+      L(`First 2000 chars: ${walletsHtml.substring(0,2000)}`);
+      LE('No routes found in page');
+      showDM('e','Could not find route data. Check debug log.');
+      throw new Error('No routes found');
+    }
 
-    // ─── Step 7: Build tasks & download ───
-    L('═══ Step 7: Downloading flights ═══');
+    // ─── Step 5: Find flight search API URL ───
+    L('═══ Step 5: Finding flight API URL ═══');
+
+    let flightApiUrl=null;
+
+    // Pattern 1: searchFlight URL
+    const searchMatch=walletsHtml.match(/"searchFlight"\s*:\s*"([^"]+)"/);
+    if(searchMatch){flightApiUrl=searchMatch[1];L(`API from searchFlight: ${flightApiUrl}`)}
+
+    // Pattern 2: flightSearchUrlJson
+    if(!flightApiUrl){
+      const urlMatch=walletsHtml.match(/flightSearchUrlJson\s*[=:]\s*["']([^"']+)["']/);
+      if(urlMatch){flightApiUrl=urlMatch[1];L(`API from flightSearchUrlJson: ${flightApiUrl}`)}
+    }
+
+    // Pattern 3: availability UUID
+    if(!flightApiUrl){
+      const uuidMatch=walletsHtml.match(/availability\/([a-f0-9-]{36})/i);
+      if(uuidMatch){
+        flightApiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${uuidMatch[1]}`;
+        L(`API from UUID: ${flightApiUrl}`);
+      }
+    }
+
+    // Fallback endpoints
+    const apiEndpoints=flightApiUrl?[flightApiUrl]:[
+      'https://multipass.wizzair.com/w6/subscriptions/json/flight-search',
+      'https://multipass.wizzair.com/w6/subscriptions/api/flight-search'
+    ];
+
+    // ─── Step 6: Download flights ───
+    L('═══ Step 6: Downloading flights ═══');
+
     const dates=[];const today=new Date();
     for(let i=0;i<4;i++){const d=new Date(today);d.setDate(today.getDate()+i);dates.push(fD(d))}
     L(`Dates: ${dates.join(', ')}`);
 
     const tasks=[];const seen=new Set();
-    routes.forEach(r=>{const orig=r.departureStation?.id;if(!orig)return;
-      (r.arrivalStations||[]).forEach(d=>{dates.forEach(dt=>{const k=`${orig}|${d.id}|${dt}`;
-        if(!seen.has(k)){seen.add(k);tasks.push({o:orig,d:d.id,dt})}})})});
-    L(`${tasks.length} tasks to download`);
+    parsedRoutes.forEach(r=>{
+      r.destinations.forEach(dest=>{
+        dates.forEach(dt=>{
+          const k=`${r.origin}|${dest}|${dt}`;
+          if(!seen.has(k)){seen.add(k);tasks.push({o:r.origin,d:dest,dt})}
+        });
+      });
+    });
+
+    L(`${tasks.length} flight tasks`);
     showDL(`Downloading ${tasks.length} routes...`);
 
-    let done=0,flights=0,errors=0,rl=0;
+    let done=0,flights=0,errors=0,rl=0,workingEndpoint=null;
+
     for(let i=0;i<tasks.length;i++){
-      if(stopped){L('Stopped by user');break}
+      if(stopped)break;
       while(paused&&!stopped)await sleep(500);
       if(stopped)break;
 
@@ -1022,38 +890,65 @@ async function loginAndDownload(){
       showDL(`${t.o}→${t.d} ${fDMY(t.dt)} [${i+1}/${tasks.length}]`);
 
       try{
-        await sleep(350+Math.random()*350);
-        const r=await px(apiUrl,{method:'POST',contentType:'application/json',
-          body:JSON.stringify({flightType:'OW',origin:t.o,destination:t.d,departure:t.dt,arrival:'',intervalSubtype:null})});
+        await sleep(400+Math.random()*400);
 
-        if(r.status===429){rl++;if(rl>=3){showDL('Rate limited — waiting 60s...');await sleep(60000);rl=0}
-          else{showDL('Rate limited — waiting 15s...');await sleep(15000)}i--;continue}
+        const endpoints=workingEndpoint?[workingEndpoint]:apiEndpoints;
+        let success=false;
 
-        rl=0;
-        if(r.status>=200&&r.status<300){
-          const data=await r.json();
-          let fl=data.flightsOutbound||data.flights||data.outbound||data.outboundFlights||[];
-          if(Array.isArray(data))fl=data;
-          fl=fl.map(f=>({departure:f.departure||f.departureTime||f.std||'',arrival:f.arrival||f.arrivalTime||f.sta||'',
-            duration:f.duration||f.flightDuration||'',flightCode:f.flightCode||f.flightNumber||''}));
-          await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:fl,timestamp:Date.now()});
-          done++;flights+=fl.length;
-          if(i<3||fl.length>0)L(`  ${t.o}→${t.d}: ${fl.length} flights`);
-        }else{
+        for(const ep of endpoints){
+          try{
+            const r=await px(ep,{
+              method:'POST',
+              contentType:'application/json',
+              body:JSON.stringify({flightType:'OW',origin:t.o,destination:t.d,departure:t.dt,arrival:'',intervalSubtype:null})
+            });
+
+            if(r.status===429){
+              rl++;
+              if(rl>=3){showDL('Rate limited — 60s...');await sleep(60000);rl=0}
+              else{showDL('Rate limited — 15s...');await sleep(15000)}
+              i--;break;
+            }
+
+            rl=0;
+            if(r.status>=200&&r.status<300){
+              const data=await r.json();
+              let fl=data.flightsOutbound||data.flights||data.outbound||[];
+              if(Array.isArray(data)&&data.length>0&&data[0].departure)fl=data;
+
+              fl=fl.map(f=>({
+                departure:f.departure||f.departureTime||'',
+                arrival:f.arrival||f.arrivalTime||'',
+                duration:f.duration||'',
+                flightCode:f.flightCode||f.flightNumber||''
+              }));
+
+              await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:fl,timestamp:Date.now()});
+              done++;flights+=fl.length;
+              workingEndpoint=ep;
+              success=true;
+              if(i<5||fl.length>0)L(`  ${t.o}→${t.d}: ${fl.length} flights`);
+              break;
+            }
+          }catch(e){L(`  ${ep}: ${e.message}`)}
+        }
+
+        if(!success){
           await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:[],timestamp:Date.now()});
-          done++;errors++}
+          done++;errors++;
+        }
 
-        if(done%30===0&&i<tasks.length-1){showDL('Rate-limit break (12s)...');await sleep(12000)}
-      }catch(e){LE(`${t.o}-${t.d}: ${e.message}`);done++;errors++}
+        if(done%30===0&&i<tasks.length-1){showDL('Break (12s)...');await sleep(12000)}
+      }catch(e){done++;errors++}
     }
 
     setDLProg(100);
-    LS(`Download complete: ${flights} flights, ${done} routes, ${errors} errors`);
-    showDL(`Done! ${flights} flights across ${done} routes.`);
+    LS(`Done: ${flights} flights, ${done} routes, ${errors} errors`);
+    showDL(`Done! ${flights} flights from ${done} routes.`);
     showDM('s',`Downloaded ${flights} flights from ${done} routes.`);
     await upSt();
 
-  }catch(e){LE(`Download failed: ${e.message}`);if(!$('loginMsg').innerHTML.includes('log'))showDM('e',e.message)}
+  }catch(e){LE(`Failed: ${e.message}`);if(!$('loginMsg').innerHTML)showDM('e',e.message)}
   finally{downloading=false;$('bLogin').disabled=false;$('bPause').classList.add('hd-n');$('bStop').classList.add('hd-n')}
 }
 
@@ -1064,24 +959,21 @@ function showDM(t,m){const c={s:'mg-s',e:'mg-e',w:'mg-w',i:'mg-i'};$('loginMsg')
 function showMsg(t,m){const c={s:'mg-s',e:'mg-e',w:'mg-w',i:'mg-i'};$('dMsg').innerHTML=`<div class="mg ${c[t]||'mg-i'}">${m}</div>`;
   setTimeout(()=>{const el=$('dMsg');if(el.innerHTML.includes(m))el.innerHTML=''},8000)}
 
-// ══ IMPORT / EXPORT ══
 async function importJ(file){L(`Import: ${file.name}`);showMsg('i','Importing...');
   try{const t=await file.text();const d=JSON.parse(t);
     if(!d.data||!Array.isArray(d.data))throw new Error('Invalid format');
     let n=0;for(const f of d.data){if(f.id&&f.flights){await dbP('flights',{...f,timestamp:Date.now()});n++}}
     if(d.favorites)d.favorites.forEach(f=>{if(!favs.some(e=>e.code===f.code)){favs.push(f)}});saveF();renderF();
-    await upSt();showMsg('s',`Imported ${n} routes!`);LS(`Imported ${n} routes`)}
-  catch(e){LE(`Import: ${e.message}`);showMsg('e','Import failed: '+e.message)}}
+    await upSt();showMsg('s',`Imported ${n} routes!`)}
+  catch(e){showMsg('e','Import failed: '+e.message)}}
 
 async function exportJ(){const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
   if(!val.length){showMsg('e','No data');return}
   const exp={version:V,exportDate:new Date().toISOString(),favorites:favs,
     flightCount:val.reduce((s,f)=>s+f.flights.length,0),routeCount:val.length,data:val};
   const blob=new Blob([JSON.stringify(exp)],{type:'application/json'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`wizz-${fD(new Date())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  LS('Exported');showMsg('s','Exported!')}
+  const a=document.createElement('a');a.href=url;a.download=`wizz-${fD(new Date())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
 
-// ══ GITHUB ══
 function loadGH(){try{const s=JSON.parse(localStorage.getItem('wz_gh3')||'{}');if(s.o)$('gO').value=s.o;if(s.r)$('gR').value=s.r;if(s.t)$('gT').value=s.t}catch{}}
 function saveGH(){localStorage.setItem('wz_gh3',JSON.stringify({o:$('gO').value.trim(),r:$('gR').value.trim(),t:$('gT').value.trim()}))}
 function gGH(){try{return JSON.parse(localStorage.getItem('wz_gh3')||'{}')}catch{return{}}}
@@ -1095,26 +987,25 @@ async function ghApi(path,method='GET',body=null){const s=gGH();if(!s.o||!s.r||!
 async function testGH(){$('gMsg').innerHTML='<div class="mg mg-i"><span class="sp-n"></span> Testing...</div>';
   try{const s=gGH();const r=await fetch(`https://api.github.com/repos/${s.o}/${s.r}`,{headers:{'Authorization':`Bearer ${s.t}`}});
     if(!r.ok)throw new Error(`HTTP ${r.status}`);const d=await r.json();
-    $('gMsg').innerHTML=`<div class="mg mg-s">✅ Connected: ${d.full_name}</div>`;LS(`GH ok: ${d.full_name}`);listGHF()}
-  catch(e){LE(`GH test: ${e.message}`);$('gMsg').innerHTML=`<div class="mg mg-e">❌ ${e.message}</div>`}}
+    $('gMsg').innerHTML=`<div class="mg mg-s">✅ ${d.full_name}</div>`;listGHF()}
+  catch(e){$('gMsg').innerHTML=`<div class="mg mg-e">❌ ${e.message}</div>`}}
 
 async function listGHF(){const fl=$('gFL');try{let f;try{f=await ghApi('data')}catch{f=[]}
   const js=(Array.isArray(f)?f:[]).filter(x=>x.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
-  if(!js.length){fl.innerHTML='<em>No saved files yet.</em>';return}
-  fl.innerHTML=js.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${x.name}</span>
+  if(!js.length){fl.innerHTML='<em>No files.</em>';return}
+  fl.innerHTML=js.map(x=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr)">
+    <span style="font-family:monospace;font-size:.7rem">${x.name}</span>
     <button class="bt bt-o bt-sm gl" data-p="${x.path}">Load</button></div>`).join('');
-  fl.querySelectorAll('.gl').forEach(b=>b.onclick=()=>loadGHF(b.dataset.p))}
-  catch(e){fl.innerHTML=`<em style="color:var(--red)">${e.message}</em>`}}
+  fl.querySelectorAll('.gl').forEach(b=>b.onclick=()=>loadGHF(b.dataset.p))}catch(e){fl.innerHTML=`<em style="color:var(--red)">${e.message}</em>`}}
 
-async function loadGHF(path){showMsg('i','Loading from GitHub...');
+async function loadGHF(path){showMsg('i','Loading...');
   try{const f=await ghApi(path);const c=atob(f.content.replace(/\n/g,''));const d=JSON.parse(c);
     if(!d.data)throw new Error('Invalid');let n=0;
     for(const x of d.data){if(x.id&&x.flights){await dbP('flights',{...x,timestamp:Date.now()});n++}}
     if(d.favorites)d.favorites.forEach(f=>{if(!favs.some(e=>e.code===f.code))favs.push(f)});saveF();renderF();
-    await upSt();showMsg('s',`Loaded ${n} routes from GitHub`)}catch(e){showMsg('e',e.message)}}
+    await upSt();showMsg('s',`Loaded ${n} routes`)}catch(e){showMsg('e',e.message)}}
 
-async function saveGHD(){showMsg('i','Saving to GitHub...');
+async function saveGHD(){showMsg('i','Saving...');
   try{const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
     if(!val.length)throw new Error('No data');
     const exp={version:V,exportDate:new Date().toISOString(),favorites:favs,
@@ -1122,18 +1013,17 @@ async function saveGHD(){showMsg('i','Saving to GitHub...');
     const c=btoa(unescape(encodeURIComponent(JSON.stringify(exp))));
     const now=new Date();const ts=`${fD(now)}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
     await ghApi(`data/flights-${ts}.json`,'PUT',{message:`flights ${ts}`,content:c});
-    showMsg('s',`Saved to GitHub: flights-${ts}.json`)}catch(e){showMsg('e',e.message)}}
+    showMsg('s',`Saved: flights-${ts}.json`)}catch(e){showMsg('e',e.message)}}
 
-// ══ SEARCH ENGINE ══
 function buildLU(val){const bO=new Map(),bD=new Map(),bK=new Map();
   val.forEach(d=>{bK.set(`${d.origin}|${d.dest}|${d.date}`,d.flights||[]);
     if(!bO.has(d.origin))bO.set(d.origin,[]);bO.get(d.origin).push({d:d.dest,dt:d.date,fl:d.flights||[]});
     if(!bD.has(d.dest))bD.set(d.dest,[]);bD.get(d.dest).push({o:d.origin,dt:d.date,fl:d.flights||[]})});
   return{bO,bD,bK}}
 
-async function doSearch(){L(`=== SEARCH mode=${mode} ===`);
+async function doSearch(){
   const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
-  if(!val.length){sR('mg-w','No data. Import or download first.');return}
+  if(!val.length){sR('mg-w','No data.');return}
   const lu=buildLU(val);
   switch(mode){case'dep':sDep(lu);break;case'dest':sDest(lu);break;case'rt':sRT(lu);break;case'trip':sTrip(lu);break}}
 
@@ -1141,42 +1031,40 @@ function sDep(lu){const ori=gSel('dL'),s=$('dS').value,e=$('dE').value;
   if(!ori.length){sR('mg-w','Select origins.');return}if(!s||!e){sR('mg-w','Set dates.');return}
   const dates=dRng(s,e),fl=[];
   ori.forEach(o=>{(lu.bO.get(o)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{fl.push({o,d:r.d,dt:r.dt,f})})})});
-  LS(`Dep: ${fl.length} flights`);dispDep(fl)}
+  dispDep(fl)}
 
 function sDest(lu){const dst=gSel('sL'),s=$('sS').value,e=$('sE').value;
   if(!dst.length){sR('mg-w','Select destinations.');return}if(!s||!e){sR('mg-w','Set dates.');return}
   const dates=dRng(s,e),rl=[];
-  dst.forEach(d=>{(lu.bD.get(d)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{rl.push({type:'d',o:r.o,d,dt:r.dt,f})})})});
-  LS(`Dest: ${rl.length}`);dispDest(rl,dst)}
+  dst.forEach(d=>{(lu.bD.get(d)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{rl.push({o:r.o,d,dt:r.dt,f})})})});
+  dispDest(rl,dst)}
 
 function sRT(lu){const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=+$('rtMx').value;
   if(!s||!e){sR('mg-w','Set dates.');return}
   const oF=$('rtO').value.toUpperCase().trim(),dF=$('rtD').value.toUpperCase().trim();
   const oS=oF?new Set(oF.split(/[,;\s]+/).filter(Boolean)):null;
   const dS=dF?new Set(dF.split(/[,;\s]+/).filter(Boolean)):null;
-  sR('mg-i','<span class="sp-n"></span> Searching round trips...');
+  sR('mg-i','<span class="sp-n"></span> Searching...');
   setTimeout(()=>{const dates=dRng(s,e),res=[],seen=new Set();
     lu.bO.forEach((routes,orig)=>{if(oS&&!oS.has(orig))return;
       routes.forEach(r=>{if(dS&&!dS.has(r.d))return;if(!r.fl.length||!dates.includes(r.dt))return;
         r.fl.forEach(of=>{(lu.bO.get(r.d)||[]).forEach(rr=>{if(rr.d!==orig||!dates.includes(rr.dt))return;
           const stay=dB(r.dt,rr.dt);if(stay<mn||stay>mx)return;if(!rr.fl.length)return;
-          rr.fl.forEach(rf=>{const k=`${orig}|${r.d}|${r.dt}|${rr.dt}|${of.departure}|${rf.departure}`;
+          rr.fl.forEach(rf=>{const k=`${orig}|${r.d}|${r.dt}|${rr.dt}`;
             if(seen.has(k))return;seen.add(k);
             res.push({o:orig,d:r.d,oD:r.dt,rD:rr.dt,oF:of,rF:rf,stay})})})})})});
-    res.sort((a,b)=>a.stay-b.stay||a.o.localeCompare(b.o));
-    LS(`RT: ${res.length}`);dispRT(res)},50)}
+    res.sort((a,b)=>a.stay-b.stay);dispRT(res)},50)}
 
 function sTrip(lu){const homes=gSel('tL'),s=$('tS').value,e=$('tE').value,mE=+$('tH').value,mD=+$('tMn').value;
-  if(!homes.length){sR('mg-w','Select home airports.');return}if(!s||!e){sR('mg-w','Set dates.');return}
-  sR('mg-i','<span class="sp-n"></span> Searching trips...');
+  if(!homes.length){sR('mg-w','Select homes.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+  sR('mg-i','<span class="sp-n"></span> Searching...');
   setTimeout(()=>{const dates=dRng(s,e),trips=[];
     const gF=(a,b,d)=>lu.bK.get(`${a}|${b}|${d}`)||[];
     function vC(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return pT(f2.departure)>=pT(f1.arrival)+MIN_LAY}
-    function vR(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return pT(f2.departure)>=pT(f1.arrival)+60}
     homes.forEach(h=>{const hR=lu.bO.get(h)||[];const dd=new Set(hR.map(r=>r.d));
       dd.forEach(d1=>{if(!(lu.bO.get(d1)||[]).some(r=>r.d===h))return;
         dates.forEach(dt1=>{gF(h,d1,dt1).forEach(f1=>{dates.forEach(dt2=>{if(dt2<dt1)return;
-          gF(d1,h,dt2).forEach(f2=>{if(!vR(f1,dt1,f2,dt2))return;const dy=dB(dt1,dt2);if(dy<mD)return;
+          gF(d1,h,dt2).forEach(f2=>{if(!vC(f1,dt1,f2,dt2))return;const dy=dB(dt1,dt2);if(dy<mD)return;
             trips.push({h,hops:1,path:[h,d1,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:h,dt:dt2,f:f2}]})})})})})});
       if(mE>=1)dd.forEach(d1=>{(lu.bO.get(d1)||[]).forEach(r=>{const d2=r.d;if(d2===h)return;
         if(!(lu.bO.get(d2)||[]).some(rr=>rr.d===h))return;
@@ -1185,201 +1073,105 @@ function sTrip(lu){const homes=gSel('tL'),s=$('tS').value,e=$('tE').value,mE=+$(
             dates.forEach(dt3=>{if(dt3<dt2)return;for(const f3 of gF(d2,h,dt3)){if(!vC(f2,dt2,f3,dt3))continue;
               const dy=dB(dt1,dt3);if(dy<mD)continue;
               trips.push({h,hops:2,path:[h,d1,d2,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:d2,dt:dt2,f:f2},{from:d2,to:h,dt:dt3,f:f3}]});return}});break}})})})})});
-    LS(`Trip: ${trips.length}`);dispTrip(trips)},50)}
+    dispTrip(trips)},50)}
 
-// ══ DISPLAY ══
 function sR(c,h){$('res').innerHTML=`<div class="mg ${c}">${h}</div>`}
 
-function dispDep(fl){const R=$('res');if(!fl.length){sR('mg-w','No flights found.');return}
+function dispDep(fl){const R=$('res');if(!fl.length){sR('mg-w','No flights.');return}
   const bD={};fl.forEach(f=>{if(!bD[f.dt])bD[f.dt]=[];bD[f.dt].push(f)});
   let h=`<div class="mg mg-s">Found <strong>${fl.length}</strong> flights</div>`;
-  Object.keys(bD).sort().forEach(d=>{h+=`<div class="dh">${fDD(d)} — ${bD[d].length} flights</div>`;
-    bD[d].forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
+  Object.keys(bD).sort().forEach(d=>{h+=`<div class="dh">${fDD(d)} — ${bD[d].length}</div>`;bD[d].forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
 
-function dispDest(rl,dst){const R=$('res');if(!rl.length){sR('mg-w',`No routes to ${dst.join(', ')}.`);return}
+function dispDest(rl,dst){const R=$('res');if(!rl.length){sR('mg-w','No routes.');return}
   const bD={};rl.forEach(f=>{if(!bD[f.d])bD[f.d]=[];bD[f.d].push(f)});
   let h=`<div class="mg mg-s">Found <strong>${rl.length}</strong> routes</div>`;
-  Object.keys(bD).sort().forEach(d=>{h+=`<div class="deh">🎯 ${aD(d)} (${bD[d].length})</div>`;
-    bD[d].slice(0,30).forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)});
-    if(bD[d].length>30)h+=`<div class="mg mg-i">${bD[d].length-30} more...</div>`});R.innerHTML=h}
+  Object.keys(bD).sort().forEach(d=>{h+=`<div class="deh">🎯 ${aD(d)} (${bD[d].length})</div>`;bD[d].slice(0,30).forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
 
-function dispRT(res){const R=$('res');if(!res.length){sR('mg-w','No round trips found.');return}
+function dispRT(res){const R=$('res');if(!res.length){sR('mg-w','No round trips.');return}
   let h=`<div class="mg mg-s">Found <strong>${res.length}</strong> round trips</div>`;
-  const lim=Math.min(res.length,100);
-  if(res.length>lim)h+=`<div class="mg mg-i">Showing ${lim} of ${res.length}</div>`;
-  res.slice(0,lim).forEach(r=>{h+=`<div class="fc"><div class="fc-r"><span class="rt">${aS(r.o)} ↔ ${aS(r.d)}</span><span class="bg bg-d">${r.stay}d</span></div>
-    <div class="lb"><strong>Out:</strong> ${fDD(r.oD)} · ${aS(r.o)}→${aS(r.d)} · <span class="m">${fT(r.oF.departure)}</span>→<span class="m">${fT(r.oF.arrival)}</span> ${r.oF.duration||''}
-    <a href="${bU(r.o,r.d,r.oD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a><br><br>
-    <strong>Ret:</strong> ${fDD(r.rD)} · ${aS(r.d)}→${aS(r.o)} · <span class="m">${fT(r.rF.departure)}</span>→<span class="m">${fT(r.rF.arrival)}</span> ${r.rF.duration||''}
+  res.slice(0,100).forEach(r=>{h+=`<div class="fc"><div class="fc-r"><span class="rt">${aS(r.o)} ↔ ${aS(r.d)}</span><span class="bg bg-d">${r.stay}d</span></div>
+    <div class="lb"><strong>Out:</strong> ${fDD(r.oD)} · <span class="m">${fT(r.oF.departure)}</span>→<span class="m">${fT(r.oF.arrival)}</span>
+    <a href="${bU(r.o,r.d,r.oD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a><br>
+    <strong>Ret:</strong> ${fDD(r.rD)} · <span class="m">${fT(r.rF.departure)}</span>→<span class="m">${fT(r.rF.arrival)}</span>
     <a href="${bU(r.d,r.o,r.rD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a></div></div>`});
   R.innerHTML=h}
 
-function dispTrip(trips){const R=$('res');if(!trips.length){sR('mg-w','No trips found.');return}
-  const bH={1:[],2:[],3:[]};trips.forEach(t=>{if(bH[t.hops])bH[t.hops].push(t)});
+function dispTrip(trips){const R=$('res');if(!trips.length){sR('mg-w','No trips.');return}
+  const bH={1:[],2:[]};trips.forEach(t=>{if(bH[t.hops])bH[t.hops].push(t)});
   let h=`<div class="mg mg-s">Found <strong>${trips.length}</strong> trips</div>`;
-  [1,2,3].forEach(hp=>{if(!bH[hp].length)return;
-    const lb=hp===1?'Direct Round Trip':hp===2?'1 Extra Stop':'2 Extra Stops';
-    h+=`<div class="deh" style="background:var(--acc2)">🔄 ${lb} (${bH[hp].length})</div>`;
-    const bP={};bH[hp].forEach(t=>{const k=t.path.join('-');if(!bP[k])bP[k]=[];bP[k].push(t)});
-    Object.keys(bP).slice(0,15).forEach(pk=>{const pts=bP[pk],s=pts[0];
-      h+=`<div class="fc" style="border-left:3px solid var(--acc2)"><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-bottom:6px">`;
-      s.path.forEach((p,i)=>{h+=`<span style="background:var(--s2);padding:3px 7px;border-radius:4px;font-size:.74rem"><span class="m" style="color:var(--acc)">${p}</span><br><small style="color:var(--tx3);font-size:.6rem">${(airp.get(p)||{}).n||''}</small></span>`;
-        if(i<s.path.length-1)h+='<span style="color:var(--acc2);font-weight:700">→</span>'});
-      h+='</div>';
-      pts.slice(0,3).forEach(trip=>{const dy=dB(trip.legs[0].dt,trip.legs[trip.legs.length-1].dt);
-        h+=`<div class="lb"><div style="font-weight:600;color:var(--grn);font-size:.78rem;margin-bottom:4px">📅 ${dy===0?'Same day':dy+'d'}</div>`;
-        trip.legs.forEach((l,i)=>{h+=`<div style="padding:3px 0;border-bottom:1px solid var(--bdr);font-size:.74rem">
-          <strong>Leg ${i+1}:</strong> ${fDD(l.dt)} · ${aS(l.from)}→${aS(l.to)} · <span class="m">${fT(l.f.departure)}</span>→<span class="m">${fT(l.f.arrival)}</span>
-          <a href="${bU(l.from,l.to,l.dt)}" target="_blank" class="bk" style="padding:2px 6px;font-size:.65rem">Book</a></div>`});
-        h+='</div>'});
-      if(pts.length>3)h+=`<div style="font-size:.7rem;color:var(--tx3)">+${pts.length-3} more</div>`;
+  [1,2].forEach(hp=>{if(!bH[hp].length)return;
+    h+=`<div class="deh" style="background:var(--acc2)">${hp===1?'Direct':'+1 Stop'} (${bH[hp].length})</div>`;
+    bH[hp].slice(0,20).forEach(t=>{
+      h+=`<div class="fc" style="border-left:3px solid var(--acc2)"><div style="margin-bottom:6px">${t.path.map(p=>`<span class="m" style="color:var(--acc)">${p}</span>`).join(' → ')}</div>`;
+      t.legs.forEach((l,i)=>{h+=`<div style="font-size:.74rem;padding:2px 0">${fDD(l.dt)} ${l.from}→${l.to} <span class="m">${fT(l.f.departure)}</span></div>`});
       h+='</div>'})});
   R.innerHTML=h}
 
 function fC(o,d,dt,f){return`<div class="fc"><div class="fc-r"><span class="rt">${aS(o)} → ${aS(d)}</span><span class="bg bg-d">Direct</span></div>
-  <div class="fc-i">📅 ${fDD(dt)} · ✈️ <span class="m">${fT(f.departure)}</span> → 🛬 <span class="m">${fT(f.arrival)}</span> · ${f.duration||''} · ${f.flightCode||''}</div>
+  <div class="fc-i">📅 ${fDD(dt)} · ✈️ <span class="m">${fT(f.departure)}</span> → 🛬 <span class="m">${fT(f.arrival)}</span></div>
   <a href="${bU(o,d,dt)}" target="_blank" class="bk">🎫 Book</a></div>`}
 
-// ══ INIT ══
 async function init(){
   L(`Init v${V}`);await initDB();loadF();renderF();loadGH();
-
-  // Check proxy
   const proxy=getProxy();
-  if(proxy){$('proxySetup').classList.add('hd-n');$('proxyUrl').value=proxy;$('gPx').value=proxy;
-    L(`Proxy: ${proxy}`)}
+  if(proxy){$('proxySetup').classList.add('hd-n');$('proxyUrl').value=proxy;$('gPx').value=proxy}
   else{$('loginCard').style.opacity='.5'}
-
-  // Worker code
   $('workerCode').textContent=workerCode();
-
-  // Dates
   const today=fD(new Date()),mx=fD((()=>{const d=new Date();d.setDate(d.getDate()+3);return d})());
   ['dS','sS','tS','rtS'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
   ['dE','sE','tE','rtE'].forEach(id=>{const e=$(id);if(e){e.value=mx;e.min=today}});
-
   await upSt();LS('Ready')}
 
-// ══ EVENTS ══
 document.addEventListener('DOMContentLoaded',()=>{
-  // Tabs
   $$('.t').forEach(t=>t.onclick=()=>{$$('.t').forEach(b=>b.classList.remove('on'));t.classList.add('on');
     mode=t.dataset.m;$$('.pn').forEach(p=>p.classList.remove('on'));$('p-'+mode).classList.add('on')});
-
-  // Favorites
   $('bFav').onclick=()=>{const i=$('favI');if(addF(i.value))i.value=''};
   $('favI').onkeydown=e=>{if(e.key==='Enter'){const i=$('favI');if(addF(i.value))i.value=''}};
-
-  // Airport selectors
   $$('.sf').forEach(b=>b.onclick=()=>sSel(b.dataset.l,favs.map(f=>f.code)));
   $$('.sa').forEach(b=>b.onclick=()=>sSel(b.dataset.l,[...airp.keys()]));
   $$('.sc').forEach(b=>b.onclick=()=>sSel(b.dataset.l,[]));
-
-  // Proxy setup
-  $('bSaveProxy').onclick=()=>{const u=$('proxyUrl').value.trim();
-    if(!u){$('proxyMsg').innerHTML='<div class="mg mg-e">Enter proxy URL</div>';return}
-    // Remove trailing slash
-    const clean=u.replace(/\/+$/,'');
-    localStorage.setItem('wz_proxy',clean);$('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy saved!</div>';
-    $('gPx').value=clean;LS(`Proxy saved: ${clean}`)};
+  $('bSaveProxy').onclick=()=>{const u=$('proxyUrl').value.trim();if(!u)return;
+    localStorage.setItem('wz_proxy',u.replace(/\/+$/,''));$('proxyMsg').innerHTML='<div class="mg mg-s">✅ Saved</div>';$('gPx').value=u};
   $('bTestProxy').onclick=async()=>{
     const u=($('proxyUrl').value||getProxy()||'').trim().replace(/\/+$/,'');
-    if(!u){$('proxyMsg').innerHTML='<div class="mg mg-e">Enter proxy URL first</div>';return}
-    $('proxyMsg').innerHTML='<div class="mg mg-i">🔄 Testing proxy connection...</div>';
+    if(!u){$('proxyMsg').innerHTML='<div class="mg mg-e">Enter URL</div>';return}
+    $('proxyMsg').innerHTML='<div class="mg mg-i">Testing...</div>';
     try{
-      // Test 1: Basic connectivity 
-      const r=await fetch(u,{method:'OPTIONS'});
-      if(!r.ok&&r.status!==204){throw new Error(`OPTIONS returned ${r.status}`)}
-      $('proxyMsg').innerHTML='<div class="mg mg-i">✅ CORS OK. Testing Wizz Air connection...</div>';
-      // Test 2: Actual proxy to wizzair 
-      const r2=await fetch(u,{headers:{'X-Target':'https://wizzair.com/static/metadata.json'}});
-      const txt=await r2.text();
-      L(`Proxy test response: ${r2.status}, body: ${txt.substring(0,200)}`);
-      if(r2.status>=200&&r2.status<300){
-        try{const j=JSON.parse(txt);
-          $('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy works! Connected to Wizz Air API v'+( j.appVersion||'OK')+'</div>';
-          // Auto-save on successful test
-          localStorage.setItem('wz_proxy',u);$('gPx').value=u;
-          setTimeout(()=>{$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1'},2000);
-        }catch{$('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy works! Got response ('+txt.length+' bytes)</div>';
-          localStorage.setItem('wz_proxy',u);$('gPx').value=u}
-      }else{$('proxyMsg').innerHTML='<div class="mg mg-w">⚠️ Proxy responded but Wizz Air returned status '+r2.status+'. Check worker code.</div>'}
-    }catch(e){L(`Proxy test error: ${e.message}`);
-      $('proxyMsg').innerHTML='<div class="mg mg-e">❌ Test failed: '+e.message+'<br><small>Make sure you pasted the correct worker code and deployed it.</small></div>'}
-  };
+      const r=await fetch(u,{headers:{'X-Target':'https://wizzair.com/'}});
+      if(r.status>=200&&r.status<400){
+        $('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy works!</div>';
+        localStorage.setItem('wz_proxy',u);$('gPx').value=u;
+        setTimeout(()=>{$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1'},1500);
+      }else{$('proxyMsg').innerHTML=`<div class="mg mg-w">Status ${r.status}</div>`}
+    }catch(e){$('proxyMsg').innerHTML=`<div class="mg mg-e">${e.message}</div>`}};
   $('setupHdr').onclick=()=>{$('setupHdr').classList.toggle('op');$('setupBody').classList.toggle('op')};
-  $('bCopyWorker').onclick=()=>{$('workerCode').classList.toggle('hd-n');
-    navigator.clipboard.writeText(workerCode()).then(()=>showMsg('s','Worker code copied!')).catch(()=>{})};
-
-  // Login & Download
+  $('bCopyWorker').onclick=()=>{$('workerCode').classList.toggle('hd-n');navigator.clipboard.writeText(workerCode())};
   $('bLogin').onclick=loginAndDownload;
   $('bPause').onclick=()=>{paused=!paused;$('bPause').textContent=paused?'▶ Resume':'⏸ Pause'};
   $('bStop').onclick=()=>{stopped=true;paused=false};
-
-  // Data management
   $('bImport').onclick=()=>$('fileIn').click();
   $('fileIn').onchange=e=>{if(e.target.files.length){importJ(e.target.files[0]);e.target.value=''}};
   $('bExport').onclick=exportJ;
-  $('bClear').onclick=async()=>{if(confirm('Clear all data?')){await dbC('flights');await upSt();$('res').innerHTML='';LS('Cleared')}};
+  $('bClear').onclick=async()=>{if(confirm('Clear all?')){await dbC('flights');await upSt();$('res').innerHTML=''}};
   $('bGHLoad').onclick=async()=>{const s=gGH();if(!s.t){$('mGH').classList.add('op');return}
-    showMsg('i','Loading latest from GitHub...');
-    try{let f;try{f=await ghApi('data')}catch{showMsg('e','No data/ folder.');return}
+    showMsg('i','Loading...');try{let f;try{f=await ghApi('data')}catch{showMsg('e','No data/');return}
       const js=(Array.isArray(f)?f:[]).filter(x=>x.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
-      if(!js.length){showMsg('w','No files found.');return}await loadGHF(js[0].path)}catch(e){showMsg('e',e.message)}};
+      if(!js.length){showMsg('w','No files');return}await loadGHF(js[0].path)}catch(e){showMsg('e',e.message)}};
   $('bGHSave').onclick=saveGHD;
-
-  // Search
   $('bSrch').onclick=doSearch;
-
-  // Settings modal
   $('bGH').onclick=()=>{$('mGH').classList.add('op');listGHF()};
   $('bCGH').onclick=()=>$('mGH').classList.remove('op');
   $('mGH').onclick=e=>{if(e.target===$('mGH'))$('mGH').classList.remove('op')};
-  $('bGHS').onclick=()=>{saveGH();$('gMsg').innerHTML='<div class="mg mg-s">Saved!</div>'};
+  $('bGHS').onclick=()=>{saveGH();$('gMsg').innerHTML='<div class="mg mg-s">Saved</div>'};
   $('bGHT').onclick=testGH;
-  $('bGPx').onclick=()=>{const u=$('gPx').value.trim();if(u){localStorage.setItem('wz_proxy',u);
-    $('proxyUrl').value=u;$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1';
-    $('gMsg').innerHTML='<div class="mg mg-s">Proxy saved!</div>'}};
-
-  // Log modal
+  $('bGPx').onclick=()=>{const u=$('gPx').value.trim();if(u){localStorage.setItem('wz_proxy',u);$('proxyUrl').value=u;$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1'}};
   $('bLog').onclick=()=>$('mLog').classList.add('op');
   $('bCL').onclick=()=>$('mLog').classList.remove('op');
   $('mLog').onclick=e=>{if(e.target===$('mLog'))$('mLog').classList.remove('op')};
   $('bLC').onclick=()=>{logs=[];$('lA').innerHTML='';$('lCnt').textContent='(0)'};
-  
-  // Enhanced log export with full diagnostics
-  function buildLogExport(){
-    const divider='═'.repeat(60);
-    let out=`${divider}\nWIZZ AYCF DEBUG LOG — ${new Date().toISOString()}\n${divider}\n\n`;
-    out+=`Version: ${V}\n`;
-    out+=`User Agent: ${navigator.userAgent}\n`;
-    out+=`Screen: ${screen.width}x${screen.height} | Window: ${innerWidth}x${innerHeight}\n`;
-    out+=`Proxy: ${getProxy()||'NOT SET'}\n`;
-    out+=`Cookies: ${cookieJar?cookieJar.substring(0,200)+'...':'NONE'}\n`;
-    out+=`XSRF Token: ${xsrfToken?xsrfToken.substring(0,30)+'...':'NONE'}\n`;
-    out+=`Favorites: ${favs.map(f=>f.code).join(', ')||'none'}\n`;
-    out+=`Airports loaded: ${airp.size}\n`;
-    out+=`Mode: ${mode}\n\n`;
-    out+=`${divider}\nLOG ENTRIES (${logs.length})\n${divider}\n\n`;
-    out+=logs.map(l=>l.l).join('\n');
-    out+=`\n\n${divider}\nEND OF LOG\n${divider}\n`;
-    return out;
-  }
-  
-  $('bLE').onclick=()=>{const blob=new Blob([buildLogExport()],{type:'text/plain'});
-    const url=URL.createObjectURL(blob);const a=document.createElement('a');
-    a.href=url;a.download=`aycf-log-${fD(new Date())}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a)};
-  
-  // Copy log to clipboard
-  if($('bLCopy'))$('bLCopy').onclick=()=>{
-    navigator.clipboard.writeText(buildLogExport()).then(()=>{
-      $('bLCopy').textContent='✅ Copied!';setTimeout(()=>{$('bLCopy').textContent='📋 Copy Log'},2000)
-    }).catch(()=>{
-      // Fallback: select text
-      const ta=document.createElement('textarea');ta.value=buildLogExport();document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-      $('bLCopy').textContent='✅ Copied!';setTimeout(()=>{$('bLCopy').textContent='📋 Copy Log'},2000)
-    })};
-
+  function buildLog(){return`WIZZ AYCF LOG — ${new Date().toISOString()}\nVersion: ${V}\nProxy: ${getProxy()||'NOT SET'}\nCookies: ${cookieJar.substring(0,200)}\n\n${logs.map(l=>l.l).join('\n')}`}
+  $('bLE').onclick=()=>{const b=new Blob([buildLog()],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`aycf-log.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a)};
+  $('bLCopy').onclick=()=>{navigator.clipboard.writeText(buildLog()).then(()=>{$('bLCopy').textContent='✅';setTimeout(()=>{$('bLCopy').textContent='📋 Copy'},1500)})};
   init()});
 </script>
 </body>
