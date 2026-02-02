@@ -1,1355 +1,1104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0a0a1a">
-  <title>Wizz AYCF Route Finder</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#060611;--surface:#0f0f24;--surface2:#181838;--surface3:#222250;
-      --border:rgba(100,100,255,0.1);--border-hi:rgba(100,200,255,0.25);
-      --accent:#00d4ff;--accent2:#7b61ff;--accent3:#ff6b9d;
-      --text:#e4e4f0;--text-dim:#8888aa;--text-muted:#555570;
-      --success:#00e68a;--warning:#ffb347;--danger:#ff5577;
-      --radius:12px;--radius-sm:8px;
-      --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-    }
-    html{font-size:15px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-    body{
-      font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
-      min-height:100dvh;overflow-x:hidden;
-      padding-top:var(--safe-top);padding-bottom:calc(60px + var(--safe-bottom));
-      -webkit-font-smoothing:antialiased;
-    }
-    body::before{
-      content:'';position:fixed;inset:0;z-index:-1;
-      background:
-        radial-gradient(ellipse 80% 60% at 10% 20%,rgba(0,212,255,0.04),transparent),
-        radial-gradient(ellipse 60% 80% at 90% 80%,rgba(123,97,255,0.04),transparent),
-        radial-gradient(ellipse 50% 50% at 50% 50%,rgba(255,107,157,0.02),transparent);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1117">
+<title>Wizz AYCF Route Finder</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2333;--s3:#252d3d;
+  --bdr:#30363d;--bdr2:#484f58;
+  --acc:#58a6ff;--acc2:#a371f7;--grn:#3fb950;--ylw:#d29922;--red:#f85149;--pnk:#f778ba;
+  --tx:#e6edf3;--tx2:#8b949e;--tx3:#6e7681;
+  --r:10px;--rs:6px;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+html{font-size:15px;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);
+  min-height:100dvh;overflow-x:hidden;padding-bottom:calc(16px + var(--sab));
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 
-    /* ── Header ── */
-    .hdr{
-      position:sticky;top:0;z-index:100;
-      background:rgba(6,6,17,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      border-bottom:1px solid var(--border);padding:12px 14px;
-    }
-    .hdr-row{display:flex;align-items:center;justify-content:space-between;max-width:860px;margin:0 auto}
-    .hdr-title{font-size:1.1rem;font-weight:800;letter-spacing:-0.03em}
-    .hdr-title .hi{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hdr-title .ver{font-weight:300;font-size:.7rem;color:var(--text-muted);-webkit-text-fill-color:var(--text-muted)}
-    .hdr-actions{display:flex;gap:6px}
-    .icon-btn{
-      width:36px;height:36px;border-radius:8px;border:1px solid var(--border);
-      background:var(--surface);color:var(--text-dim);display:flex;align-items:center;justify-content:center;
-      cursor:pointer;font-size:1rem;transition:all .2s;
-    }
-    .icon-btn:hover,.icon-btn:active{border-color:var(--accent);color:var(--accent)}
+/* Header */
+.hd{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bdr);padding:10px 14px}
+.hd-r{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto}
+.hd-t{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:6px}
+.hd-t .g{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hd-t .v{font-weight:400;font-size:.65rem;color:var(--tx3);-webkit-text-fill-color:var(--tx3)}
+.hd-a{display:flex;gap:4px}
+.ib{width:36px;height:36px;border-radius:8px;border:1px solid var(--bdr);background:var(--s1);
+  color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem}
+.ib:active{background:var(--s2);border-color:var(--acc)}
 
-    /* ── Content ── */
-    .content{max-width:860px;margin:0 auto;padding:10px 12px}
-    @media(min-width:600px){.content{padding:14px 20px}}
+/* Container */
+.ct{max-width:680px;margin:0 auto;padding:10px 12px}
 
-    /* ── Cards ── */
-    .card{
-      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-      padding:14px;margin-bottom:12px;
-    }
-    .card-title{
-      font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
-      color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:7px;
-    }
+/* Cards */
+.cd{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.cd-t{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--tx2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 
-    /* ── Status ── */
-    .status{border-radius:var(--radius);padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
-    .status::before{content:'';position:absolute;inset:0;border-radius:var(--radius);border:1px solid transparent;pointer-events:none}
-    .status.s-empty{background:linear-gradient(135deg,rgba(255,85,119,.1),rgba(255,85,119,.03))}
-    .status.s-empty::before{border-color:rgba(255,85,119,.25)}
-    .status.s-ok{background:linear-gradient(135deg,rgba(0,230,138,.1),rgba(0,230,138,.03))}
-    .status.s-ok::before{border-color:rgba(0,230,138,.25)}
-    .status.s-load{background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,212,255,.03))}
-    .status.s-load::before{border-color:rgba(0,212,255,.25)}
-    .s-icon{font-size:1.2rem;margin-bottom:4px}
-    .s-title{font-weight:700;font-size:.92rem;margin-bottom:3px}
-    .s-detail{font-size:.78rem;color:var(--text-dim);line-height:1.4}
-    .s-stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
-    .stat-n{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:600;color:var(--success)}
-    .stat-l{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+/* Status */
+.st{border-radius:var(--r);padding:14px;margin-bottom:10px;border:1px solid}
+.st-e{background:rgba(248,81,73,.06);border-color:rgba(248,81,73,.3)}
+.st-o{background:rgba(63,185,80,.06);border-color:rgba(63,185,80,.3)}
+.st-l{background:rgba(88,166,255,.06);border-color:rgba(88,166,255,.3)}
+.st-i{font-size:1.1rem;margin-bottom:2px}
+.st-h{font-weight:700;font-size:.9rem;margin-bottom:3px}
+.st-d{font-size:.78rem;color:var(--tx2);line-height:1.4}
+.st-s{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.sn{font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:600;color:var(--grn)}
+.sl{font-size:.6rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em}
 
-    /* ── Buttons ── */
-    .btn{
-      display:inline-flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--radius-sm);
-      border:none;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;
-      transition:all .2s;white-space:nowrap;
-    }
-    .btn:active{transform:scale(.97)}
-    .btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-    .btn-o{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
-    .btn-o:hover{border-color:var(--accent);color:var(--accent)}
-    .btn-s{background:linear-gradient(135deg,var(--success),#00b377);color:#fff}
-    .btn-d{background:rgba(255,85,119,.12);border:1px solid rgba(255,85,119,.25);color:var(--danger)}
-    .btn-w{background:linear-gradient(135deg,var(--warning),#e69500);color:#111}
-    .btn-sm{padding:6px 10px;font-size:.78rem}
-    .btn-full{width:100%;justify-content:center}
-    .btn:disabled{opacity:.35;cursor:not-allowed}
+/* Buttons */
+.bt{display:inline-flex;align-items:center;gap:4px;padding:10px 14px;border-radius:var(--rs);
+  border:none;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;
+  transition:all .15s;white-space:nowrap;min-height:40px;-webkit-tap-highlight-color:transparent}
+.bt:active{transform:scale(.97);filter:brightness(.85)}
+.bt:disabled{opacity:.3;pointer-events:none}
+.bt-p{background:var(--acc);color:#0d1117}
+.bt-g{background:var(--grn);color:#0d1117}
+.bt-o{background:transparent;border:1px solid var(--bdr);color:var(--tx2)}
+.bt-o:active{border-color:var(--acc);color:var(--acc)}
+.bt-d{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:var(--red)}
+.bt-w{background:var(--ylw);color:#0d1117}
+.bt-sm{padding:7px 10px;font-size:.76rem;min-height:34px}
+.bt-f{width:100%;justify-content:center}
+.rw{display:flex;gap:6px;flex-wrap:wrap}.rw.mb{margin-bottom:10px}
 
-    .row{display:flex;gap:8px;flex-wrap:wrap}
-    .row.mb{margin-bottom:10px}
+/* Inputs */
+.ip{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:11px 12px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.88rem;min-height:42px}
+.ip::placeholder{color:var(--tx3)}.ip:focus{outline:none;border-color:var(--acc)}
+.ip-m{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+select.ip{-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.ip-row{display:flex;gap:8px;margin-bottom:8px}.ip-row .ip{flex:1}
 
-    /* ── Inputs ── */
-    .inp{
-      width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
-      padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;
-    }
-    .inp::placeholder{color:var(--text-muted)}
-    .inp:focus{outline:none;border-color:var(--accent)}
-    .inp-mono{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
-    select.inp{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238888aa' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+/* Favorites */
+.fav-c{display:flex;flex-wrap:wrap;gap:5px;min-height:28px}
+.fav{display:inline-flex;align-items:center;gap:3px;background:rgba(88,166,255,.1);
+  border:1px solid rgba(88,166,255,.2);border-radius:14px;padding:4px 8px 4px 10px;font-size:.76rem}
+.fav .c{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--acc)}
+.fav .n{color:var(--tx3);font-size:.65rem}
+.fav .x{width:18px;height:18px;border-radius:50%;background:rgba(248,81,73,.15);
+  color:var(--red);border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
+.fav-e{color:var(--tx3);font-size:.78rem;font-style:italic}
 
-    /* ── Favorites ── */
-    .fav-row{display:flex;gap:8px;margin-bottom:8px}
-    .fav-row input{flex:1}
-    .fav-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:28px}
-    .fav-chip{
-      display:inline-flex;align-items:center;gap:4px;
-      background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(123,97,255,.1));
-      border:1px solid rgba(0,212,255,.25);border-radius:16px;padding:4px 10px 4px 11px;font-size:.78rem;
-    }
-    .fav-chip .fc{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent)}
-    .fav-chip .fi{color:var(--text-muted);font-size:.68rem}
-    .fav-chip .fx{
-      width:18px;height:18px;border-radius:50%;background:rgba(255,85,119,.15);
-      color:var(--danger);border:none;cursor:pointer;font-size:.7rem;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .fav-empty{color:var(--text-muted);font-size:.78rem;font-style:italic}
+/* Tabs */
+.tb{display:flex;background:var(--s1);border-radius:var(--r);padding:3px;
+  margin-bottom:10px;border:1px solid var(--bdr);overflow-x:auto;gap:2px}
+.t{flex:1;min-width:0;padding:9px 4px;border:none;background:none;color:var(--tx3);
+  font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;border-radius:7px;
+  cursor:pointer;text-align:center;white-space:nowrap}
+.t.on{background:var(--acc);color:#0d1117;font-weight:700}
+.pn{display:none}.pn.on{display:block}
 
-    /* ── Tabs ── */
-    .tabs{
-      display:flex;background:var(--surface);border-radius:var(--radius);padding:3px;
-      margin-bottom:12px;border:1px solid var(--border);overflow-x:auto;
-    }
-    .tab{
-      flex:1;min-width:0;padding:9px 6px;border:none;background:none;color:var(--text-muted);
-      font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;border-radius:9px;
-      cursor:pointer;transition:all .25s;text-align:center;white-space:nowrap;
-    }
-    .tab.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(0,212,255,.2)}
+/* Airport list */
+.ap-b{max-height:220px;overflow-y:auto;border:1px solid var(--bdr);border-radius:var(--rs);
+  background:var(--bg);-webkit-overflow-scrolling:touch}
+.ap-gh{position:sticky;top:0;z-index:2;background:var(--s2);padding:8px 10px;font-size:.72rem;
+  font-weight:700;color:var(--tx2);cursor:pointer;display:flex;justify-content:space-between;
+  align-items:center;border-bottom:1px solid var(--bdr);user-select:none}
+.ap-gh:active{background:var(--s3)}
+.ap-gh .ar{font-size:.6rem;transition:transform .2s}.ap-gh.op .ar{transform:rotate(90deg)}
+.ap-gb{display:none;padding:5px;flex-wrap:wrap;gap:4px}.ap-gb.op{display:flex}
+.ap-c{display:inline-flex;align-items:center;gap:3px;padding:7px 9px;border-radius:5px;
+  background:var(--s1);border:1px solid var(--bdr);cursor:pointer;font-size:.74rem;
+  user-select:none;min-height:34px}
+.ap-c:active{transform:scale(.96)}
+.ap-c.sl{background:rgba(88,166,255,.15);border-color:var(--acc);color:var(--acc)}
+.ap-c .ac{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.78rem}
+.ap-c .an{color:var(--tx3);font-size:.64rem}
+.ap-c.fv{border-color:var(--ylw)}
 
-    /* ── Panels ── */
-    .panel{display:none}.panel.on{display:block}
+/* Date grid */
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.dg label{display:block;font-size:.68rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.dg input[type="date"]{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:10px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.85rem;min-height:42px;-webkit-appearance:none}
+.dg input[type="date"]:focus{outline:none;border-color:var(--acc)}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
-    /* ── Airport list ── */
-    .ap-search{margin-bottom:8px}
-    .ap-box{
-      max-height:260px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);
-      background:var(--bg);-webkit-overflow-scrolling:touch;
-    }
-    .ap-ghdr{
-      position:sticky;top:0;background:var(--surface2);padding:8px 12px;font-size:.75rem;font-weight:700;
-      color:var(--text-dim);cursor:pointer;display:flex;justify-content:space-between;align-items:center;
-      border-bottom:1px solid var(--border);z-index:2;user-select:none;-webkit-user-select:none;
-    }
-    .ap-ghdr:active{background:var(--surface3)}
-    .ap-ghdr .arr{transition:transform .2s;font-size:.65rem}
-    .ap-ghdr.open .arr{transform:rotate(90deg)}
-    .ap-gbody{display:none;padding:6px;flex-wrap:wrap;gap:5px}
-    .ap-gbody.open{display:flex}
-    .ap-chip{
-      display:inline-flex;align-items:center;gap:3px;padding:6px 10px;border-radius:6px;
-      background:var(--surface);border:1px solid var(--border);cursor:pointer;font-size:.76rem;
-      transition:all .15s;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
-    }
-    .ap-chip:active{transform:scale(.96)}
-    .ap-chip.sel{background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(123,97,255,.15));border-color:var(--accent);color:var(--accent)}
-    .ap-chip .ac{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem}
-    .ap-chip .an{color:var(--text-muted);font-size:.68rem}
-    .ap-chip.fv{border-color:var(--warning)}
+/* Options */
+.or{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.or label{font-size:.76rem;font-weight:600;color:var(--tx2)}
 
-    /* ── Date grid ── */
-    .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-    .dgrid label{display:block;font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-    .dgrid input[type="date"]{
-      width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
-      padding:9px 10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;-webkit-appearance:none;
-    }
-    .dgrid input[type="date"]:focus{outline:none;border-color:var(--accent)}
-    input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6)}
+/* Search button */
+.sb{width:100%;padding:14px;border:none;border-radius:var(--r);background:var(--acc);color:#0d1117;
+  font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin:12px 0;
+  min-height:48px}
+.sb:active{filter:brightness(.8);transform:scale(.99)}
+.sb:disabled{opacity:.3;cursor:not-allowed}
 
-    /* ── Options ── */
-    .opt-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
-    .opt-row label{font-size:.78rem;font-weight:600;color:var(--text-dim)}
+/* Results */
+.rs{margin-top:8px}
+.mg{padding:12px;border-radius:var(--rs);margin-bottom:8px;font-size:.82rem;line-height:1.5}
+.mg-i{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);color:#79c0ff}
+.mg-s{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);color:var(--grn)}
+.mg-w{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.2);color:var(--ylw)}
+.mg-e{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);color:var(--red)}
+.dh{font-size:.78rem;font-weight:700;color:var(--acc);margin:12px 0 6px;padding:7px 10px;
+  background:rgba(88,166,255,.06);border-radius:var(--rs);border-left:3px solid var(--acc)}
+.deh{font-size:.82rem;font-weight:700;padding:9px 12px;margin:12px 0 6px;border-radius:var(--rs);
+  background:var(--acc);color:#0d1117}
+.fc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px;margin-bottom:6px}
+.fc-r{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.fc-r .rt{font-weight:700;font-size:.84rem}
+.bg{padding:2px 7px;border-radius:4px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.bg-d{background:rgba(63,185,80,.12);color:var(--grn)}
+.bg-s{background:rgba(210,153,34,.12);color:var(--ylw)}
+.fc-i{font-size:.76rem;color:var(--tx2);line-height:1.5}
+.fc-i .m{font-family:'JetBrains Mono',monospace;color:var(--tx)}
+.bk{display:inline-flex;align-items:center;gap:3px;margin-top:6px;padding:6px 11px;border-radius:4px;
+  background:var(--grn);color:#0d1117;text-decoration:none;font-size:.72rem;font-weight:600;min-height:32px}
+.bk:active{filter:brightness(.8)}
+.lb{background:var(--s2);border-radius:5px;padding:8px;margin-top:6px;font-size:.74rem;line-height:1.6;color:var(--tx2)}
 
-    /* ── Search button ── */
-    .search-btn{
-      width:100%;padding:13px;border:none;border-radius:var(--radius);
-      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-      font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;
-      margin:12px 0;transition:all .2s;box-shadow:0 5px 20px rgba(0,212,255,.2);letter-spacing:.01em;
-    }
-    .search-btn:active{transform:scale(.98);filter:brightness(.9)}
-    .search-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+/* Modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center}
+.mo.op{display:flex}
+.mo-s{width:100%;max-width:520px;background:var(--s1);border-radius:14px 14px 0 0;
+  padding:16px 14px calc(16px + var(--sab));max-height:88dvh;overflow-y:auto;animation:su .25s ease-out}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mo-h{width:36px;height:3px;background:var(--tx3);border-radius:2px;margin:0 auto 12px}
+.mo-t{font-size:1rem;font-weight:700;margin-bottom:12px}
 
-    /* ── Results ── */
-    .results{margin-top:8px}
-    .msg{padding:12px;border-radius:var(--radius-sm);margin-bottom:8px;font-size:.82rem;line-height:1.5}
-    .msg-i{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:#88ccff}
-    .msg-s{background:rgba(0,230,138,.08);border:1px solid rgba(0,230,138,.2);color:var(--success)}
-    .msg-w{background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.2);color:var(--warning)}
-    .msg-e{background:rgba(255,85,119,.08);border:1px solid rgba(255,85,119,.2);color:var(--danger)}
+/* Progress */
+.pg{height:4px;background:rgba(88,166,255,.12);border-radius:2px;overflow:hidden;margin:6px 0}
+.pg .fl{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px;transition:width .3s;width:0%}
 
-    .date-hdr{
-      font-size:.8rem;font-weight:700;color:var(--accent);margin:14px 0 6px;
-      padding:7px 10px;background:rgba(0,212,255,.06);border-radius:var(--radius-sm);border-left:3px solid var(--accent);
-    }
-    .dest-hdr{
-      font-size:.85rem;font-weight:700;padding:9px 12px;margin:12px 0 6px;border-radius:var(--radius-sm);
-      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-    }
+/* Log */
+.la{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);max-height:280px;
+  overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  line-height:1.5;color:var(--tx3);white-space:pre-wrap;word-break:break-all}
+.la .e{color:var(--red)}.la .w{color:var(--ylw)}.la .s{color:var(--grn)}.la .a{color:var(--acc)}
 
-    .fc{
-      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
-      padding:12px;margin-bottom:7px;transition:border-color .2s;
-    }
-    .fc:active{border-color:var(--accent)}
-    .fc.indirect{border-left:3px solid var(--warning)}
-    .fc-route{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-    .fc-route .rt{font-weight:700;font-size:.85rem}
-    .badge{padding:2px 7px;border-radius:5px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-    .b-dir{background:rgba(0,230,138,.12);color:var(--success)}
-    .b-1s{background:rgba(255,179,71,.12);color:var(--warning)}
-    .fc-info{font-size:.78rem;color:var(--text-dim);line-height:1.5}
-    .fc-info .mono{font-family:'JetBrains Mono',monospace;color:var(--text)}
-    .book{
-      display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:6px 12px;border-radius:5px;
-      background:linear-gradient(135deg,var(--success),#00b377);color:#fff;text-decoration:none;
-      font-size:.75rem;font-weight:600;transition:filter .2s;
-    }
-    .book:active{filter:brightness(.85)}
+/* Collapsible */
+.cl-h{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.cl-h .tg{font-size:.65rem;color:var(--tx3);transition:transform .2s}
+.cl-h.op .tg{transform:rotate(180deg)}
+.cl-b{display:none;margin-top:10px}.cl-b.op{display:block}
 
-    .lay-box{background:var(--surface2);border-radius:6px;padding:9px;margin-top:6px;font-size:.76rem;line-height:1.6;color:var(--text-dim)}
-    .trip-path{display:flex;align-items:center;flex-wrap:wrap;gap:3px;margin:6px 0}
-    .trip-path .lb{background:var(--surface2);padding:4px 8px;border-radius:5px;font-size:.75rem;text-align:center}
-    .trip-path .lb .ac{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent)}
-    .trip-path .lb small{display:block;color:var(--text-muted);font-size:.65rem}
-    .trip-path .as{color:var(--accent2);font-weight:700;font-size:.82rem}
-    .trip-dur{font-size:.8rem;font-weight:600;color:var(--success);margin-bottom:6px}
-    .trip-leg{padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem}
-    .trip-leg:last-child{border-bottom:none}
+/* Steps */
+.stp{counter-reset:step;margin:10px 0}
+.sp{counter-increment:step;padding-left:30px;position:relative;margin-bottom:10px;font-size:.8rem;line-height:1.5;color:var(--tx2)}
+.sp::before{content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;
+  background:var(--acc);color:var(--bg);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sp strong{color:var(--tx)}
 
-    /* ── Modal ── */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-    .modal.open{display:flex}
-    .modal-sheet{
-      width:100%;max-width:520px;background:var(--surface);border-radius:18px 18px 0 0;
-      padding:18px 14px calc(18px + var(--safe-bottom));max-height:85dvh;overflow-y:auto;
-      animation:sheetUp .3s ease-out;
-    }
-    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-    .modal-handle{width:36px;height:3px;background:var(--text-muted);border-radius:2px;margin:0 auto 14px}
-    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:14px}
-
-    /* ── Drop zone ── */
-    .drop{
-      border:2px dashed var(--border);border-radius:var(--radius);padding:24px 16px;text-align:center;
-      color:var(--text-muted);cursor:pointer;transition:all .2s;margin-bottom:14px;
-    }
-    .drop:hover,.drop.over{border-color:var(--accent);background:rgba(0,212,255,.03)}
-    .drop .di{font-size:1.8rem;margin-bottom:6px}
-
-    /* ── Debug log ── */
-    .log-area{
-      background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
-      max-height:300px;overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;
-      font-size:.7rem;line-height:1.5;color:var(--text-dim);white-space:pre-wrap;word-break:break-all;
-    }
-    .log-area .err{color:var(--danger)}.log-area .warn{color:var(--warning)}.log-area .ok{color:var(--success)}
-    .log-area .api{color:var(--accent)}
-
-    /* ── Collapsible ── */
-    .coll-hdr{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-    .coll-hdr .tgl{font-size:.7rem;color:var(--text-muted);transition:transform .2s}
-    .coll-hdr.open .tgl{transform:rotate(180deg)}
-    .coll-body{display:none;margin-top:10px}
-    .coll-body.open{display:block}
-
-    /* ── Bookmarklet code ── */
-    .bm-code{
-      background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
-      padding:10px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);
-      max-height:120px;overflow-y:auto;word-break:break-all;user-select:all;-webkit-user-select:all;
-    }
-    .bm-link{
-      display:inline-block;padding:10px 18px;border-radius:var(--radius-sm);
-      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-      font-weight:700;font-size:.85rem;text-decoration:none;cursor:grab;margin:8px 0;
-    }
-
-    /* ── GitHub settings ── */
-    .gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-    @media(max-width:400px){.gh-grid{grid-template-columns:1fr}}
-
-    /* ── Progress ── */
-    .prog{height:5px;background:rgba(0,212,255,.1);border-radius:3px;overflow:hidden;margin:8px 0}
-    .prog .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:2px}
-
-    /* ── Misc ── */
-    .hidden{display:none!important}
-    .footer{text-align:center;font-size:.7rem;color:var(--text-muted);padding:18px 0}
-    .footer a{color:var(--accent);text-decoration:none}
-    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,212,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .sep{border:none;border-top:1px solid var(--border);margin:12px 0}
-
-    /* ── Steps ── */
-    .steps{counter-reset:step}
-    .step{counter-increment:step;padding-left:32px;position:relative;margin-bottom:10px;font-size:.82rem;line-height:1.5}
-    .step::before{
-      content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;
-      border-radius:50%;background:var(--accent);color:var(--bg);font-size:.72rem;font-weight:700;
-      display:flex;align-items:center;justify-content:center;
-    }
-  </style>
+/* Misc */
+.hd-n{display:none!important}
+.sep{border:none;border-top:1px solid var(--bdr);margin:12px 0}
+.sp-n{display:inline-block;width:14px;height:14px;border:2px solid rgba(88,166,255,.2);
+  border-top-color:var(--acc);border-radius:50%;animation:spi .6s linear infinite}
+@keyframes spi{to{transform:rotate(360deg)}}
+.ft{text-align:center;font-size:.68rem;color:var(--tx3);padding:18px 0}
+.ft a{color:var(--acc);text-decoration:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(88,166,255,.15);border-radius:2px}
+.code-box{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);padding:8px;
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--acc);max-height:100px;
+  overflow-y:auto;word-break:break-all;user-select:all;-webkit-user-select:all;margin:6px 0}
+.gh-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:380px){.gh-g{grid-template-columns:1fr}}
+.lbl{font-size:.68rem;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;display:block}
+</style>
 </head>
 <body>
 
-<!-- ═══ Header ═══ -->
-<header class="hdr">
-  <div class="hdr-row">
-    <div class="hdr-title">✈️ <span class="hi">Wizz AYCF Finder</span> <span class="ver">v3.0</span></div>
-    <div class="hdr-actions">
-      <button class="icon-btn" id="btnLog" title="Debug Log">🔧</button>
-      <button class="icon-btn" id="btnGH" title="GitHub Settings">⚙️</button>
-    </div>
+<!-- HEADER -->
+<header class="hd">
+<div class="hd-r">
+  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.1</span></div>
+  <div class="hd-a">
+    <button class="ib" id="bLog" title="Debug Log">🔧</button>
+    <button class="ib" id="bGH" title="Settings">⚙️</button>
   </div>
+</div>
 </header>
 
-<main class="content">
+<main class="ct">
 
-  <!-- ═══ Status ═══ -->
-  <div class="status s-empty" id="statusCard">
-    <div class="s-icon" id="sIcon">📭</div>
-    <div class="s-title" id="sTitle">No Flight Data</div>
-    <div class="s-detail" id="sDetail">Import data or use the Data Collector to download flights from Wizz Air.</div>
-    <div class="s-stats hidden" id="sStats">
-      <div><div class="stat-n" id="stFlights">0</div><div class="stat-l">Flights</div></div>
-      <div><div class="stat-n" id="stOrigins">0</div><div class="stat-l">Origins</div></div>
-      <div><div class="stat-n" id="stRoutes">0</div><div class="stat-l">Routes</div></div>
-      <div><div class="stat-n" id="stDays">0</div><div class="stat-l">Days</div></div>
-    </div>
-  </div>
-
-  <!-- ═══ Data Collector (Bookmarklet) ═══ -->
-  <div class="card">
-    <div class="coll-hdr" id="collectorHdr">
-      <div class="card-title" style="margin:0">🚀 Data Collector — Download Flights</div>
-      <span class="tgl">▼</span>
-    </div>
-    <div class="coll-body" id="collectorBody">
-      <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px;">
-        Since the Wizz Air API requires login cookies, we use a <strong>Data Collector bookmarklet</strong> that runs directly on the Wizz Air page.
-      </p>
-
-      <div class="steps">
-        <div class="step"><strong>Login</strong> — Open Wizz Air Multipass and log in:<br>
-          <a href="https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets" target="_blank" class="btn btn-p btn-sm" style="margin-top:6px">🔑 Open Wizz Air Multipass</a>
-        </div>
-        <div class="step"><strong>Install Bookmarklet</strong> — Drag this button to your bookmarks bar:<br>
-          <a class="bm-link" id="bmLink" href="#">📥 AYCF Collector</a><br>
-          <small style="color:var(--text-muted)">On mobile: copy the code below and create a bookmark manually, then paste as the URL.</small>
-          <div style="margin-top:6px">
-            <button class="btn btn-o btn-sm" id="btnCopyBM">📋 Copy bookmarklet code</button>
-          </div>
-          <div class="bm-code hidden" id="bmCode"></div>
-        </div>
-        <div class="step"><strong>Run</strong> — While on the Wizz Air Multipass page, click the bookmarklet. It will scrape routes and download flights, then save a JSON file.</div>
-        <div class="step"><strong>Import</strong> — Import the downloaded JSON file below.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ Import / GitHub ═══ -->
-  <div class="card">
-    <div class="card-title">📦 Data Management</div>
-    <div class="row mb">
-      <button class="btn btn-p" id="btnImport">📥 Import JSON</button>
-      <button class="btn btn-s" id="btnExport">📤 Export</button>
-      <button class="btn btn-o" id="btnGHLoad">☁️ Load from GitHub</button>
-      <button class="btn btn-o" id="btnGHSave">💾 Save to GitHub</button>
-      <button class="btn btn-d btn-sm" id="btnClear">🗑️ Clear</button>
-    </div>
-    <input type="file" id="fileIn" accept=".json" style="display:none">
-    <div id="dataMsg"></div>
-  </div>
-
-  <!-- ═══ Favorites ═══ -->
-  <div class="card">
-    <div class="card-title">⭐ Favorites</div>
-    <div class="fav-row">
-      <input type="text" class="inp inp-mono" id="favIn" placeholder="TLV, BCN..." maxlength="3" autocomplete="off" autocapitalize="characters">
-      <button class="btn btn-p btn-sm" id="btnFav">Add</button>
-    </div>
-    <div class="fav-chips" id="favChips"><span class="fav-empty">No favorites</span></div>
-  </div>
-
-  <!-- ═══ Mode Tabs ═══ -->
-  <div class="tabs">
-    <button class="tab on" data-m="dep">✈️ From Origin</button>
-    <button class="tab" data-m="dest">🎯 To Dest</button>
-    <button class="tab" data-m="rt">🔄 Round Trip</button>
-    <button class="tab" data-m="trip">🗓️ Multi-Hop</button>
-  </div>
-
-  <!-- ═══ FROM ORIGIN ═══ -->
-  <div class="panel on" id="p-dep">
-    <div class="card">
-      <div class="card-title">🛫 Origin Airports</div>
-      <input type="text" class="inp ap-search" id="depSrch" placeholder="Search airports...">
-      <div class="row mb">
-        <button class="btn btn-o btn-sm sfav" data-l="depList">⭐</button>
-        <button class="btn btn-o btn-sm sall" data-l="depList">All</button>
-        <button class="btn btn-o btn-sm sclr" data-l="depList">Clear</button>
-      </div>
-      <div class="ap-box" id="depList"></div>
-    </div>
-    <div class="dgrid">
-      <div><label>From</label><input type="date" id="depS"></div>
-      <div><label>To</label><input type="date" id="depE"></div>
-    </div>
-  </div>
-
-  <!-- ═══ TO DESTINATION ═══ -->
-  <div class="panel" id="p-dest">
-    <div class="card">
-      <div class="card-title">🎯 Destination Airports</div>
-      <input type="text" class="inp ap-search" id="destSrch" placeholder="Search airports...">
-      <div class="row mb">
-        <button class="btn btn-o btn-sm sfav" data-l="destList">⭐</button>
-        <button class="btn btn-o btn-sm sall" data-l="destList">All</button>
-        <button class="btn btn-o btn-sm sclr" data-l="destList">Clear</button>
-      </div>
-      <div class="ap-box" id="destList"></div>
-    </div>
-    <div class="dgrid">
-      <div><label>From</label><input type="date" id="destS"></div>
-      <div><label>To</label><input type="date" id="destE"></div>
-    </div>
-  </div>
-
-  <!-- ═══ ROUND TRIP (Anywhere ↔ Anywhere) ═══ -->
-  <div class="panel" id="p-rt">
-    <div class="card">
-      <div class="card-title">🔄 Round Trip — Anywhere to Anywhere</div>
-      <p style="font-size:.78rem;color:var(--text-dim);margin-bottom:10px;">
-        Find all possible round trips in the cached data. Optionally filter by origin/destination.
-      </p>
-      <div class="opt-row">
-        <label>Origin filter:</label>
-        <input type="text" class="inp inp-mono" id="rtOrigIn" placeholder="Any (or TLV,BUD)" style="width:140px" autocapitalize="characters">
-      </div>
-      <div class="opt-row">
-        <label>Dest filter:</label>
-        <input type="text" class="inp inp-mono" id="rtDestIn" placeholder="Any (or BCN,ATH)" style="width:140px" autocapitalize="characters">
-      </div>
-    </div>
-    <div class="dgrid">
-      <div><label>Depart after</label><input type="date" id="rtS"></div>
-      <div><label>Return before</label><input type="date" id="rtE"></div>
-    </div>
-    <div class="opt-row">
-      <label>Min stay:</label>
-      <select class="inp" id="rtMin" style="width:100px">
-        <option value="0">Any</option><option value="1">1+ days</option><option value="2" selected>2+ days</option>
-        <option value="3">3+ days</option><option value="5">5+ days</option><option value="7">7+ days</option>
-      </select>
-      <label>Max stay:</label>
-      <select class="inp" id="rtMax" style="width:100px">
-        <option value="3">3 days</option><option value="5">5 days</option><option value="7" selected>7 days</option>
-        <option value="14">14 days</option><option value="30">30 days</option><option value="99">Any</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- ═══ MULTI-HOP TRIP ═══ -->
-  <div class="panel" id="p-trip">
-    <div class="card">
-      <div class="card-title">🏠 Home Airports</div>
-      <p style="font-size:.78rem;color:var(--text-dim);margin-bottom:8px;">Trip starts & ends here.</p>
-      <input type="text" class="inp ap-search" id="tripSrch" placeholder="Search airports...">
-      <div class="row mb">
-        <button class="btn btn-o btn-sm sfav" data-l="tripList">⭐</button>
-        <button class="btn btn-o btn-sm sall" data-l="tripList">All</button>
-        <button class="btn btn-o btn-sm sclr" data-l="tripList">Clear</button>
-      </div>
-      <div class="ap-box" id="tripList"></div>
-    </div>
-    <div class="dgrid">
-      <div><label>From</label><input type="date" id="tripS"></div>
-      <div><label>To</label><input type="date" id="tripE"></div>
-    </div>
-    <div class="opt-row">
-      <label>Extra stops:</label>
-      <select class="inp" id="tripHops" style="width:200px">
-        <option value="0">Direct (A→B→A)</option>
-        <option value="1" selected>1 extra (A→B→C→A)</option>
-        <option value="2">2 extra (A→B→C→D→A)</option>
-      </select>
-    </div>
-    <div class="opt-row">
-      <label>Min duration:</label>
-      <select class="inp" id="tripMin" style="width:100px">
-        <option value="0">Any</option><option value="1">1+</option><option value="2">2+</option>
-        <option value="3" selected>3+</option><option value="5">5+</option><option value="7">7+</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- ═══ Search Button ═══ -->
-  <button class="search-btn" id="btnSearch">🔍 Search Flights</button>
-
-  <!-- ═══ Results ═══ -->
-  <div class="results" id="results"></div>
-
-  <div class="footer">
-    Not affiliated with Wizz Air.
-    <a href="https://github.com/vloss3/wizz-aycf-route-finder" target="_blank">GitHub</a> ·
-    <a href="https://discord.gg/k3eRaSBez4" target="_blank">Discord</a>
-  </div>
-</main>
-
-<!-- ═══ GitHub Settings Modal ═══ -->
-<div class="modal" id="modalGH">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">⚙️ GitHub Settings</div>
-    <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:12px;">
-      Save & load flight data from your GitHub repo. Create a
-      <a href="https://github.com/settings/tokens/new?scopes=repo&description=AYCF+Route+Finder" target="_blank" style="color:var(--accent)">Personal Access Token</a>
-      with <strong>repo</strong> scope.
-    </p>
-    <div class="gh-grid">
-      <div><label style="font-size:.72rem;color:var(--text-muted)">Owner</label><input class="inp" id="ghOwner" placeholder="palayax"></div>
-      <div><label style="font-size:.72rem;color:var(--text-muted)">Repo</label><input class="inp" id="ghRepo" placeholder="wizz-aycf-web"></div>
-    </div>
-    <div style="margin-bottom:8px">
-      <label style="font-size:.72rem;color:var(--text-muted)">Personal Access Token</label>
-      <input class="inp" id="ghToken" type="password" placeholder="ghp_xxxxxxxxxxxx">
-    </div>
-    <div class="row mb">
-      <button class="btn btn-s" id="btnGHTest">🔗 Test Connection</button>
-      <button class="btn btn-p" id="btnGHSettSave">💾 Save Settings</button>
-    </div>
-    <div id="ghMsg"></div>
-    <hr class="sep">
-    <div class="card-title">📁 Saved Databases</div>
-    <div id="ghFileList" style="font-size:.82rem;color:var(--text-dim)">Configure settings above to see saved files.</div>
-    <hr class="sep">
-    <button class="btn btn-o btn-full" id="btnCloseGH">Close</button>
+<!-- STATUS -->
+<div class="st st-e" id="stC">
+  <div class="st-i" id="stI">📭</div>
+  <div class="st-h" id="stH">No Flight Data</div>
+  <div class="st-d" id="stD">Login to Wizz Air or import data to get started.</div>
+  <div class="st-s hd-n" id="stS">
+    <div><div class="sn" id="s1">0</div><div class="sl">Flights</div></div>
+    <div><div class="sn" id="s2">0</div><div class="sl">Origins</div></div>
+    <div><div class="sn" id="s3">0</div><div class="sl">Routes</div></div>
+    <div><div class="sn" id="s4">0</div><div class="sl">Days</div></div>
   </div>
 </div>
 
-<!-- ═══ Debug Log Modal ═══ -->
-<div class="modal" id="modalLog">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">🔧 Debug Log <span id="logCount" style="font-size:.75rem;color:var(--text-muted)">(0)</span></div>
-    <div class="row mb">
-      <button class="btn btn-o btn-sm" id="btnLogExport">📥 Export Log</button>
-      <button class="btn btn-d btn-sm" id="btnLogClear">Clear</button>
+<!-- PROXY SETUP (shown when no proxy configured) -->
+<div class="cd" id="proxySetup">
+  <div class="cd-t">🔧 One-Time Setup (required)</div>
+  <p style="font-size:.8rem;color:var(--tx2);margin-bottom:10px">
+    To connect to Wizz Air from this app, you need a free <strong style="color:var(--tx)">Cloudflare Worker</strong> proxy (takes 2 minutes).
+  </p>
+  <div class="cl-h" id="setupHdr"><span style="font-size:.78rem;font-weight:600;color:var(--acc)">📋 Setup Instructions</span><span class="tg">▼</span></div>
+  <div class="cl-b" id="setupBody">
+    <div class="stp">
+      <div class="sp">Go to <a href="https://dash.cloudflare.com/sign-up" target="_blank" style="color:var(--acc)">Cloudflare</a> → Create free account (or log in)</div>
+      <div class="sp"><strong>Workers & Pages</strong> → <strong>Create</strong></div>
+      <div class="sp">Click <strong>"Start with Hello World!"</strong> (green globe icon)</div>
+      <div class="sp">Name it anything (e.g. <code style="color:var(--acc)">aycf-proxy</code>) → Click <strong>Deploy</strong></div>
+      <div class="sp">Click <strong>"Edit Code"</strong> → Select all existing code → Delete it → Paste the code below → Click <strong>Deploy</strong></div>
+      <div class="sp">Copy your Worker URL from the top (like <code style="color:var(--acc)">https://aycf-proxy.YOUR.workers.dev</code>) and paste it below</div>
+      <div class="sp">Click <strong>Test</strong> to verify it works! ✅</div>
     </div>
-    <div class="log-area" id="logArea">Waiting for events...</div>
-    <hr class="sep">
-    <button class="btn btn-o btn-full" id="btnCloseLog">Close</button>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button class="bt bt-p bt-sm" id="bCopyWorker">📋 Copy Worker Code</button>
+    </div>
+    <div class="code-box hd-n" id="workerCode"></div>
   </div>
+  <div class="ip-row" style="margin-top:10px">
+    <input class="ip" id="proxyUrl" placeholder="https://aycf-proxy.xxx.workers.dev" autocomplete="url">
+    <button class="bt bt-g" id="bSaveProxy">Save</button>
+    <button class="bt bt-p bt-sm" id="bTestProxy" style="white-space:nowrap">🧪 Test</button>
+  </div>
+  <div id="proxyMsg" style="margin-top:6px"></div>
+</div>
+
+<!-- LOGIN & DOWNLOAD -->
+<div class="cd" id="loginCard">
+  <div class="cd-t">🔑 Wizz Air Login & Download</div>
+  <div class="ip-row">
+    <input class="ip" id="wizEmail" type="email" placeholder="Email" autocomplete="email">
+  </div>
+  <div class="ip-row">
+    <input class="ip" id="wizPass" type="password" placeholder="Password" autocomplete="current-password">
+  </div>
+  <div class="rw mb">
+    <button class="bt bt-p" id="bLogin">🚀 Login & Download All</button>
+    <button class="bt bt-o hd-n" id="bPause">⏸ Pause</button>
+    <button class="bt bt-d hd-n" id="bStop">⏹ Stop</button>
+  </div>
+  <div class="pg hd-n" id="dlProg"><div class="fl" id="dlFill"></div></div>
+  <div id="dlStatus" style="font-size:.75rem;color:var(--tx2);margin-top:4px"></div>
+  <div id="loginMsg"></div>
+</div>
+
+<!-- DATA MANAGEMENT -->
+<div class="cd">
+  <div class="cd-t">📦 Data Management</div>
+  <div class="rw mb">
+    <button class="bt bt-o bt-sm" id="bImport">📥 Import</button>
+    <button class="bt bt-o bt-sm" id="bExport">📤 Export</button>
+    <button class="bt bt-o bt-sm" id="bGHLoad">☁️ GitHub</button>
+    <button class="bt bt-o bt-sm" id="bGHSave">💾 Save GH</button>
+    <button class="bt bt-d bt-sm" id="bClear">🗑️</button>
+  </div>
+  <input type="file" id="fileIn" accept=".json" style="display:none">
+  <div id="dMsg"></div>
+</div>
+
+<!-- FAVORITES -->
+<div class="cd">
+  <div class="cd-t">⭐ Favorites</div>
+  <div class="ip-row">
+    <input class="ip ip-m" id="favI" placeholder="TLV" maxlength="3" autocomplete="off" autocapitalize="characters">
+    <button class="bt bt-p bt-sm" id="bFav">Add</button>
+  </div>
+  <div class="fav-c" id="favC"><span class="fav-e">No favorites</span></div>
+</div>
+
+<!-- MODE TABS -->
+<div class="tb">
+  <button class="t on" data-m="dep">✈️ From</button>
+  <button class="t" data-m="dest">🎯 To</button>
+  <button class="t" data-m="rt">🔄 Round Trip</button>
+  <button class="t" data-m="trip">🗓️ Multi-Hop</button>
+</div>
+
+<!-- FROM ORIGIN -->
+<div class="pn on" id="p-dep">
+  <div class="cd">
+    <div class="cd-t">🛫 Origin Airports</div>
+    <input class="ip" id="dSr" placeholder="Search airports..." style="margin-bottom:6px">
+    <div class="rw mb">
+      <button class="bt bt-o bt-sm sf" data-l="dL">⭐</button>
+      <button class="bt bt-o bt-sm sa" data-l="dL">All</button>
+      <button class="bt bt-o bt-sm sc" data-l="dL">Clear</button>
+    </div>
+    <div class="ap-b" id="dL"></div>
+  </div>
+  <div class="dg">
+    <div><label>From</label><input type="date" id="dS"></div>
+    <div><label>To</label><input type="date" id="dE"></div>
+  </div>
+</div>
+
+<!-- TO DESTINATION -->
+<div class="pn" id="p-dest">
+  <div class="cd">
+    <div class="cd-t">🎯 Destination Airports</div>
+    <input class="ip" id="sSr" placeholder="Search airports..." style="margin-bottom:6px">
+    <div class="rw mb">
+      <button class="bt bt-o bt-sm sf" data-l="sL">⭐</button>
+      <button class="bt bt-o bt-sm sa" data-l="sL">All</button>
+      <button class="bt bt-o bt-sm sc" data-l="sL">Clear</button>
+    </div>
+    <div class="ap-b" id="sL"></div>
+  </div>
+  <div class="dg">
+    <div><label>From</label><input type="date" id="sS"></div>
+    <div><label>To</label><input type="date" id="sE"></div>
+  </div>
+</div>
+
+<!-- ROUND TRIP -->
+<div class="pn" id="p-rt">
+  <div class="cd">
+    <div class="cd-t">🔄 Round Trip — Anywhere ↔ Anywhere</div>
+    <p style="font-size:.76rem;color:var(--tx2);margin-bottom:8px">Find all round-trip combos in cached data.</p>
+    <div class="or"><label>Origin:</label><input class="ip ip-m" id="rtO" placeholder="Any (or TLV,BUD)" style="width:140px" autocapitalize="characters"></div>
+    <div class="or"><label>Dest:</label><input class="ip ip-m" id="rtD" placeholder="Any (or BCN,ATH)" style="width:140px" autocapitalize="characters"></div>
+  </div>
+  <div class="dg">
+    <div><label>Depart after</label><input type="date" id="rtS"></div>
+    <div><label>Return before</label><input type="date" id="rtE"></div>
+  </div>
+  <div class="or">
+    <label>Min stay:</label>
+    <select class="ip" id="rtMn" style="width:90px"><option value="0">Any</option><option value="1">1d</option><option value="2" selected>2d</option><option value="3">3d</option><option value="5">5d</option><option value="7">7d</option></select>
+    <label>Max:</label>
+    <select class="ip" id="rtMx" style="width:90px"><option value="3">3d</option><option value="5">5d</option><option value="7" selected>7d</option><option value="14">14d</option><option value="30">30d</option><option value="99">Any</option></select>
+  </div>
+</div>
+
+<!-- MULTI-HOP -->
+<div class="pn" id="p-trip">
+  <div class="cd">
+    <div class="cd-t">🏠 Home Airports</div>
+    <p style="font-size:.76rem;color:var(--tx2);margin-bottom:6px">Trip starts & ends here.</p>
+    <input class="ip" id="tSr" placeholder="Search airports..." style="margin-bottom:6px">
+    <div class="rw mb">
+      <button class="bt bt-o bt-sm sf" data-l="tL">⭐</button>
+      <button class="bt bt-o bt-sm sa" data-l="tL">All</button>
+      <button class="bt bt-o bt-sm sc" data-l="tL">Clear</button>
+    </div>
+    <div class="ap-b" id="tL"></div>
+  </div>
+  <div class="dg">
+    <div><label>From</label><input type="date" id="tS"></div>
+    <div><label>To</label><input type="date" id="tE"></div>
+  </div>
+  <div class="or">
+    <label>Stops:</label>
+    <select class="ip" id="tH" style="width:180px"><option value="0">Direct (A→B→A)</option><option value="1" selected>1 extra (A→B→C→A)</option><option value="2">2 extra</option></select>
+  </div>
+  <div class="or">
+    <label>Min days:</label>
+    <select class="ip" id="tMn" style="width:80px"><option value="0">Any</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="5">5</option><option value="7">7</option></select>
+  </div>
+</div>
+
+<button class="sb" id="bSrch">🔍 Search Flights</button>
+<div class="rs" id="res"></div>
+
+<div class="ft">Not affiliated with Wizz Air. <a href="https://github.com/vloss3/wizz-aycf-route-finder" target="_blank">GitHub</a> · <a href="https://discord.gg/k3eRaSBez4" target="_blank">Discord</a></div>
+</main>
+
+<!-- SETTINGS MODAL -->
+<div class="mo" id="mGH">
+<div class="mo-s">
+  <div class="mo-h"></div>
+  <div class="mo-t">⚙️ GitHub Settings</div>
+  <p style="font-size:.78rem;color:var(--tx2);margin-bottom:10px">Save flight data to your GitHub repo. Need a <a href="https://github.com/settings/tokens/new?scopes=repo&description=AYCF" target="_blank" style="color:var(--acc)">Personal Access Token</a> with <strong>repo</strong> scope.</p>
+  <div class="gh-g">
+    <div><span class="lbl">Owner</span><input class="ip" id="gO" placeholder="palayax"></div>
+    <div><span class="lbl">Repo</span><input class="ip" id="gR" placeholder="wizz-aycf-web"></div>
+  </div>
+  <div style="margin-bottom:8px"><span class="lbl">Token</span><input class="ip" id="gT" type="password" placeholder="ghp_xxxx"></div>
+  <div class="rw mb">
+    <button class="bt bt-g bt-sm" id="bGHT">Test</button>
+    <button class="bt bt-p bt-sm" id="bGHS">Save</button>
+  </div>
+  <div id="gMsg"></div>
+  <hr class="sep">
+  <div class="cd-t">📁 Saved Files</div>
+  <div id="gFL" style="font-size:.78rem;color:var(--tx2)">Configure above first.</div>
+  <hr class="sep">
+  <div class="cd-t">🔧 Proxy URL</div>
+  <div class="ip-row"><input class="ip" id="gPx" placeholder="https://aycf-proxy.xxx.workers.dev"><button class="bt bt-g bt-sm" id="bGPx">Save</button></div>
+  <hr class="sep">
+  <button class="bt bt-o bt-f" id="bCGH">Close</button>
+</div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="mo" id="mLog">
+<div class="mo-s">
+  <div class="mo-h"></div>
+  <div class="mo-t">🔧 Debug Log <span id="lCnt" style="font-size:.72rem;color:var(--tx3)">(0)</span></div>
+  <div class="rw mb">
+    <button class="bt bt-o bt-sm" id="bLE">📥 Export</button>
+    <button class="bt bt-d bt-sm" id="bLC">Clear</button>
+  </div>
+  <div class="la" id="lA">Waiting for events...</div>
+  <hr class="sep">
+  <button class="bt bt-o bt-f" id="bCL">Close</button>
+</div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  WIZZ AYCF WEB v3.0 — Full-featured mobile web app
-// ═══════════════════════════════════════════════════════════════
-
-const VER = '3.0.0';
-const DB_NAME = 'WizzAYCFWeb';
-const DB_VER = 1;
-const CACHE_H = 72; // hours
-const MIN_LAY = 120; // minutes
-const COUNTRIES = {
-  TLV:'Israel',ETH:'Israel',VDA:'Israel',
-  LTN:'UK',LGW:'UK',STN:'UK',LHR:'UK',BHX:'UK',BRS:'UK',MAN:'UK',EDI:'UK',GLA:'UK',LPL:'UK',NCL:'UK',EMA:'UK',ABZ:'UK',CWL:'UK',DSA:'UK',
-  FCO:'Italy',CIA:'Italy',MXP:'Italy',BGY:'Italy',VCE:'Italy',TSF:'Italy',NAP:'Italy',BRI:'Italy',CTA:'Italy',PMO:'Italy',BLQ:'Italy',TRN:'Italy',PSA:'Italy',VRN:'Italy',GOA:'Italy',TRS:'Italy',
-  BCN:'Spain',MAD:'Spain',AGP:'Spain',ALC:'Spain',PMI:'Spain',IBZ:'Spain',VLC:'Spain',SVQ:'Spain',BIO:'Spain',TFS:'Spain',LPA:'Spain',ACE:'Spain',FUE:'Spain',
-  BER:'Germany',CGN:'Germany',DTM:'Germany',DUS:'Germany',FRA:'Germany',HHN:'Germany',HAM:'Germany',HAJ:'Germany',MUC:'Germany',NUE:'Germany',STR:'Germany',FMM:'Germany',
-  WAW:'Poland',WMI:'Poland',KRK:'Poland',KTW:'Poland',GDN:'Poland',POZ:'Poland',WRO:'Poland',LUZ:'Poland',RZE:'Poland',SZZ:'Poland',BZG:'Poland',LCJ:'Poland',
-  OTP:'Romania',CLJ:'Romania',TSR:'Romania',IAS:'Romania',SBZ:'Romania',SUJ:'Romania',CRA:'Romania',BCM:'Romania',OMR:'Romania',
-  BUD:'Hungary',VIE:'Austria',
-  ATH:'Greece',SKG:'Greece',HER:'Greece',RHO:'Greece',CFU:'Greece',ZTH:'Greece',KGS:'Greece',CHQ:'Greece',
-  LCA:'Cyprus',PFO:'Cyprus',DXB:'UAE',AUH:'UAE',
-  SOF:'Bulgaria',VAR:'Bulgaria',BOJ:'Bulgaria',
-  CDG:'France',ORY:'France',BVA:'France',NCE:'France',MRS:'France',LYS:'France',TLS:'France',BOD:'France',NTE:'France',
-  LIS:'Portugal',OPO:'Portugal',FAO:'Portugal',AMS:'Netherlands',EIN:'Netherlands',
-  BRU:'Belgium',CRL:'Belgium',GVA:'Switzerland',ZRH:'Switzerland',BSL:'Switzerland',
-  ARN:'Sweden',GOT:'Sweden',CPH:'Denmark',OSL:'Norway',BGO:'Norway',TRD:'Norway',HEL:'Finland',TMP:'Finland',
-  BEG:'Serbia',PRN:'Kosovo',SKP:'N.Macedonia',TGD:'Montenegro',SJJ:'Bosnia',ZAG:'Croatia',SPU:'Croatia',DBV:'Croatia',
-  TIA:'Albania',PRG:'Czechia',BTS:'Slovakia',LJU:'Slovenia',RIX:'Latvia',VNO:'Lithuania',TLL:'Estonia',KIV:'Moldova',KBP:'Ukraine',IEV:'Ukraine',
+// ══════════════════════════════════════════════════════
+//  WIZZ AYCF WEB v3.1 — Complete mobile web app
+// ══════════════════════════════════════════════════════
+const V='3.1.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120;
+const CC={
+TLV:'Israel',ETH:'Israel',VDA:'Israel',
+LTN:'UK',LGW:'UK',STN:'UK',LHR:'UK',BHX:'UK',BRS:'UK',MAN:'UK',EDI:'UK',GLA:'UK',LPL:'UK',NCL:'UK',EMA:'UK',ABZ:'UK',CWL:'UK',DSA:'UK',
+FCO:'Italy',CIA:'Italy',MXP:'Italy',BGY:'Italy',VCE:'Italy',TSF:'Italy',NAP:'Italy',BRI:'Italy',CTA:'Italy',PMO:'Italy',BLQ:'Italy',TRN:'Italy',PSA:'Italy',VRN:'Italy',GOA:'Italy',TRS:'Italy',
+BCN:'Spain',MAD:'Spain',AGP:'Spain',ALC:'Spain',PMI:'Spain',IBZ:'Spain',VLC:'Spain',SVQ:'Spain',BIO:'Spain',TFS:'Spain',LPA:'Spain',ACE:'Spain',FUE:'Spain',
+BER:'Germany',CGN:'Germany',DTM:'Germany',DUS:'Germany',FRA:'Germany',HHN:'Germany',HAM:'Germany',HAJ:'Germany',MUC:'Germany',NUE:'Germany',STR:'Germany',FMM:'Germany',
+WAW:'Poland',WMI:'Poland',KRK:'Poland',KTW:'Poland',GDN:'Poland',POZ:'Poland',WRO:'Poland',LUZ:'Poland',RZE:'Poland',SZZ:'Poland',BZG:'Poland',LCJ:'Poland',
+OTP:'Romania',CLJ:'Romania',TSR:'Romania',IAS:'Romania',SBZ:'Romania',SUJ:'Romania',CRA:'Romania',BCM:'Romania',OMR:'Romania',
+BUD:'Hungary',VIE:'Austria',
+ATH:'Greece',SKG:'Greece',HER:'Greece',RHO:'Greece',CFU:'Greece',ZTH:'Greece',KGS:'Greece',CHQ:'Greece',
+LCA:'Cyprus',PFO:'Cyprus',DXB:'UAE',AUH:'UAE',
+SOF:'Bulgaria',VAR:'Bulgaria',BOJ:'Bulgaria',
+CDG:'France',ORY:'France',BVA:'France',NCE:'France',MRS:'France',LYS:'France',TLS:'France',BOD:'France',NTE:'France',
+LIS:'Portugal',OPO:'Portugal',FAO:'Portugal',AMS:'Netherlands',EIN:'Netherlands',
+BRU:'Belgium',CRL:'Belgium',GVA:'Switzerland',ZRH:'Switzerland',BSL:'Switzerland',
+ARN:'Sweden',GOT:'Sweden',CPH:'Denmark',OSL:'Norway',BGO:'Norway',TRD:'Norway',HEL:'Finland',TMP:'Finland',
+BEG:'Serbia',PRN:'Kosovo',SKP:'N.Macedonia',TGD:'Montenegro',SJJ:'Bosnia',ZAG:'Croatia',SPU:'Croatia',DBV:'Croatia',
+TIA:'Albania',PRG:'Czechia',BTS:'Slovakia',LJU:'Slovenia',RIX:'Latvia',VNO:'Lithuania',TLL:'Estonia',KIV:'Moldova',KBP:'Ukraine',IEV:'Ukraine'
 };
 
-// ── State ──
-let db=null, airportInfo=new Map(), favorites=[], mode='dep', logs=[];
+// STATE
+let db=null,airp=new Map(),favs=[],mode='dep',logs=[],
+    downloading=false,paused=false,stopped=false,cookies='';
 
-// ── DOM helpers ──
-const $=id=>document.getElementById(id);
-const $$=s=>document.querySelectorAll(s);
+const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
-// ═══ LOGGING ═══
-function L(msg,cls=''){
-  const ts=new Date().toISOString().slice(11,23);
-  const line=`[${ts}] ${msg}`;
-  logs.push({line,cls});
-  if(logs.length>5000)logs=logs.slice(-5000);
-  console.log('[AYCF]',msg);
-  const area=$('logArea');
-  if(area){
-    const span=document.createElement('div');
-    span.className=cls;span.textContent=line;
-    area.appendChild(span);
-    area.scrollTop=area.scrollHeight;
-  }
-  $('logCount').textContent=`(${logs.length})`;
-}
-function LE(msg){L('❌ '+msg,'err')}
-function LW(msg){L('⚠️ '+msg,'warn')}
-function LS(msg){L('✅ '+msg,'ok')}
-function LA(msg){L('🌐 '+msg,'api')}
+// ══ LOGGING ══
+function L(m,c=''){const ts=new Date().toISOString().slice(11,23);const l=`[${ts}] ${m}`;logs.push({l,c});
+  if(logs.length>5000)logs=logs.slice(-5000);console.log('[AYCF]',m);
+  const a=$('lA');if(a){const d=document.createElement('div');d.className=c;d.textContent=l;a.appendChild(d);a.scrollTop=a.scrollHeight}
+  $('lCnt').textContent=`(${logs.length})`}
+function LE(m){L('❌ '+m,'e')}function LW(m){L('⚠️ '+m,'w')}function LS(m){L('✅ '+m,'s')}function LA(m){L('🌐 '+m,'a')}
 
-// ═══ UTILITIES ═══
-function fmtD(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function fmtDMY(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}-${m}-${y}`}
-function fmtDD(s){if(!s)return'';const[y,m,d]=s.split('-');const dt=new Date(+y,+m-1,+d);return`${dt.toLocaleDateString('en',{weekday:'short'})} ${d}-${m}-${y}`}
-function fmtT(t){if(!t)return'';if(t.includes(':')&&!t.includes('AM')&&!t.includes('PM')){const p=t.split(':');return String(+p[0]).padStart(2,'0')+':'+String(+(p[1]||0)).padStart(2,'0')}return t}
-function parseT(t){if(!t)return 0;const p=t.split(':');return(+p[0])*60+(+(p[1]||0))}
-function dateRange(s,e){
-  const r=[];const[sy,sm,sd]=s.split('-').map(Number);const[ey,em,ed]=e.split('-').map(Number);
-  let c=new Date(sy,sm-1,sd);const end=new Date(ey,em-1,ed);
-  while(c<=end){r.push(fmtD(c));c.setDate(c.getDate()+1)}return r;
-}
-function apDisp(c){const i=airportInfo.get(c);if(!i)return c;return[c,i.name!==c?i.name:'',i.country].filter(Boolean).join(' · ')}
-function apShort(c){const i=airportInfo.get(c);return i&&i.name&&i.name!==c?`${c} (${i.name})`:c}
-function bookUrl(o,d,dt){return`https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`}
-function daysBetween(d1,d2){const[y1,m1,dd1]=d1.split('-').map(Number);const[y2,m2,dd2]=d2.split('-').map(Number);return Math.floor((new Date(y2,m2-1,dd2)-new Date(y1,m1-1,dd1))/864e5)}
+// ══ UTILS ══
+function fD(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function fDMY(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}-${m}-${y}`}
+function fDD(s){if(!s)return'';const[y,m,d]=s.split('-');const dt=new Date(+y,+m-1,+d);return`${dt.toLocaleDateString('en',{weekday:'short'})} ${d}-${m}-${y}`}
+function fT(t){if(!t)return'';if(t.includes('T'))t=t.split('T')[1];if(t.includes(':')&&!t.includes('AM')&&!t.includes('PM')){const p=t.split(':');return String(+p[0]).padStart(2,'0')+':'+String(+(p[1]||0)).padStart(2,'0')}return t}
+function pT(t){if(!t)return 0;if(t.includes('T'))t=t.split('T')[1];const p=t.split(':');return(+p[0])*60+(+(p[1]||0))}
+function dRng(s,e){const r=[];const[sy,sm,sd]=s.split('-').map(Number);const[ey,em,ed]=e.split('-').map(Number);
+  let c=new Date(sy,sm-1,sd);const end=new Date(ey,em-1,ed);while(c<=end){r.push(fD(c));c.setDate(c.getDate()+1)}return r}
+function aD(c){const i=airp.get(c);if(!i)return c;return[c,i.n!==c?i.n:'',i.c].filter(Boolean).join(' · ')}
+function aS(c){const i=airp.get(c);return i&&i.n&&i.n!==c?`${c} (${i.n})`:c}
+function bU(o,d,dt){return`https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`}
+function dB(d1,d2){const[y1,m1,dd1]=d1.split('-').map(Number);const[y2,m2,dd2]=d2.split('-').map(Number);return Math.floor((new Date(y2,m2-1,dd2)-new Date(y1,m1-1,dd1))/864e5)}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function getProxy(){return localStorage.getItem('wz_proxy')||''}
 
-// ═══ INDEXEDDB ═══
-function initDB(){
-  return new Promise((ok,no)=>{
-    L('Opening IndexedDB...');
-    const r=indexedDB.open(DB_NAME,DB_VER);
-    r.onerror=()=>{LE('IndexedDB error');no(r.error)};
-    r.onsuccess=()=>{db=r.result;LS('IndexedDB ready');ok(db)};
-    r.onupgradeneeded=e=>{
-      const d=e.target.result;
-      if(!d.objectStoreNames.contains('flights'))d.createObjectStore('flights',{keyPath:'id'});
-      if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'});
-    };
-  });
-}
-function dbPut(s,d){return new Promise((ok,no)=>{const t=db.transaction(s,'readwrite');const r=t.objectStore(s).put(d);r.onsuccess=ok;r.onerror=()=>no(r.error)})}
-function dbGetAll(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readonly');const r=t.objectStore(s).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}
-function dbClear(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readwrite');const r=t.objectStore(s).clear();r.onsuccess=ok;r.onerror=()=>no(r.error)})}
+// ══ INDEXEDDB ══
+function initDB(){return new Promise((ok,no)=>{L('Opening IndexedDB...');const r=indexedDB.open(DB_N,DB_V);
+  r.onerror=()=>{LE('DB error');no(r.error)};r.onsuccess=()=>{db=r.result;LS('DB ready');ok(db)};
+  r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('flights'))d.createObjectStore('flights',{keyPath:'id'});
+    if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'})}})}
+function dbP(s,d){return new Promise((ok,no)=>{const t=db.transaction(s,'readwrite');t.objectStore(s).put(d).onsuccess=ok;t.onerror=()=>no(t.error)})}
+function dbA(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readonly');const r=t.objectStore(s).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}
+function dbC(s){return new Promise((ok,no)=>{const t=db.transaction(s,'readwrite');t.objectStore(s).clear().onsuccess=ok;t.onerror=()=>no(t.error)})}
 
-// ═══ FAVORITES ═══
-function loadFavs(){try{favorites=JSON.parse(localStorage.getItem('wz_fav')||'[]')}catch{favorites=[]}L(`Loaded ${favorites.length} favorites`)}
-function saveFavs(){localStorage.setItem('wz_fav',JSON.stringify(favorites))}
-function addFav(code){
-  code=code.toUpperCase().trim();if(!code||code.length<2||code.length>3)return false;
-  if(favorites.some(f=>f.code===code))return false;
-  const i=airportInfo.get(code)||{code,name:code,country:COUNTRIES[code]||''};
-  favorites.push({code:i.code,name:i.name||code,country:i.country||COUNTRIES[code]||''});
-  saveFavs();renderFavs();renderAllLists();LS(`Added favorite: ${code}`);return true;
-}
-function removeFav(code){favorites=favorites.filter(f=>f.code!==code);saveFavs();renderFavs();renderAllLists()}
-function renderFavs(){
-  const c=$('favChips');
-  if(!favorites.length){c.innerHTML='<span class="fav-empty">No favorites</span>';return}
-  c.innerHTML=favorites.map(f=>`<span class="fav-chip"><span class="fc">${f.code}</span><span class="fi">${f.country||''}</span><button class="fx" data-c="${f.code}">×</button></span>`).join('');
-  c.querySelectorAll('.fx').forEach(b=>b.onclick=e=>{e.stopPropagation();removeFav(b.dataset.c)});
-}
+// ══ FAVORITES ══
+function loadF(){try{favs=JSON.parse(localStorage.getItem('wz_fav3')||'[]')}catch{favs=[]}L(`Loaded ${favs.length} favorites`)}
+function saveF(){localStorage.setItem('wz_fav3',JSON.stringify(favs))}
+function addF(c){c=c.toUpperCase().trim();if(!c||c.length<2||c.length>3)return false;
+  if(favs.some(f=>f.code===c))return false;
+  favs.push({code:c,name:c,country:CC[c]||''});saveF();renderF();renderAL();LS(`Fav +${c}`);return true}
+function rmF(c){favs=favs.filter(f=>f.code!==c);saveF();renderF();renderAL()}
+function renderF(){const c=$('favC');if(!favs.length){c.innerHTML='<span class="fav-e">No favorites</span>';return}
+  c.innerHTML=favs.map(f=>`<span class="fav"><span class="c">${f.code}</span><span class="n">${f.country||''}</span><button class="x" data-c="${f.code}">×</button></span>`).join('');
+  c.querySelectorAll('.x').forEach(b=>b.onclick=e=>{e.stopPropagation();rmF(b.dataset.c)})}
 
-// ═══ AIRPORT INFO ═══
-function buildInfo(data){
-  airportInfo=new Map();
-  data.forEach(d=>{
-    [d.origin,d.dest].forEach(c=>{
-      if(!airportInfo.has(c))airportInfo.set(c,{code:c,name:c,country:COUNTRIES[c]||''});
-    });
-  });
-  L(`Built airport info: ${airportInfo.size} airports`);
-}
+// ══ AIRPORT INFO ══
+function buildAI(data){airp=new Map();data.forEach(d=>{[d.origin,d.dest].forEach(c=>{if(!airp.has(c))airp.set(c,{code:c,n:c,c:CC[c]||''})})});L(`${airp.size} airports`)}
 
-// ═══ AIRPORT LIST UI ═══
-function renderList(cid,sid){
-  const c=$(cid);if(!c)return;
-  if(!airportInfo.size){c.innerHTML='<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:.8rem">No airports. Import data first.</div>';return}
-  const byC={};
-  airportInfo.forEach((i,code)=>{const co=i.country||'Other';if(!byC[co])byC[co]=[];byC[co].push(i)});
-  const favC=new Set(favorites.map(f=>f.country));
-  const sorted=Object.keys(byC).sort((a,b)=>{if(favC.has(a)&&!favC.has(b))return-1;if(!favC.has(a)&&favC.has(b))return 1;return a.localeCompare(b)});
-  let h='';
-  sorted.forEach(co=>{
-    const aps=byC[co].sort((a,b)=>a.code.localeCompare(b.code));
-    const hf=aps.some(a=>favorites.some(f=>f.code===a.code));
-    h+=`<div class="ap-g" data-co="${co}"><div class="ap-ghdr" data-co="${co}"><span>${hf?'⭐ ':''}${co} (${aps.length})</span><span class="arr">▶</span></div><div class="ap-gbody">`;
-    aps.forEach(a=>{
-      const fv=favorites.some(f=>f.code===a.code);
-      h+=`<div class="ap-chip${fv?' fv':''}" data-code="${a.code}" data-co="${co}" data-name="${a.name}"><span class="ac">${a.code}</span>${a.name!==a.code?`<span class="an">${a.name}</span>`:''}</div>`;
-    });
-    h+='</div></div>';
-  });
+// ══ AIRPORT LIST ══
+function renderL(cid,sid){const c=$(cid);if(!c)return;
+  if(!airp.size){c.innerHTML='<div style="padding:14px;text-align:center;color:var(--tx3);font-size:.78rem">No airports. Import or download data.</div>';return}
+  const bc={};airp.forEach((i,k)=>{const co=i.c||'Other';if(!bc[co])bc[co]=[];bc[co].push(i)});
+  const fc=new Set(favs.map(f=>f.country));
+  const sk=Object.keys(bc).sort((a,b)=>{if(fc.has(a)&&!fc.has(b))return-1;if(!fc.has(a)&&fc.has(b))return 1;return a.localeCompare(b)});
+  let h='';sk.forEach(co=>{const ap=bc[co].sort((a,b)=>a.code.localeCompare(b.code));
+    const hf=ap.some(a=>favs.some(f=>f.code===a.code));
+    h+=`<div class="ap-g" data-co="${co}"><div class="ap-gh" data-co="${co}"><span>${hf?'⭐ ':''}${co} (${ap.length})</span><span class="ar">▶</span></div><div class="ap-gb">`;
+    ap.forEach(a=>{const fv=favs.some(f=>f.code===a.code);
+      h+=`<div class="ap-c${fv?' fv':''}" data-code="${a.code}" data-co="${co}" data-name="${a.n}"><span class="ac">${a.code}</span>${a.n!==a.code?`<span class="an">${a.n}</span>`:''}</div>`});
+    h+='</div></div>'});
   c.innerHTML=h;
-  c.querySelectorAll('.ap-ghdr').forEach(hdr=>{hdr.addEventListener('click',()=>{hdr.classList.toggle('open');hdr.nextElementSibling.classList.toggle('open')})});
-  c.querySelectorAll('.ap-chip').forEach(ch=>{ch.addEventListener('click',()=>ch.classList.toggle('sel'))});
-  if(sid){
-    const inp=$(sid);
-    if(inp)inp.addEventListener('input',()=>{
-      const q=inp.value.toLowerCase();
-      c.querySelectorAll('.ap-chip').forEach(ch=>{
-        const m=ch.dataset.code.toLowerCase().includes(q)||ch.dataset.co.toLowerCase().includes(q)||(ch.dataset.name||'').toLowerCase().includes(q);
-        ch.style.display=m?'':'none';
-      });
-      c.querySelectorAll('.ap-g').forEach(g=>{
-        const vis=[...g.querySelectorAll('.ap-chip')].some(ch=>ch.style.display!=='none');
-        g.style.display=vis?'':'none';
-        if(q&&vis){g.querySelector('.ap-ghdr').classList.add('open');g.querySelector('.ap-gbody').classList.add('open')}
-      });
-    });
-  }
+  c.querySelectorAll('.ap-gh').forEach(h=>h.addEventListener('click',()=>{h.classList.toggle('op');h.nextElementSibling.classList.toggle('op')}));
+  c.querySelectorAll('.ap-c').forEach(ch=>ch.addEventListener('click',()=>ch.classList.toggle('sl')));
+  if(sid){const inp=$(sid);if(inp)inp.oninput=()=>{const q=inp.value.toLowerCase();
+    c.querySelectorAll('.ap-c').forEach(ch=>{const m=ch.dataset.code.toLowerCase().includes(q)||ch.dataset.co.toLowerCase().includes(q)||(ch.dataset.name||'').toLowerCase().includes(q);ch.style.display=m?'':'none'});
+    c.querySelectorAll('.ap-g').forEach(g=>{const vis=[...g.querySelectorAll('.ap-c')].some(ch=>ch.style.display!=='none');g.style.display=vis?'':'none';
+      if(q&&vis){g.querySelector('.ap-gh').classList.add('op');g.querySelector('.ap-gb').classList.add('op')}})}}
 }
-function renderAllLists(){renderList('depList','depSrch');renderList('destList','destSrch');renderList('tripList','tripSrch')}
-function getSel(cid){const c=$(cid);return c?[...c.querySelectorAll('.ap-chip.sel')].map(ch=>ch.dataset.code):[]}
-function setSel(cid,codes){const c=$(cid);if(!c)return;const s=new Set(codes);c.querySelectorAll('.ap-chip').forEach(ch=>ch.classList.toggle('sel',s.has(ch.dataset.code)))}
+function renderAL(){renderL('dL','dSr');renderL('sL','sSr');renderL('tL','tSr')}
+function gSel(cid){const c=$(cid);return c?[...c.querySelectorAll('.ap-c.sl')].map(ch=>ch.dataset.code):[]}
+function sSel(cid,codes){const c=$(cid);if(!c)return;const s=new Set(codes);c.querySelectorAll('.ap-c').forEach(ch=>ch.classList.toggle('sl',s.has(ch.dataset.code)))}
 
-// ═══ STATUS ═══
-async function updateStatus(){
-  const all=await dbGetAll('flights');
-  const valid=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
-  L(`DB: ${all.length} total, ${valid.length} valid`);
-  const card=$('statusCard');
-  if(!valid.length){
-    card.className='status s-empty';$('sIcon').textContent='📭';$('sTitle').textContent='No Flight Data';
-    $('sDetail').textContent='Import data or use the Data Collector.';$('sStats').classList.add('hidden');
-  }else{
-    const tf=valid.reduce((s,d)=>s+(d.flights?.length||0),0);
-    const ori=new Set(valid.map(d=>d.origin)),des=new Set(valid.map(d=>d.dest)),dts=new Set(valid.map(d=>d.date));
-    card.className='status s-ok';$('sIcon').textContent='✅';
-    $('sTitle').textContent='Flight Data Ready';
-    $('sDetail').textContent=`Dates: ${[...dts].sort().map(fmtDMY).join(', ')}`;
-    $('sStats').classList.remove('hidden');
-    $('stFlights').textContent=tf.toLocaleString();$('stOrigins').textContent=ori.size;
-    $('stRoutes').textContent=valid.length.toLocaleString();$('stDays').textContent=dts.size;
-    buildInfo(valid);renderAllLists();
-    LS(`Data loaded: ${tf} flights, ${ori.size} origins, ${dts.size} days`);
-  }
+// ══ STATUS ══
+async function upSt(){const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
+  L(`DB: ${all.length} total, ${val.length} valid`);
+  if(!val.length){$('stC').className='st st-e';$('stI').textContent='📭';$('stH').textContent='No Flight Data';
+    $('stD').textContent='Login to Wizz Air or import data.';$('stS').classList.add('hd-n')}
+  else{const tf=val.reduce((s,d)=>s+(d.flights?.length||0),0);
+    const ori=new Set(val.map(d=>d.origin)),dts=new Set(val.map(d=>d.date));
+    $('stC').className='st st-o';$('stI').textContent='✅';$('stH').textContent='Flight Data Ready';
+    $('stD').textContent=`Dates: ${[...dts].sort().map(fDMY).join(', ')}`;
+    $('stS').classList.remove('hd-n');$('s1').textContent=tf.toLocaleString();$('s2').textContent=ori.size;
+    $('s3').textContent=val.length.toLocaleString();$('s4').textContent=dts.size;
+    buildAI(val);renderAL();LS(`Data: ${tf} flights, ${ori.size} origins`)}
 }
 
-// ═══ IMPORT / EXPORT ═══
-async function importJSON(file){
-  L(`Importing file: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-  showDataMsg('info','Importing...');
+// ══ PROXY / API ══
+async function px(url,opts={}){
+  const proxy=getProxy();if(!proxy)throw new Error('Proxy not configured. Complete the setup above.');
+  const headers={'X-Target':url};
+  if(cookies)headers['X-Cookies']=cookies;
+  if(opts.contentType)headers['Content-Type']=opts.contentType;
+  const fOpts={method:opts.method||'GET',headers};
+  if(opts.body)fOpts.body=typeof opts.body==='string'?opts.body:JSON.stringify(opts.body);
+  LA(`${fOpts.method} ${url}`);
+  const resp=await fetch(proxy,fOpts);
+  // Capture cookies
+  const sc=resp.headers.get('X-Set-Cookies');
+  if(sc){try{const arr=JSON.parse(sc);const newC=arr.map(c=>c.split(';')[0]).join('; ');
+    cookies=cookies?cookies+'; '+newC:newC;L(`Got cookies: ${newC.substring(0,60)}...`)}catch{}}
+  const loc=resp.headers.get('X-Location');
+  if(loc)L(`Redirect to: ${loc}`);
+  return{status:resp.status,headers:resp.headers,text:()=>resp.text(),json:()=>resp.json(),loc};
+}
+
+// ══ CLOUDFLARE WORKER CODE ══
+function workerCode(){return`export default{
+async fetch(r,env,ctx){
+const cors={'Access-Control-Allow-Origin':'*',
+'Access-Control-Allow-Methods':'GET,POST,PUT,DELETE,OPTIONS',
+'Access-Control-Allow-Headers':'Content-Type,X-Target,X-Cookies',
+'Access-Control-Expose-Headers':'X-Set-Cookies,X-Location,Content-Type,X-Status',
+'Access-Control-Max-Age':'86400'};
+if(r.method==='OPTIONS')return new Response(null,{headers:cors});
+const t=r.headers.get('X-Target');
+if(!t)return new Response(JSON.stringify({error:'Need X-Target header',usage:'Set X-Target header to the wizzair.com URL you want to proxy'}),{status:400,headers:{...cors,'Content-Type':'application/json'}});
+let url;
+try{url=new URL(t)}catch{return new Response(JSON.stringify({error:'Invalid URL in X-Target'}),{status:400,headers:{...cors,'Content-Type':'application/json'}})}
+if(!url.hostname.endsWith('wizzair.com'))return new Response(JSON.stringify({error:'Only wizzair.com domains allowed'}),{status:403,headers:{...cors,'Content-Type':'application/json'}});
+const h=new Headers();
+h.set('User-Agent','Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36');
+h.set('Accept',r.headers.get('Accept')||'text/html,application/xhtml+xml,application/json,*/*;q=0.8');
+h.set('Accept-Language','en-US,en;q=0.9');
+if(r.headers.get('Content-Type'))h.set('Content-Type',r.headers.get('Content-Type'));
+const ck=r.headers.get('X-Cookies');if(ck)h.set('Cookie',ck);
+h.set('Referer','https://multipass.wizzair.com/');
+h.set('Origin','https://multipass.wizzair.com');
+try{
+const resp=await fetch(t,{method:r.method,headers:h,
+body:['GET','HEAD'].includes(r.method)?undefined:await r.arrayBuffer(),redirect:'manual'});
+const rh=new Headers(cors);
+rh.set('X-Status',String(resp.status));
+const sc=resp.headers.getSetCookie?resp.headers.getSetCookie():[];
+if(sc.length)rh.set('X-Set-Cookies',JSON.stringify(sc));
+if(resp.status>=300&&resp.status<400){
+rh.set('X-Location',resp.headers.get('Location')||'');
+rh.set('Content-Type','application/json');
+return new Response(JSON.stringify({redirect:resp.headers.get('Location'),status:resp.status,cookies:sc.length}),{status:200,headers:rh})}
+const ct=resp.headers.get('Content-Type');if(ct)rh.set('Content-Type',ct);
+return new Response(resp.body,{status:resp.status,headers:rh});
+}catch(e){return new Response(JSON.stringify({error:'Fetch failed: '+e.message}),{status:502,headers:{...cors,'Content-Type':'application/json'}})}
+}
+};`}
+
+// ══ AUTH & DOWNLOAD ══
+async function loginAndDownload(){
+  if(downloading)return;
+  const email=$('wizEmail').value.trim();const pass=$('wizPass').value;
+  if(!email||!pass){showDM('e','Enter email and password.');return}
+  if(!getProxy()){showDM('e','Set up proxy first (see above).');return}
+
+  downloading=true;paused=false;stopped=false;
+  $('bLogin').disabled=true;$('bPause').classList.remove('hd-n');$('bStop').classList.remove('hd-n');
+  $('dlProg').classList.remove('hd-n');showDL('Connecting to Wizz Air...');setDLProg(0);
+
   try{
-    const text=await file.text();const data=JSON.parse(text);
-    if(!data.data||!Array.isArray(data.data))throw new Error('Invalid format — need .data array');
-    let n=0;
-    for(const f of data.data){if(f.id&&f.flights){await dbPut('flights',{...f,timestamp:Date.now()});n++}}
-    if(data.favorites&&Array.isArray(data.favorites)){
-      data.favorites.forEach(f=>{if(!favorites.some(e=>e.code===f.code))favorites.push(f)});
-      saveFavs();renderFavs();
-    }
-    await updateStatus();showDataMsg('success',`Imported ${n} routes!`);LS(`Imported ${n} routes from ${file.name}`);
-  }catch(e){LE(`Import failed: ${e.message}`);showDataMsg('error',`Import failed: ${e.message}`)}
-}
-
-async function exportJSON(){
-  const all=await dbGetAll('flights');
-  const valid=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
-  if(!valid.length){showDataMsg('error','No data to export');return}
-  const exp={version:VER,exportDate:new Date().toISOString(),favorites,flightCount:valid.reduce((s,f)=>s+f.flights.length,0),routeCount:valid.length,data:valid};
-  const blob=new Blob([JSON.stringify(exp)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`wizz-flights-${fmtD(new Date())}.json`;
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  LS('Exported data');showDataMsg('success','Exported!');
-}
-
-function showDataMsg(type,msg){
-  const m=$('dataMsg');
-  const cls={info:'msg-i',success:'msg-s',error:'msg-e',warning:'msg-w'};
-  m.innerHTML=`<div class="msg ${cls[type]||'msg-i'}">${msg}</div>`;
-  setTimeout(()=>{if(m.innerHTML.includes(msg))m.innerHTML=''},8000);
-}
-
-// ═══ GITHUB API ═══
-function loadGHSettings(){
-  try{
-    const s=JSON.parse(localStorage.getItem('wz_gh')||'{}');
-    if(s.owner)$('ghOwner').value=s.owner;
-    if(s.repo)$('ghRepo').value=s.repo;
-    if(s.token)$('ghToken').value=s.token;
-  }catch{}
-}
-function saveGHSettings(){
-  const s={owner:$('ghOwner').value.trim(),repo:$('ghRepo').value.trim(),token:$('ghToken').value.trim()};
-  localStorage.setItem('wz_gh',JSON.stringify(s));
-  LS('GitHub settings saved');return s;
-}
-function getGH(){
-  try{return JSON.parse(localStorage.getItem('wz_gh')||'{}')}catch{return{}}
-}
-
-async function ghAPI(path,method='GET',body=null){
-  const s=getGH();
-  if(!s.owner||!s.repo||!s.token)throw new Error('GitHub not configured');
-  const url=`https://api.github.com/repos/${s.owner}/${s.repo}/contents/${path}`;
-  LA(`${method} ${url}`);
-  const opts={method,headers:{'Authorization':`Bearer ${s.token}`,'Accept':'application/vnd.github.v3+json'}};
-  if(body)opts.body=JSON.stringify(body);
-  const resp=await fetch(url,opts);
-  if(!resp.ok){
-    const err=await resp.text();
-    throw new Error(`GitHub API ${resp.status}: ${err.slice(0,200)}`);
-  }
-  return resp.json();
-}
-
-async function testGH(){
-  const ghM=$('ghMsg');ghM.innerHTML='<div class="msg msg-i"><span class="spinner"></span> Testing...</div>';
-  try{
-    const s=getGH();
-    const resp=await fetch(`https://api.github.com/repos/${s.owner}/${s.repo}`,{
-      headers:{'Authorization':`Bearer ${s.token}`}
-    });
-    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
-    const data=await resp.json();
-    ghM.innerHTML=`<div class="msg msg-s">✅ Connected to <strong>${data.full_name}</strong></div>`;
-    LS(`GitHub connected: ${data.full_name}`);
-    await listGHFiles();
-  }catch(e){
-    LE(`GitHub test failed: ${e.message}`);
-    ghM.innerHTML=`<div class="msg msg-e">❌ ${e.message}</div>`;
-  }
-}
-
-async function listGHFiles(){
-  const list=$('ghFileList');
-  try{
-    let files;
-    try{files=await ghAPI('data')}catch{files=[]}
-    if(!Array.isArray(files)||!files.length){list.innerHTML='<em>No saved databases yet.</em>';return}
-    const jsonFiles=files.filter(f=>f.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
-    if(!jsonFiles.length){list.innerHTML='<em>No JSON files found in data/ folder.</em>';return}
-    list.innerHTML=jsonFiles.map(f=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${f.name}</span>
-        <button class="btn btn-o btn-sm gh-load-file" data-path="${f.path}" data-sha="${f.sha}">Load</button>
-      </div>
-    `).join('');
-    list.querySelectorAll('.gh-load-file').forEach(b=>b.onclick=()=>loadGHFile(b.dataset.path));
-  }catch(e){LE(`List GH files: ${e.message}`);list.innerHTML=`<em style="color:var(--danger)">Error: ${e.message}</em>`}
-}
-
-async function loadGHFile(path){
-  showDataMsg('info','Loading from GitHub...');
-  try{
-    const file=await ghAPI(path);
-    const content=atob(file.content.replace(/\n/g,''));
-    const data=JSON.parse(content);
-    if(!data.data||!Array.isArray(data.data))throw new Error('Invalid format');
-    let n=0;
-    for(const f of data.data){if(f.id&&f.flights){await dbPut('flights',{...f,timestamp:Date.now()});n++}}
-    if(data.favorites)data.favorites.forEach(f=>{if(!favorites.some(e=>e.code===f.code))favorites.push(f)});
-    saveFavs();renderFavs();await updateStatus();
-    showDataMsg('success',`Loaded ${n} routes from GitHub!`);LS(`Loaded ${n} routes from ${path}`);
-  }catch(e){LE(`GH load failed: ${e.message}`);showDataMsg('error',`Load failed: ${e.message}`)}
-}
-
-async function saveToGH(){
-  showDataMsg('info','Saving to GitHub...');
-  try{
-    const all=await dbGetAll('flights');
-    const valid=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
-    if(!valid.length)throw new Error('No data to save');
-    const exp={version:VER,exportDate:new Date().toISOString(),favorites,flightCount:valid.reduce((s,f)=>s+f.flights.length,0),routeCount:valid.length,data:valid};
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(exp))));
-    const now=new Date();
-    const ts=`${fmtD(now)}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
-    const path=`data/flights-${ts}.json`;
-    await ghAPI(path,'PUT',{message:`Add flight data ${ts}`,content});
-    showDataMsg('success',`Saved to GitHub: ${path}`);LS(`Saved to GitHub: ${path}`);
-  }catch(e){LE(`GH save failed: ${e.message}`);showDataMsg('error',`Save failed: ${e.message}`)}
-}
-
-// ═══ BOOKMARKLET ═══
-function buildBookmarklet(){
-  // This runs on the Wizz Air multipass page
-  const code=`javascript:void((function(){
-if(!location.href.includes('multipass.wizzair.com')){alert('Open multipass.wizzair.com first!');return}
-var panel=document.createElement('div');
-panel.id='aycf-collector';
-panel.style.cssText='position:fixed;top:10px;right:10px;z-index:999999;background:#1a1a2e;color:#e4e4f0;padding:16px;border-radius:12px;width:320px;font-family:sans-serif;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.5);border:1px solid rgba(100,100,255,.2);max-height:90vh;overflow-y:auto;';
-panel.innerHTML='<div style="font-size:16px;font-weight:700;margin-bottom:10px">✈️ AYCF Data Collector</div><div id="aycf-status">Initializing...</div><div id="aycf-prog" style="height:5px;background:rgba(0,212,255,.15);border-radius:3px;margin:8px 0;overflow:hidden"><div id="aycf-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#7b61ff);border-radius:3px;transition:width .3s"></div></div><div id="aycf-detail" style="font-size:11px;color:#8888aa"></div><div style="margin-top:10px"><button id="aycf-start" style="padding:8px 16px;border:none;border-radius:6px;background:linear-gradient(135deg,#00d4ff,#7b61ff);color:#fff;font-weight:700;cursor:pointer;margin-right:6px">▶ Start Download</button><button id="aycf-stop" style="padding:8px 16px;border:none;border-radius:6px;background:#ff5577;color:#fff;font-weight:700;cursor:pointer;display:none">⏹ Stop</button><button id="aycf-close" style="padding:8px 16px;border:none;border-radius:6px;background:rgba(255,255,255,.1);color:#ccc;cursor:pointer;margin-left:6px">✕ Close</button></div>';
-document.body.appendChild(panel);
-var status=document.getElementById('aycf-status');
-var fill=document.getElementById('aycf-fill');
-var detail=document.getElementById('aycf-detail');
-var startBtn=document.getElementById('aycf-start');
-var stopBtn=document.getElementById('aycf-stop');
-document.getElementById('aycf-close').onclick=function(){panel.remove()};
-var running=false,stopped=false;
-function getRoutes(){
-  var h=document.head.innerHTML,b=document.body.innerHTML;
-  var rp=/"routes":\\[(.*?)\\].*?"isOneWayFlightsOnly"/gms;
-  var bp=/window\\.CVO\\.routes\\s*=\\s*(\\[.*?\\]);/s;
-  var hm=h.match(rp),bm=b.match(bp),rj;
-  if(hm&&hm[0])rj='{"routes":'+hm[0].split('"routes":')[1].split(',"isOneWayFlightsOnly"')[0]+'}';
-  else if(bm&&bm[1])rj='{"routes":'+bm[1]+'}';
-  if(rj)return JSON.parse(rj).routes;
-  return null;
-}
-function getApiUrl(){
-  var h=document.head.innerHTML,b=document.body.innerHTML;
-  var hm=h.match(/"searchFlight":"https:\\/\\/multipass\\.wizzair\\.com[^"]+\\/([^"]+)"/);
-  var bm=b.match(/window\\.CVO\\.flightSearchUrlJson\\s*=\\s*"(https:\\/\\/multipass\\.wizzair\\.com[^"]+)"/);
-  if(hm&&hm[1])return'https://multipass.wizzair.com/w6/subscriptions/json/availability/'+hm[1];
-  if(bm&&bm[1])return bm[1];
-  return null;
-}
-status.textContent='Ready. Click Start to begin downloading.';
-startBtn.onclick=async function(){
-  if(running)return;running=true;stopped=false;
-  startBtn.style.display='none';stopBtn.style.display='';
-  status.textContent='Extracting routes...';
-  var routes=getRoutes();
-  if(!routes){status.textContent='❌ Could not find routes. Navigate to the booking page.';running=false;startBtn.style.display='';stopBtn.style.display='none';return}
-  var apiUrl=getApiUrl();
-  if(!apiUrl){status.textContent='❌ Could not find API URL. Navigate to booking/search page.';running=false;startBtn.style.display='';stopBtn.style.display='none';return}
-  status.textContent='Found '+routes.length+' origins. Building tasks...';
-  var tasks=[],seen=new Set();
-  var today=new Date();
-  var dates=[];
-  for(var di=0;di<4;di++){var dd=new Date(today);dd.setDate(today.getDate()+di);var ds=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');dates.push(ds)}
-  routes.forEach(function(r){
-    var orig=r.departureStation.id;
-    r.arrivalStations.forEach(function(d){
-      dates.forEach(function(dt){
-        var k=orig+'|'+d.id+'|'+dt;
-        if(!seen.has(k)){seen.add(k);tasks.push({origin:orig,dest:d.id,date:dt})}
-      });
-    });
-  });
-  status.textContent='Downloading '+tasks.length+' routes over '+dates.length+' days...';
-  var results=[],done=0,errors=0,rl=0;
-  for(var i=0;i<tasks.length;i++){
-    if(stopped)break;
-    var t=tasks[i];
-    fill.style.width=((i/tasks.length)*100)+'%';
-    detail.textContent=t.origin+' → '+t.dest+' ('+t.date+') ['+i+'/'+tasks.length+']';
+    // Step 1: Get the multipass page (may redirect to login)
+    L('Step 1: Fetching multipass page...');
+    showDL('Loading Wizz Air page...');
+    let pageHtml='';
     try{
-      await new Promise(function(r){setTimeout(r,400+Math.random()*400)});
-      var resp=await fetch(apiUrl,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({flightType:'OW',origin:t.origin,destination:t.dest,departure:t.date,arrival:'',intervalSubtype:null}),credentials:'include'});
-      if(resp.status===429){rl++;if(rl>=3){detail.textContent='Rate limited, waiting 60s...';await new Promise(function(r){setTimeout(r,60000)});rl=0}else{detail.textContent='Rate limited, waiting 15s...';await new Promise(function(r){setTimeout(r,15000)})}i--;continue}
-      if(!resp.ok){errors++;results.push({id:t.origin+'-'+t.dest+'-'+t.date,origin:t.origin,dest:t.dest,date:t.date,flights:[],timestamp:Date.now()});done++;continue}
-      rl=0;var data=await resp.json();
-      var flights=data.flightsOutbound||data.flights||data.outbound||data.outboundFlights||[];
-      if(Array.isArray(data))flights=data;
-      flights=flights.map(function(f){return{departure:f.departure||f.departureTime||f.std||'',arrival:f.arrival||f.arrivalTime||f.sta||'',duration:f.duration||f.flightDuration||'',flightCode:f.flightCode||f.flightNumber||''}});
-      results.push({id:t.origin+'-'+t.dest+'-'+t.date,origin:t.origin,dest:t.dest,date:t.date,flights:flights,timestamp:Date.now()});
-      done++;if(done%30===0&&i<tasks.length-1){detail.textContent='Rate limit break (12s)...';await new Promise(function(r){setTimeout(r,12000)})}
-    }catch(e){errors++;done++}
-  }
-  fill.style.width='100%';
-  var totalFlights=results.reduce(function(s,r){return s+r.flights.length},0);
-  status.textContent=stopped?'Stopped':'✅ Done! '+totalFlights+' flights found across '+done+' routes ('+errors+' errors)';
-  detail.textContent='Preparing download...';
-  var exp={version:'3.0-collector',exportDate:new Date().toISOString(),favorites:[],flightCount:totalFlights,routeCount:results.length,data:results};
-  var blob=new Blob([JSON.stringify(exp)],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');a.href=url;
-  var ts2=new Date().toISOString().slice(0,19).replace(/[T:.]/g,'-');
-  a.download='wizz-aycf-'+ts2+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-  detail.textContent='File downloaded! Import it into the AYCF web app.';
-  running=false;startBtn.style.display='';startBtn.textContent='↻ Run Again';stopBtn.style.display='none';
-};
-stopBtn.onclick=function(){stopped=true;stopBtn.style.display='none'};
-})())`;
-  return code;
+      const r=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets');
+      pageHtml=await r.text();
+      L(`Page response: ${r.status}, length: ${pageHtml.length}`);
+    }catch(e){L(`Initial page fetch: ${e.message}`)}
+
+    // Step 2: Try to authenticate
+    // Try finding the login API from the page, or use known endpoints
+    L('Step 2: Authenticating...');
+    showDL('Logging in...');
+
+    // Try multipass login endpoints
+    const loginEndpoints=[
+      'https://multipass.wizzair.com/w6/subscriptions/json/auth/login',
+      'https://multipass.wizzair.com/w6/subscriptions/api/auth/login',
+      'https://multipass.wizzair.com/w6/subscriptions/json/login',
+    ];
+
+    let loggedIn=false;
+    for(const ep of loginEndpoints){
+      if(loggedIn)break;
+      try{
+        L(`Trying login at: ${ep}`);
+        const r=await px(ep,{method:'POST',contentType:'application/json',
+          body:JSON.stringify({email,password:pass})});
+        const txt=await r.text();
+        L(`Login response ${r.status}: ${txt.substring(0,300)}`);
+        if(r.status>=200&&r.status<300){loggedIn=true;LS(`Login succeeded at ${ep}`)}
+        else if(r.status===401||r.status===403){LW(`Auth rejected at ${ep}`)}
+      }catch(e){LW(`Login endpoint ${ep}: ${e.message}`)}
+    }
+
+    // Also try the main Wizz Air API login
+    if(!loggedIn){
+      L('Trying main wizzair.com API login...');
+      try{
+        // Get API version
+        const metaR=await px('https://wizzair.com/static/metadata.json');
+        const meta=await metaR.json();
+        const apiUrl=meta.apiUrl||`https://be.wizzair.com/${meta.appVersion||'19.3.0'}/Api`;
+        L(`API URL: ${apiUrl}`);
+
+        const loginR=await px(`${apiUrl}/customer/login`,{method:'POST',contentType:'application/json',
+          body:JSON.stringify({email,password:pass,isGoogleLogin:false})});
+        const loginTxt=await loginR.text();
+        L(`Main API login response ${loginR.status}: ${loginTxt.substring(0,300)}`);
+        if(loginR.status>=200&&loginR.status<300){loggedIn=true;LS('Main API login succeeded')}
+      }catch(e){LW(`Main API login: ${e.message}`)}
+    }
+
+    // Try fetching the authenticated page regardless (cookies may have been set)
+    L('Step 3: Fetching authenticated page...');
+    showDL('Fetching route data...');
+    const authR=await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets');
+    pageHtml=await authR.text();
+    L(`Auth page: ${authR.status}, length: ${pageHtml.length}`);
+
+    // Step 4: Parse routes
+    L('Step 4: Parsing routes...');
+    showDL('Parsing route data...');
+    let routes=null;
+
+    // Pattern 1: "routes":[...] from head
+    const rp=/"routes":\[(.*?)\].*?"isOneWayFlightsOnly"/gms;
+    let hm=pageHtml.match(rp);
+    if(hm&&hm[0]){
+      try{const j=`{"routes":${hm[0].split('"routes":')[1].split(',"isOneWayFlightsOnly"')[0]}}`;
+        routes=JSON.parse(j).routes;L(`Routes from pattern 1: ${routes.length} origins`)}
+      catch(e){LE(`Parse routes p1: ${e.message}`)}
+    }
+    // Pattern 2: window.CVO.routes
+    if(!routes){const bp=/window\.CVO\.routes\s*=\s*(\[.*?\]);/s;const bm=pageHtml.match(bp);
+      if(bm&&bm[1]){try{routes=JSON.parse(bm[1]);L(`Routes from pattern 2: ${routes.length}`)}catch(e){LE(`Parse p2: ${e.message}`)}}}
+    // Pattern 3: try JSON in script tags
+    if(!routes){const sm=pageHtml.match(/"departureStation":\s*\{[^}]*"id"\s*:\s*"[A-Z]{3}"/g);
+      if(sm)L(`Found ${sm.length} departureStation references but couldn't parse full routes`)}
+
+    if(!routes||!routes.length){
+      LE('Could not find routes in page');
+      showDM('e',`Could not extract routes from Wizz Air page. Login may have failed or the page structure changed. Check the debug log (🔧) for details.`);
+      throw new Error('No routes found')}
+
+    LS(`Found ${routes.length} route origins`);
+
+    // Step 5: Get flight search API URL
+    L('Step 5: Finding flight search API URL...');
+    let apiUrl=null;
+    const hp=/"searchFlight":"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
+    const hm2=pageHtml.match(hp);
+    if(hm2&&hm2[1]){apiUrl=hm2[1];L(`API URL from pattern: ${apiUrl}`)}
+    else{
+      const hp2=/"searchFlight":"https:\/\/multipass\.wizzair\.com[^"]+\/([^"]+)"/;
+      const hm3=pageHtml.match(hp2);
+      if(hm3&&hm3[1]){apiUrl=`https://multipass.wizzair.com/w6/subscriptions/json/availability/${hm3[1]}`;L(`API URL from UUID: ${apiUrl}`)}
+    }
+    if(!apiUrl){const bp2=/window\.CVO\.flightSearchUrlJson\s*=\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/;
+      const bm2=pageHtml.match(bp2);if(bm2&&bm2[1]){apiUrl=bm2[1];L(`API URL from CVO: ${apiUrl}`)}}
+
+    if(!apiUrl){LE('Could not find flight search API URL');
+      showDM('e','Routes found but flight API URL not found. Check debug log.');throw new Error('No API URL')}
+
+    LS(`Flight API: ${apiUrl}`);
+
+    // Step 6: Build tasks & download
+    L('Step 6: Building download tasks...');
+    const dates=[];const today=new Date();
+    for(let i=0;i<4;i++){const d=new Date(today);d.setDate(today.getDate()+i);dates.push(fD(d))}
+    L(`Dates: ${dates.join(', ')}`);
+
+    const tasks=[];const seen=new Set();
+    routes.forEach(r=>{const orig=r.departureStation?.id;if(!orig)return;
+      (r.arrivalStations||[]).forEach(d=>{dates.forEach(dt=>{const k=`${orig}|${d.id}|${dt}`;
+        if(!seen.has(k)){seen.add(k);tasks.push({o:orig,d:d.id,dt})}})})});
+    L(`${tasks.length} tasks to download`);
+    showDL(`Downloading ${tasks.length} routes...`);
+
+    let done=0,flights=0,errors=0,rl=0;
+    for(let i=0;i<tasks.length;i++){
+      if(stopped){L('Stopped by user');break}
+      while(paused&&!stopped)await sleep(500);
+      if(stopped)break;
+
+      const t=tasks[i];
+      setDLProg((i/tasks.length)*100);
+      showDL(`${t.o}→${t.d} ${fDMY(t.dt)} [${i+1}/${tasks.length}]`);
+
+      try{
+        await sleep(350+Math.random()*350);
+        const r=await px(apiUrl,{method:'POST',contentType:'application/json',
+          body:JSON.stringify({flightType:'OW',origin:t.o,destination:t.d,departure:t.dt,arrival:'',intervalSubtype:null})});
+
+        if(r.status===429){rl++;if(rl>=3){showDL('Rate limited — waiting 60s...');await sleep(60000);rl=0}
+          else{showDL('Rate limited — waiting 15s...');await sleep(15000)}i--;continue}
+
+        rl=0;
+        if(r.status>=200&&r.status<300){
+          const data=await r.json();
+          let fl=data.flightsOutbound||data.flights||data.outbound||data.outboundFlights||[];
+          if(Array.isArray(data))fl=data;
+          fl=fl.map(f=>({departure:f.departure||f.departureTime||f.std||'',arrival:f.arrival||f.arrivalTime||f.sta||'',
+            duration:f.duration||f.flightDuration||'',flightCode:f.flightCode||f.flightNumber||''}));
+          await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:fl,timestamp:Date.now()});
+          done++;flights+=fl.length;
+        }else{
+          await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:[],timestamp:Date.now()});
+          done++;errors++}
+
+        if(done%30===0&&i<tasks.length-1){showDL('Rate-limit break (12s)...');await sleep(12000)}
+      }catch(e){LE(`${t.o}-${t.d}: ${e.message}`);done++;errors++}
+    }
+
+    setDLProg(100);
+    LS(`Download complete: ${flights} flights, ${done} routes, ${errors} errors`);
+    showDL(`Done! ${flights} flights across ${done} routes.`);
+    showDM('s',`Downloaded ${flights} flights from ${done} routes.`);
+    await upSt();
+
+  }catch(e){LE(`Download failed: ${e.message}`);if(!$('loginMsg').innerHTML)showDM('e',e.message)}
+  finally{downloading=false;$('bLogin').disabled=false;$('bPause').classList.add('hd-n');$('bStop').classList.add('hd-n')}
 }
 
-// ═══ SEARCH ═══
-function buildLookup(valid){
-  const byOrigin=new Map(),byDest=new Map(),byKey=new Map();
-  valid.forEach(d=>{
-    byKey.set(`${d.origin}|${d.dest}|${d.date}`,d.flights||[]);
-    if(!byOrigin.has(d.origin))byOrigin.set(d.origin,[]);
-    byOrigin.get(d.origin).push({dest:d.dest,date:d.date,flights:d.flights||[]});
-    if(!byDest.has(d.dest))byDest.set(d.dest,[]);
-    byDest.get(d.dest).push({origin:d.origin,date:d.date,flights:d.flights||[]});
-  });
-  return{byOrigin,byDest,byKey};
-}
+function setDLProg(p){$('dlFill').style.width=Math.min(100,p)+'%'}
+function showDL(m){$('dlStatus').textContent=m}
+function showDM(t,m){const c={s:'mg-s',e:'mg-e',w:'mg-w',i:'mg-i'};$('loginMsg').innerHTML=`<div class="mg ${c[t]||'mg-i'}">${m}</div>`;
+  if(t!=='e')setTimeout(()=>{const el=$('loginMsg');if(el.innerHTML.includes(m))el.innerHTML=''},10000)}
+function showMsg(t,m){const c={s:'mg-s',e:'mg-e',w:'mg-w',i:'mg-i'};$('dMsg').innerHTML=`<div class="mg ${c[t]||'mg-i'}">${m}</div>`;
+  setTimeout(()=>{const el=$('dMsg');if(el.innerHTML.includes(m))el.innerHTML=''},8000)}
 
-async function doSearch(){
-  L(`=== SEARCH mode=${mode} ===`);
-  const all=await dbGetAll('flights');
-  const valid=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
-  if(!valid.length){showRes('msg-e','No cached data. Import flight data first.');return}
-  const lu=buildLookup(valid);
-  switch(mode){
-    case'dep':searchDep(lu);break;
-    case'dest':searchDest(lu);break;
-    case'rt':searchRT(lu);break;
-    case'trip':searchTrip(lu);break;
-  }
-}
+// ══ IMPORT / EXPORT ══
+async function importJ(file){L(`Import: ${file.name}`);showMsg('i','Importing...');
+  try{const t=await file.text();const d=JSON.parse(t);
+    if(!d.data||!Array.isArray(d.data))throw new Error('Invalid format');
+    let n=0;for(const f of d.data){if(f.id&&f.flights){await dbP('flights',{...f,timestamp:Date.now()});n++}}
+    if(d.favorites)d.favorites.forEach(f=>{if(!favs.some(e=>e.code===f.code)){favs.push(f)}});saveF();renderF();
+    await upSt();showMsg('s',`Imported ${n} routes!`);LS(`Imported ${n} routes`)}
+  catch(e){LE(`Import: ${e.message}`);showMsg('e','Import failed: '+e.message)}}
 
-function searchDep(lu){
-  const origins=getSel('depList'),s=$('depS').value,e=$('depE').value;
-  if(!origins.length){showRes('msg-w','Select at least one origin.');return}
-  if(!s||!e){showRes('msg-w','Set both dates.');return}
-  L(`Departure search: ${origins.join(',')} from ${s} to ${e}`);
-  const dates=dateRange(s,e),flights=[];
-  origins.forEach(o=>{
-    const data=lu.byOrigin.get(o)||[];
-    dates.forEach(d=>{data.filter(r=>r.date===d).forEach(route=>{(route.flights||[]).forEach(f=>{flights.push({origin:o,dest:route.dest,date:d,flight:f})})})});
-  });
-  LS(`Found ${flights.length} flights`);
-  displayDep(flights);
-}
+async function exportJ(){const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
+  if(!val.length){showMsg('e','No data');return}
+  const exp={version:V,exportDate:new Date().toISOString(),favorites:favs,
+    flightCount:val.reduce((s,f)=>s+f.flights.length,0),routeCount:val.length,data:val};
+  const blob=new Blob([JSON.stringify(exp)],{type:'application/json'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`wizz-${fD(new Date())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  LS('Exported');showMsg('s','Exported!')}
 
-function searchDest(lu){
-  const dests=getSel('destList'),s=$('destS').value,e=$('destE').value;
-  if(!dests.length){showRes('msg-w','Select at least one destination.');return}
-  if(!s||!e){showRes('msg-w','Set both dates.');return}
-  L(`Destination search: ${dests.join(',')} from ${s} to ${e}`);
-  const dates=dateRange(s,e),results=[];
-  dests.forEach(dest=>{
-    const data=lu.byDest.get(dest)||[];
-    dates.forEach(d=>{data.filter(r=>r.date===d).forEach(route=>{(route.flights||[]).forEach(f=>{results.push({type:'direct',origin:route.origin,dest,date:d,flight:f})})})});
-  });
-  LS(`Found ${results.length} routes`);
-  displayDest(results,dests);
-}
+// ══ GITHUB ══
+function loadGH(){try{const s=JSON.parse(localStorage.getItem('wz_gh3')||'{}');if(s.o)$('gO').value=s.o;if(s.r)$('gR').value=s.r;if(s.t)$('gT').value=s.t}catch{}}
+function saveGH(){localStorage.setItem('wz_gh3',JSON.stringify({o:$('gO').value.trim(),r:$('gR').value.trim(),t:$('gT').value.trim()}))}
+function gGH(){try{return JSON.parse(localStorage.getItem('wz_gh3')||'{}')}catch{return{}}}
 
-function searchRT(lu){
-  const sDate=$('rtS').value,eDate=$('rtE').value;
-  const minStay=+$('rtMin').value,maxStay=+$('rtMax').value;
-  if(!sDate||!eDate){showRes('msg-w','Set departure and return date ranges.');return}
-  // Parse origin/dest filters
-  const origFilter=$('rtOrigIn').value.toUpperCase().trim();
-  const destFilter=$('rtDestIn').value.toUpperCase().trim();
-  const origSet=origFilter?new Set(origFilter.split(/[,;\s]+/).filter(Boolean)):null;
-  const destSet=destFilter?new Set(destFilter.split(/[,;\s]+/).filter(Boolean)):null;
+async function ghApi(path,method='GET',body=null){const s=gGH();if(!s.o||!s.r||!s.t)throw new Error('GitHub not configured');
+  const url=`https://api.github.com/repos/${s.o}/${s.r}/contents/${path}`;
+  const opts={method,headers:{'Authorization':`Bearer ${s.t}`,'Accept':'application/vnd.github.v3+json'}};
+  if(body)opts.body=JSON.stringify(body);const resp=await fetch(url,opts);
+  if(!resp.ok)throw new Error(`GitHub ${resp.status}`);return resp.json()}
 
-  L(`Round-trip search: ${sDate} to ${eDate}, stay ${minStay}-${maxStay}d, orig=${origFilter||'any'}, dest=${destFilter||'any'}`);
-  showRes('msg-i','<span class="spinner"></span> Searching round trips...');
+async function testGH(){$('gMsg').innerHTML='<div class="mg mg-i"><span class="sp-n"></span> Testing...</div>';
+  try{const s=gGH();const r=await fetch(`https://api.github.com/repos/${s.o}/${s.r}`,{headers:{'Authorization':`Bearer ${s.t}`}});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);const d=await r.json();
+    $('gMsg').innerHTML=`<div class="mg mg-s">✅ Connected: ${d.full_name}</div>`;LS(`GH ok: ${d.full_name}`);listGHF()}
+  catch(e){LE(`GH test: ${e.message}`);$('gMsg').innerHTML=`<div class="mg mg-e">❌ ${e.message}</div>`}}
 
-  // Use setTimeout to not block UI
-  setTimeout(()=>{
-    const dates=dateRange(sDate,eDate);
-    const results=[];
-    const seen=new Set();
+async function listGHF(){const fl=$('gFL');try{let f;try{f=await ghApi('data')}catch{f=[]}
+  const js=(Array.isArray(f)?f:[]).filter(x=>x.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
+  if(!js.length){fl.innerHTML='<em>No saved files yet.</em>';return}
+  fl.innerHTML=js.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${x.name}</span>
+    <button class="bt bt-o bt-sm gl" data-p="${x.path}">Load</button></div>`).join('');
+  fl.querySelectorAll('.gl').forEach(b=>b.onclick=()=>loadGHF(b.dataset.p))}
+  catch(e){fl.innerHTML=`<em style="color:var(--red)">${e.message}</em>`}}
 
-    // For each origin→dest pair in the data, find outbound+return combos
-    lu.byOrigin.forEach((routes,origin)=>{
-      if(origSet&&!origSet.has(origin))return;
-      routes.forEach(route=>{
-        if(destSet&&!destSet.has(route.dest))return;
-        if(!route.flights||!route.flights.length)return;
-        if(!dates.includes(route.date))return;
+async function loadGHF(path){showMsg('i','Loading from GitHub...');
+  try{const f=await ghApi(path);const c=atob(f.content.replace(/\n/g,''));const d=JSON.parse(c);
+    if(!d.data)throw new Error('Invalid');let n=0;
+    for(const x of d.data){if(x.id&&x.flights){await dbP('flights',{...x,timestamp:Date.now()});n++}}
+    if(d.favorites)d.favorites.forEach(f=>{if(!favs.some(e=>e.code===f.code))favs.push(f)});saveF();renderF();
+    await upSt();showMsg('s',`Loaded ${n} routes from GitHub`)}catch(e){showMsg('e',e.message)}}
 
-        // For each outbound flight, look for return flights
-        route.flights.forEach(outFlight=>{
-          // Find return flights (dest→origin)
-          const returnRoutes=lu.byOrigin.get(route.dest)||[];
-          returnRoutes.forEach(retRoute=>{
-            if(retRoute.dest!==origin)return;
-            if(!dates.includes(retRoute.date))return;
-            const stay=daysBetween(route.date,retRoute.date);
-            if(stay<minStay||stay>maxStay)return;
-            if(!retRoute.flights||!retRoute.flights.length)return;
+async function saveGHD(){showMsg('i','Saving to GitHub...');
+  try{const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
+    if(!val.length)throw new Error('No data');
+    const exp={version:V,exportDate:new Date().toISOString(),favorites:favs,
+      flightCount:val.reduce((s,f)=>s+f.flights.length,0),routeCount:val.length,data:val};
+    const c=btoa(unescape(encodeURIComponent(JSON.stringify(exp))));
+    const now=new Date();const ts=`${fD(now)}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+    await ghApi(`data/flights-${ts}.json`,'PUT',{message:`flights ${ts}`,content:c});
+    showMsg('s',`Saved to GitHub: flights-${ts}.json`)}catch(e){showMsg('e',e.message)}}
 
-            retRoute.flights.forEach(retFlight=>{
-              const key=`${origin}|${route.dest}|${route.date}|${retRoute.date}|${outFlight.departure}|${retFlight.departure}`;
-              if(seen.has(key))return;
-              seen.add(key);
-              results.push({
-                origin,dest:route.dest,
-                outDate:route.date,retDate:retRoute.date,
-                outFlight,retFlight,stay
-              });
-            });
-          });
-        });
-      });
-    });
+// ══ SEARCH ENGINE ══
+function buildLU(val){const bO=new Map(),bD=new Map(),bK=new Map();
+  val.forEach(d=>{bK.set(`${d.origin}|${d.dest}|${d.date}`,d.flights||[]);
+    if(!bO.has(d.origin))bO.set(d.origin,[]);bO.get(d.origin).push({d:d.dest,dt:d.date,fl:d.flights||[]});
+    if(!bD.has(d.dest))bD.set(d.dest,[]);bD.get(d.dest).push({o:d.origin,dt:d.date,fl:d.flights||[]})});
+  return{bO,bD,bK}}
 
-    // Sort by stay duration, then origin
-    results.sort((a,b)=>a.stay-b.stay||a.origin.localeCompare(b.origin)||a.dest.localeCompare(b.dest));
-    LS(`Round-trip: found ${results.length} options`);
-    displayRT(results);
-  },50);
-}
+async function doSearch(){L(`=== SEARCH mode=${mode} ===`);
+  const all=await dbA('flights');const val=all.filter(d=>Date.now()-d.timestamp<CACHE_H*36e5);
+  if(!val.length){sR('mg-w','No data. Import or download first.');return}
+  const lu=buildLU(val);
+  switch(mode){case'dep':sDep(lu);break;case'dest':sDest(lu);break;case'rt':sRT(lu);break;case'trip':sTrip(lu);break}}
 
-function searchTrip(lu){
-  const homes=getSel('tripList'),s=$('tripS').value,e=$('tripE').value;
-  const maxExtra=+$('tripHops').value,minDays=+$('tripMin').value;
-  if(!homes.length){showRes('msg-w','Select home airport(s).');return}
-  if(!s||!e){showRes('msg-w','Set dates.');return}
-  L(`Trip search: homes=${homes.join(',')}, ${s}-${e}, extra=${maxExtra}, minDays=${minDays}`);
-  showRes('msg-i','<span class="spinner"></span> Searching trips...');
+function sDep(lu){const ori=gSel('dL'),s=$('dS').value,e=$('dE').value;
+  if(!ori.length){sR('mg-w','Select origins.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+  const dates=dRng(s,e),fl=[];
+  ori.forEach(o=>{(lu.bO.get(o)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{fl.push({o,d:r.d,dt:r.dt,f})})})});
+  LS(`Dep: ${fl.length} flights`);dispDep(fl)}
 
-  setTimeout(()=>{
-    const dates=dateRange(s,e);
-    const trips=[];
-    const getF=(a,b,d)=>lu.byKey.get(`${a}|${b}|${d}`)||[];
-    function validC(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return parseT(f2.departure)>=parseT(f1.arrival)+MIN_LAY}
-    function validR(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return parseT(f2.departure)>=parseT(f1.arrival)+60}
+function sDest(lu){const dst=gSel('sL'),s=$('sS').value,e=$('sE').value;
+  if(!dst.length){sR('mg-w','Select destinations.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+  const dates=dRng(s,e),rl=[];
+  dst.forEach(d=>{(lu.bD.get(d)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{rl.push({type:'d',o:r.o,d,dt:r.dt,f})})})});
+  LS(`Dest: ${rl.length}`);dispDest(rl,dst)}
 
-    homes.forEach(home=>{
-      const homeR=lu.byOrigin.get(home)||[];
-      const dd=new Set(homeR.map(r=>r.dest));
+function sRT(lu){const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=+$('rtMx').value;
+  if(!s||!e){sR('mg-w','Set dates.');return}
+  const oF=$('rtO').value.toUpperCase().trim(),dF=$('rtD').value.toUpperCase().trim();
+  const oS=oF?new Set(oF.split(/[,;\s]+/).filter(Boolean)):null;
+  const dS=dF?new Set(dF.split(/[,;\s]+/).filter(Boolean)):null;
+  sR('mg-i','<span class="sp-n"></span> Searching round trips...');
+  setTimeout(()=>{const dates=dRng(s,e),res=[],seen=new Set();
+    lu.bO.forEach((routes,orig)=>{if(oS&&!oS.has(orig))return;
+      routes.forEach(r=>{if(dS&&!dS.has(r.d))return;if(!r.fl.length||!dates.includes(r.dt))return;
+        r.fl.forEach(of=>{(lu.bO.get(r.d)||[]).forEach(rr=>{if(rr.d!==orig||!dates.includes(rr.dt))return;
+          const stay=dB(r.dt,rr.dt);if(stay<mn||stay>mx)return;if(!rr.fl.length)return;
+          rr.fl.forEach(rf=>{const k=`${orig}|${r.d}|${r.dt}|${rr.dt}|${of.departure}|${rf.departure}`;
+            if(seen.has(k))return;seen.add(k);
+            res.push({o:orig,d:r.d,oD:r.dt,rD:rr.dt,oF:of,rF:rf,stay})})})})})});
+    res.sort((a,b)=>a.stay-b.stay||a.o.localeCompare(b.o));
+    LS(`RT: ${res.length}`);dispRT(res)},50)}
 
-      // 1-stop: H→A→H
-      dd.forEach(d1=>{
-        const ret=lu.byOrigin.get(d1)||[];
-        if(!ret.some(r=>r.dest===home))return;
-        dates.forEach(dt1=>{
-          getF(home,d1,dt1).forEach(f1=>{
-            dates.forEach(dt2=>{
-              if(dt2<dt1)return;
-              getF(d1,home,dt2).forEach(f2=>{
-                if(!validR(f1,dt1,f2,dt2))return;
-                const days=daysBetween(dt1,dt2);if(days<minDays)return;
-                trips.push({home,hops:1,path:[home,d1,home],legs:[{from:home,to:d1,date:dt1,flight:f1},{from:d1,to:home,date:dt2,flight:f2}]});
-              });
-            });
-          });
-        });
-      });
+function sTrip(lu){const homes=gSel('tL'),s=$('tS').value,e=$('tE').value,mE=+$('tH').value,mD=+$('tMn').value;
+  if(!homes.length){sR('mg-w','Select home airports.');return}if(!s||!e){sR('mg-w','Set dates.');return}
+  sR('mg-i','<span class="sp-n"></span> Searching trips...');
+  setTimeout(()=>{const dates=dRng(s,e),trips=[];
+    const gF=(a,b,d)=>lu.bK.get(`${a}|${b}|${d}`)||[];
+    function vC(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return pT(f2.departure)>=pT(f1.arrival)+MIN_LAY}
+    function vR(f1,d1,f2,d2){if(d2>d1)return true;if(d2<d1)return false;return pT(f2.departure)>=pT(f1.arrival)+60}
+    homes.forEach(h=>{const hR=lu.bO.get(h)||[];const dd=new Set(hR.map(r=>r.d));
+      dd.forEach(d1=>{if(!(lu.bO.get(d1)||[]).some(r=>r.d===h))return;
+        dates.forEach(dt1=>{gF(h,d1,dt1).forEach(f1=>{dates.forEach(dt2=>{if(dt2<dt1)return;
+          gF(d1,h,dt2).forEach(f2=>{if(!vR(f1,dt1,f2,dt2))return;const dy=dB(dt1,dt2);if(dy<mD)return;
+            trips.push({h,hops:1,path:[h,d1,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:h,dt:dt2,f:f2}]})})})})})});
+      if(mE>=1)dd.forEach(d1=>{(lu.bO.get(d1)||[]).forEach(r=>{const d2=r.d;if(d2===h)return;
+        if(!(lu.bO.get(d2)||[]).some(rr=>rr.d===h))return;
+        dates.forEach(dt1=>{const l1=gF(h,d1,dt1);if(!l1.length)return;const f1=l1[0];
+          dates.forEach(dt2=>{if(dt2<dt1)return;for(const f2 of gF(d1,d2,dt2)){if(!vC(f1,dt1,f2,dt2))continue;
+            dates.forEach(dt3=>{if(dt3<dt2)return;for(const f3 of gF(d2,h,dt3)){if(!vC(f2,dt2,f3,dt3))continue;
+              const dy=dB(dt1,dt3);if(dy<mD)continue;
+              trips.push({h,hops:2,path:[h,d1,d2,h],legs:[{from:h,to:d1,dt:dt1,f:f1},{from:d1,to:d2,dt:dt2,f:f2},{from:d2,to:h,dt:dt3,f:f3}]});return}});break}})})})})});
+    LS(`Trip: ${trips.length}`);dispTrip(trips)},50)}
 
-      // 2-stop: H→A→B→H
-      if(maxExtra>=1){
-        dd.forEach(d1=>{
-          (lu.byOrigin.get(d1)||[]).forEach(r=>{
-            const d2=r.dest;if(d2===home)return;
-            if(!(lu.byOrigin.get(d2)||[]).some(rr=>rr.dest===home))return;
-            dates.forEach(dt1=>{
-              const l1=getF(home,d1,dt1);if(!l1.length)return;const f1=l1[0];
-              dates.forEach(dt2=>{
-                if(dt2<dt1)return;
-                for(const f2 of getF(d1,d2,dt2)){
-                  if(!validC(f1,dt1,f2,dt2))continue;
-                  dates.forEach(dt3=>{
-                    if(dt3<dt2)return;
-                    for(const f3 of getF(d2,home,dt3)){
-                      if(!validC(f2,dt2,f3,dt3))continue;
-                      const days=daysBetween(dt1,dt3);if(days<minDays)continue;
-                      trips.push({home,hops:2,path:[home,d1,d2,home],legs:[{from:home,to:d1,date:dt1,flight:f1},{from:d1,to:d2,date:dt2,flight:f2},{from:d2,to:home,date:dt3,flight:f3}]});
-                      return;
-                    }
-                  });break;
-                }
-              });
-            });
-          });
-        });
-      }
-    });
-    LS(`Trip search: ${trips.length} trips found`);
-    displayTrips(trips);
-  },50);
-}
+// ══ DISPLAY ══
+function sR(c,h){$('res').innerHTML=`<div class="mg ${c}">${h}</div>`}
 
-// ═══ DISPLAY ═══
-function showRes(cls,html){$('results').innerHTML=`<div class="msg ${cls}">${html}</div>`}
+function dispDep(fl){const R=$('res');if(!fl.length){sR('mg-w','No flights found.');return}
+  const bD={};fl.forEach(f=>{if(!bD[f.dt])bD[f.dt]=[];bD[f.dt].push(f)});
+  let h=`<div class="mg mg-s">Found <strong>${fl.length}</strong> flights</div>`;
+  Object.keys(bD).sort().forEach(d=>{h+=`<div class="dh">${fDD(d)} — ${bD[d].length} flights</div>`;
+    bD[d].forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)})});R.innerHTML=h}
 
-function displayDep(flights){
-  const R=$('results');
-  if(!flights.length){showRes('msg-w','No flights found.');return}
-  const byD={};flights.forEach(f=>{if(!byD[f.date])byD[f.date]=[];byD[f.date].push(f)});
-  let h=`<div class="msg msg-s">Found <strong>${flights.length}</strong> flights</div>`;
-  Object.keys(byD).sort().forEach(d=>{
-    h+=`<div class="date-hdr">${fmtDD(d)} — ${byD[d].length} flights</div>`;
-    byD[d].forEach(f=>{h+=flightCard(f.origin,f.dest,f.date,f.flight)});
-  });
-  R.innerHTML=h;
-}
+function dispDest(rl,dst){const R=$('res');if(!rl.length){sR('mg-w',`No routes to ${dst.join(', ')}.`);return}
+  const bD={};rl.forEach(f=>{if(!bD[f.d])bD[f.d]=[];bD[f.d].push(f)});
+  let h=`<div class="mg mg-s">Found <strong>${rl.length}</strong> routes</div>`;
+  Object.keys(bD).sort().forEach(d=>{h+=`<div class="deh">🎯 ${aD(d)} (${bD[d].length})</div>`;
+    bD[d].slice(0,30).forEach(f=>{h+=fC(f.o,f.d,f.dt,f.f)});
+    if(bD[d].length>30)h+=`<div class="mg mg-i">${bD[d].length-30} more...</div>`});R.innerHTML=h}
 
-function displayDest(results,dests){
-  const R=$('results');
-  if(!results.length){showRes('msg-w',`No routes to ${dests.join(', ')}.`);return}
-  const byD={};results.forEach(f=>{if(!byD[f.dest])byD[f.dest]=[];byD[f.dest].push(f)});
-  let h=`<div class="msg msg-s">Found <strong>${results.length}</strong> routes</div>`;
-  Object.keys(byD).sort().forEach(d=>{
-    h+=`<div class="dest-hdr">🎯 ${apDisp(d)} (${byD[d].length})</div>`;
-    byD[d].slice(0,30).forEach(f=>{h+=flightCard(f.origin,f.dest,f.date,f.flight)});
-    if(byD[d].length>30)h+=`<div class="msg msg-i">${byD[d].length-30} more...</div>`;
-  });
-  R.innerHTML=h;
-}
+function dispRT(res){const R=$('res');if(!res.length){sR('mg-w','No round trips found.');return}
+  let h=`<div class="mg mg-s">Found <strong>${res.length}</strong> round trips</div>`;
+  const lim=Math.min(res.length,100);
+  if(res.length>lim)h+=`<div class="mg mg-i">Showing ${lim} of ${res.length}</div>`;
+  res.slice(0,lim).forEach(r=>{h+=`<div class="fc"><div class="fc-r"><span class="rt">${aS(r.o)} ↔ ${aS(r.d)}</span><span class="bg bg-d">${r.stay}d</span></div>
+    <div class="lb"><strong>Out:</strong> ${fDD(r.oD)} · ${aS(r.o)}→${aS(r.d)} · <span class="m">${fT(r.oF.departure)}</span>→<span class="m">${fT(r.oF.arrival)}</span> ${r.oF.duration||''}
+    <a href="${bU(r.o,r.d,r.oD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a><br><br>
+    <strong>Ret:</strong> ${fDD(r.rD)} · ${aS(r.d)}→${aS(r.o)} · <span class="m">${fT(r.rF.departure)}</span>→<span class="m">${fT(r.rF.arrival)}</span> ${r.rF.duration||''}
+    <a href="${bU(r.d,r.o,r.rD)}" target="_blank" class="bk" style="margin-left:4px;padding:3px 7px">Book</a></div></div>`});
+  R.innerHTML=h}
 
-function displayRT(results){
-  const R=$('results');
-  if(!results.length){showRes('msg-w','No round trips found. Try widening dates or filters.');return}
-  let h=`<div class="msg msg-s">Found <strong>${results.length}</strong> round-trip options</div>`;
-  const limit=Math.min(results.length,100);
-  if(results.length>limit)h+=`<div class="msg msg-i">Showing first ${limit} of ${results.length}</div>`;
-  results.slice(0,limit).forEach(r=>{
-    h+=`<div class="fc">
-      <div class="fc-route">
-        <span class="rt">${apShort(r.origin)} ↔ ${apShort(r.dest)}</span>
-        <span class="badge b-dir">${r.stay}d trip</span>
-      </div>
-      <div class="lay-box">
-        <strong>Outbound:</strong> ${fmtDD(r.outDate)}<br>
-        ${apShort(r.origin)} → ${apShort(r.dest)} · <span class="mono">${fmtT(r.outFlight.departure)}</span> → <span class="mono">${fmtT(r.outFlight.arrival)}</span> · ${r.outFlight.duration||''}
-        <a href="${bookUrl(r.origin,r.dest,r.outDate)}" target="_blank" class="book" style="margin-left:6px;padding:3px 8px;font-size:.7rem">Book</a><br><br>
-        <strong>Return:</strong> ${fmtDD(r.retDate)}<br>
-        ${apShort(r.dest)} → ${apShort(r.origin)} · <span class="mono">${fmtT(r.retFlight.departure)}</span> → <span class="mono">${fmtT(r.retFlight.arrival)}</span> · ${r.retFlight.duration||''}
-        <a href="${bookUrl(r.dest,r.origin,r.retDate)}" target="_blank" class="book" style="margin-left:6px;padding:3px 8px;font-size:.7rem">Book</a>
-      </div>
-    </div>`;
-  });
-  R.innerHTML=h;
-}
-
-function displayTrips(trips){
-  const R=$('results');
-  if(!trips.length){showRes('msg-w','No trip itineraries found.');return}
-  const byH={1:[],2:[],3:[]};trips.forEach(t=>{if(byH[t.hops])byH[t.hops].push(t)});
-  let h=`<div class="msg msg-s">Found <strong>${trips.length}</strong> trip itineraries</div>`;
-  [1,2,3].forEach(hp=>{
-    if(!byH[hp].length)return;
-    const lbl=hp===1?'Direct Round Trip':hp===2?'1 Extra Stop':'2 Extra Stops';
-    h+=`<div class="dest-hdr" style="background:linear-gradient(135deg,#7b61ff,#5a3fd4)">🔄 ${lbl} (${byH[hp].length})</div>`;
-    const byP={};byH[hp].forEach(t=>{const k=t.path.join('-');if(!byP[k])byP[k]=[];byP[k].push(t)});
-    Object.keys(byP).slice(0,15).forEach(pk=>{
-      const pts=byP[pk],s=pts[0];
-      h+=`<div class="fc" style="border-left:3px solid #7b61ff">
-        <div class="trip-path">${s.path.map((p,i)=>`<span class="lb"><span class="ac">${p}</span><small>${(airportInfo.get(p)||{}).name||''}</small></span>${i<s.path.length-1?'<span class="as">→</span>':''}`).join('')}</div>`;
-      pts.slice(0,3).forEach(trip=>{
-        const days=daysBetween(trip.legs[0].date,trip.legs[trip.legs.length-1].date);
-        h+=`<div class="lay-box"><div class="trip-dur">📅 ${days===0?'Same day':days+' days'}</div>`;
-        trip.legs.forEach((l,i)=>{
-          h+=`<div class="trip-leg"><strong>Leg ${i+1}:</strong> ${fmtDD(l.date)} · ${apShort(l.from)} → ${apShort(l.to)} · <span class="mono">${fmtT(l.flight.departure)}</span> → <span class="mono">${fmtT(l.flight.arrival)}</span> <a href="${bookUrl(l.from,l.to,l.date)}" target="_blank" class="book" style="padding:2px 6px;font-size:.68rem">Book</a></div>`;
-        });
-        h+='</div>';
-      });
-      if(pts.length>3)h+=`<div style="font-size:.72rem;color:var(--text-muted);padding:4px 0">+${pts.length-3} more date options</div>`;
+function dispTrip(trips){const R=$('res');if(!trips.length){sR('mg-w','No trips found.');return}
+  const bH={1:[],2:[],3:[]};trips.forEach(t=>{if(bH[t.hops])bH[t.hops].push(t)});
+  let h=`<div class="mg mg-s">Found <strong>${trips.length}</strong> trips</div>`;
+  [1,2,3].forEach(hp=>{if(!bH[hp].length)return;
+    const lb=hp===1?'Direct Round Trip':hp===2?'1 Extra Stop':'2 Extra Stops';
+    h+=`<div class="deh" style="background:var(--acc2)">🔄 ${lb} (${bH[hp].length})</div>`;
+    const bP={};bH[hp].forEach(t=>{const k=t.path.join('-');if(!bP[k])bP[k]=[];bP[k].push(t)});
+    Object.keys(bP).slice(0,15).forEach(pk=>{const pts=bP[pk],s=pts[0];
+      h+=`<div class="fc" style="border-left:3px solid var(--acc2)"><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-bottom:6px">`;
+      s.path.forEach((p,i)=>{h+=`<span style="background:var(--s2);padding:3px 7px;border-radius:4px;font-size:.74rem"><span class="m" style="color:var(--acc)">${p}</span><br><small style="color:var(--tx3);font-size:.6rem">${(airp.get(p)||{}).n||''}</small></span>`;
+        if(i<s.path.length-1)h+='<span style="color:var(--acc2);font-weight:700">→</span>'});
       h+='</div>';
-    });
-  });
-  R.innerHTML=h;
-}
+      pts.slice(0,3).forEach(trip=>{const dy=dB(trip.legs[0].dt,trip.legs[trip.legs.length-1].dt);
+        h+=`<div class="lb"><div style="font-weight:600;color:var(--grn);font-size:.78rem;margin-bottom:4px">📅 ${dy===0?'Same day':dy+'d'}</div>`;
+        trip.legs.forEach((l,i)=>{h+=`<div style="padding:3px 0;border-bottom:1px solid var(--bdr);font-size:.74rem">
+          <strong>Leg ${i+1}:</strong> ${fDD(l.dt)} · ${aS(l.from)}→${aS(l.to)} · <span class="m">${fT(l.f.departure)}</span>→<span class="m">${fT(l.f.arrival)}</span>
+          <a href="${bU(l.from,l.to,l.dt)}" target="_blank" class="bk" style="padding:2px 6px;font-size:.65rem">Book</a></div>`});
+        h+='</div>'});
+      if(pts.length>3)h+=`<div style="font-size:.7rem;color:var(--tx3)">+${pts.length-3} more</div>`;
+      h+='</div>'})});
+  R.innerHTML=h}
 
-function flightCard(origin,dest,date,flight){
-  return`<div class="fc"><div class="fc-route"><span class="rt">${apShort(origin)} → ${apShort(dest)}</span><span class="badge b-dir">Direct</span></div><div class="fc-info">📅 ${fmtDD(date)} · ✈️ <span class="mono">${fmtT(flight.departure)}</span> → 🛬 <span class="mono">${fmtT(flight.arrival)}</span> · ${flight.duration||''} · ${flight.flightCode||''}</div><a href="${bookUrl(origin,dest,date)}" target="_blank" class="book">🎫 Book</a></div>`;
-}
+function fC(o,d,dt,f){return`<div class="fc"><div class="fc-r"><span class="rt">${aS(o)} → ${aS(d)}</span><span class="bg bg-d">Direct</span></div>
+  <div class="fc-i">📅 ${fDD(dt)} · ✈️ <span class="m">${fT(f.departure)}</span> → 🛬 <span class="m">${fT(f.arrival)}</span> · ${f.duration||''} · ${f.flightCode||''}</div>
+  <a href="${bU(o,d,dt)}" target="_blank" class="bk">🎫 Book</a></div>`}
 
-// ═══ INIT ═══
+// ══ INIT ══
 async function init(){
-  L(`Initializing v${VER}...`);
-  await initDB();
-  loadFavs();renderFavs();loadGHSettings();
+  L(`Init v${V}`);await initDB();loadF();renderF();loadGH();
+
+  // Check proxy
+  const proxy=getProxy();
+  if(proxy){$('proxySetup').classList.add('hd-n');$('proxyUrl').value=proxy;$('gPx').value=proxy;
+    L(`Proxy: ${proxy}`)}
+  else{$('loginCard').style.opacity='.5'}
+
+  // Worker code
+  $('workerCode').textContent=workerCode();
 
   // Dates
-  const today=fmtD(new Date()),maxD=fmtD((()=>{const d=new Date();d.setDate(d.getDate()+3);return d})());
-  ['depS','destS','tripS','rtS'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
-  ['depE','destE','tripE','rtE'].forEach(id=>{const e=$(id);if(e){e.value=maxD;e.min=today}});
+  const today=fD(new Date()),mx=fD((()=>{const d=new Date();d.setDate(d.getDate()+3);return d})());
+  ['dS','sS','tS','rtS'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
+  ['dE','sE','tE','rtE'].forEach(id=>{const e=$(id);if(e){e.value=mx;e.min=today}});
 
-  await updateStatus();
+  await upSt();LS('Ready')}
 
-  // Build bookmarklet
-  const bmCode=buildBookmarklet();
-  $('bmLink').href=bmCode;
-  $('bmCode').textContent=bmCode;
-
-  LS('App initialized');
-}
-
-// ═══ EVENTS ═══
+// ══ EVENTS ══
 document.addEventListener('DOMContentLoaded',()=>{
   // Tabs
-  $$('.tab').forEach(t=>t.onclick=()=>{
-    $$('.tab').forEach(b=>b.classList.remove('on'));t.classList.add('on');
-    mode=t.dataset.m;$$('.panel').forEach(p=>p.classList.remove('on'));$('p-'+mode).classList.add('on');
-  });
+  $$('.t').forEach(t=>t.onclick=()=>{$$('.t').forEach(b=>b.classList.remove('on'));t.classList.add('on');
+    mode=t.dataset.m;$$('.pn').forEach(p=>p.classList.remove('on'));$('p-'+mode).classList.add('on')});
 
   // Favorites
-  $('btnFav').onclick=()=>{const i=$('favIn');if(addFav(i.value))i.value=''};
-  $('favIn').onkeypress=e=>{if(e.key==='Enter'){const i=$('favIn');if(addFav(i.value))i.value=''}};
+  $('bFav').onclick=()=>{const i=$('favI');if(addF(i.value))i.value=''};
+  $('favI').onkeydown=e=>{if(e.key==='Enter'){const i=$('favI');if(addF(i.value))i.value=''}};
 
-  // Select helpers
-  $$('.sfav').forEach(b=>b.onclick=()=>setSel(b.dataset.l,favorites.map(f=>f.code)));
-  $$('.sall').forEach(b=>b.onclick=()=>setSel(b.dataset.l,[...airportInfo.keys()]));
-  $$('.sclr').forEach(b=>b.onclick=()=>setSel(b.dataset.l,[]));
+  // Airport selectors
+  $$('.sf').forEach(b=>b.onclick=()=>sSel(b.dataset.l,favs.map(f=>f.code)));
+  $$('.sa').forEach(b=>b.onclick=()=>sSel(b.dataset.l,[...airp.keys()]));
+  $$('.sc').forEach(b=>b.onclick=()=>sSel(b.dataset.l,[]));
+
+  // Proxy setup
+  $('bSaveProxy').onclick=()=>{const u=$('proxyUrl').value.trim();
+    if(!u){$('proxyMsg').innerHTML='<div class="mg mg-e">Enter proxy URL</div>';return}
+    // Remove trailing slash
+    const clean=u.replace(/\/+$/,'');
+    localStorage.setItem('wz_proxy',clean);$('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy saved!</div>';
+    $('gPx').value=clean;LS(`Proxy saved: ${clean}`)};
+  $('bTestProxy').onclick=async()=>{
+    const u=($('proxyUrl').value||getProxy()||'').trim().replace(/\/+$/,'');
+    if(!u){$('proxyMsg').innerHTML='<div class="mg mg-e">Enter proxy URL first</div>';return}
+    $('proxyMsg').innerHTML='<div class="mg mg-i">🔄 Testing proxy connection...</div>';
+    try{
+      // Test 1: Basic connectivity 
+      const r=await fetch(u,{method:'OPTIONS'});
+      if(!r.ok&&r.status!==204){throw new Error(`OPTIONS returned ${r.status}`)}
+      $('proxyMsg').innerHTML='<div class="mg mg-i">✅ CORS OK. Testing Wizz Air connection...</div>';
+      // Test 2: Actual proxy to wizzair 
+      const r2=await fetch(u,{headers:{'X-Target':'https://wizzair.com/static/metadata.json'}});
+      const txt=await r2.text();
+      L(`Proxy test response: ${r2.status}, body: ${txt.substring(0,200)}`);
+      if(r2.status>=200&&r2.status<300){
+        try{const j=JSON.parse(txt);
+          $('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy works! Connected to Wizz Air API v'+( j.appVersion||'OK')+'</div>';
+          // Auto-save on successful test
+          localStorage.setItem('wz_proxy',u);$('gPx').value=u;
+          setTimeout(()=>{$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1'},2000);
+        }catch{$('proxyMsg').innerHTML='<div class="mg mg-s">✅ Proxy works! Got response ('+txt.length+' bytes)</div>';
+          localStorage.setItem('wz_proxy',u);$('gPx').value=u}
+      }else{$('proxyMsg').innerHTML='<div class="mg mg-w">⚠️ Proxy responded but Wizz Air returned status '+r2.status+'. Check worker code.</div>'}
+    }catch(e){L(`Proxy test error: ${e.message}`);
+      $('proxyMsg').innerHTML='<div class="mg mg-e">❌ Test failed: '+e.message+'<br><small>Make sure you pasted the correct worker code and deployed it.</small></div>'}
+  };
+  $('setupHdr').onclick=()=>{$('setupHdr').classList.toggle('op');$('setupBody').classList.toggle('op')};
+  $('bCopyWorker').onclick=()=>{$('workerCode').classList.toggle('hd-n');
+    navigator.clipboard.writeText(workerCode()).then(()=>showMsg('s','Worker code copied!')).catch(()=>{})};
+
+  // Login & Download
+  $('bLogin').onclick=loginAndDownload;
+  $('bPause').onclick=()=>{paused=!paused;$('bPause').textContent=paused?'▶ Resume':'⏸ Pause'};
+  $('bStop').onclick=()=>{stopped=true;paused=false};
+
+  // Data management
+  $('bImport').onclick=()=>$('fileIn').click();
+  $('fileIn').onchange=e=>{if(e.target.files.length){importJ(e.target.files[0]);e.target.value=''}};
+  $('bExport').onclick=exportJ;
+  $('bClear').onclick=async()=>{if(confirm('Clear all data?')){await dbC('flights');await upSt();$('res').innerHTML='';LS('Cleared')}};
+  $('bGHLoad').onclick=async()=>{const s=gGH();if(!s.t){$('mGH').classList.add('op');return}
+    showMsg('i','Loading latest from GitHub...');
+    try{let f;try{f=await ghApi('data')}catch{showMsg('e','No data/ folder.');return}
+      const js=(Array.isArray(f)?f:[]).filter(x=>x.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
+      if(!js.length){showMsg('w','No files found.');return}await loadGHF(js[0].path)}catch(e){showMsg('e',e.message)}};
+  $('bGHSave').onclick=saveGHD;
 
   // Search
-  $('btnSearch').onclick=doSearch;
+  $('bSrch').onclick=doSearch;
 
-  // Import/Export
-  $('btnImport').onclick=()=>$('fileIn').click();
-  $('fileIn').onchange=e=>{if(e.target.files.length){importJSON(e.target.files[0]);e.target.value=''}};
-  $('btnExport').onclick=exportJSON;
-  $('btnClear').onclick=async()=>{if(confirm('Clear all cached data?')){await dbClear('flights');await updateStatus();$('results').innerHTML='';LS('Cache cleared')}};
+  // Settings modal
+  $('bGH').onclick=()=>{$('mGH').classList.add('op');listGHF()};
+  $('bCGH').onclick=()=>$('mGH').classList.remove('op');
+  $('mGH').onclick=e=>{if(e.target===$('mGH'))$('mGH').classList.remove('op')};
+  $('bGHS').onclick=()=>{saveGH();$('gMsg').innerHTML='<div class="mg mg-s">Saved!</div>'};
+  $('bGHT').onclick=testGH;
+  $('bGPx').onclick=()=>{const u=$('gPx').value.trim();if(u){localStorage.setItem('wz_proxy',u);
+    $('proxyUrl').value=u;$('proxySetup').classList.add('hd-n');$('loginCard').style.opacity='1';
+    $('gMsg').innerHTML='<div class="mg mg-s">Proxy saved!</div>'}};
 
-  // GitHub
-  $('btnGH').onclick=()=>{$('modalGH').classList.add('open');listGHFiles()};
-  $('btnCloseGH').onclick=()=>$('modalGH').classList.remove('open');
-  $('modalGH').onclick=e=>{if(e.target===$('modalGH'))$('modalGH').classList.remove('open')};
-  $('btnGHSettSave').onclick=()=>{saveGHSettings();$('ghMsg').innerHTML='<div class="msg msg-s">Saved!</div>'};
-  $('btnGHTest').onclick=testGH;
-  $('btnGHLoad').onclick=async()=>{
-    try{const s=getGH();if(!s.token){$('modalGH').classList.add('open');return}
-    showDataMsg('info','Loading from GitHub...');
-    let files;try{files=await ghAPI('data')}catch{showDataMsg('error','No data/ folder found in repo.');return}
-    const jsons=(Array.isArray(files)?files:[]).filter(f=>f.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name));
-    if(!jsons.length){showDataMsg('warning','No JSON files in data/ folder.');return}
-    await loadGHFile(jsons[0].path);
-    }catch(e){showDataMsg('error',e.message)}
-  };
-  $('btnGHSave').onclick=saveToGH;
-
-  // Debug log
-  $('btnLog').onclick=()=>$('modalLog').classList.add('open');
-  $('btnCloseLog').onclick=()=>$('modalLog').classList.remove('open');
-  $('modalLog').onclick=e=>{if(e.target===$('modalLog'))$('modalLog').classList.remove('open')};
-  $('btnLogClear').onclick=()=>{logs=[];$('logArea').innerHTML='';$('logCount').textContent='(0)'};
-  $('btnLogExport').onclick=()=>{
-    const blob=new Blob([logs.map(l=>l.line).join('\n')],{type:'text/plain'});
+  // Log modal
+  $('bLog').onclick=()=>$('mLog').classList.add('op');
+  $('bCL').onclick=()=>$('mLog').classList.remove('op');
+  $('mLog').onclick=e=>{if(e.target===$('mLog'))$('mLog').classList.remove('op')};
+  $('bLC').onclick=()=>{logs=[];$('lA').innerHTML='';$('lCnt').textContent='(0)'};
+  $('bLE').onclick=()=>{const blob=new Blob([logs.map(l=>l.l).join('\n')],{type:'text/plain'});
     const url=URL.createObjectURL(blob);const a=document.createElement('a');
-    a.href=url;a.download=`aycf-log-${fmtD(new Date())}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a);
-  };
+    a.href=url;a.download=`aycf-log-${fD(new Date())}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a)};
 
-  // Collapsibles
-  $('collectorHdr').onclick=()=>{$('collectorHdr').classList.toggle('open');$('collectorBody').classList.toggle('open')};
-
-  // Bookmarklet copy
-  $('btnCopyBM').onclick=()=>{
-    $('bmCode').classList.toggle('hidden');
-    navigator.clipboard.writeText($('bmCode').textContent).then(()=>showDataMsg('success','Bookmarklet code copied!')).catch(()=>{});
-  };
-
-  init();
-});
+  init()});
 </script>
 </body>
 </html>
