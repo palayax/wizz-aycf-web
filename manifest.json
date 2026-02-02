@@ -1,21 +1,13 @@
 {
   "name": "Wizz AYCF Route Finder",
   "short_name": "AYCF Finder",
-  "description": "Find Wizz Air AYCF routes with offline search, multi-hop trips, and booking links.",
-  "start_url": "/index.html",
+  "description": "Find Wizz Air AYCF routes with offline search, round trips, and booking links.",
+  "start_url": "/wizz-aycf-web/index.html",
   "display": "standalone",
-  "background_color": "#0c0618",
-  "theme_color": "#1a0a2e",
+  "background_color": "#060611",
+  "theme_color": "#0a0a1a",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
