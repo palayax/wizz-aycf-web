@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a0a2e">
+  <title>Wizz AYCF Route Finder</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0618;
+      --surface: #1a0f2e;
+      --surface2: #241847;
+      --surface3: #2e1f5e;
+      --accent: #c850c0;
+      --accent2: #ff6ec7;
+      --accent3: #4158d0;
+      --text: #e8e0f0;
+      --text-dim: #9b8fb8;
+      --text-muted: #6b5f82;
+      --success: #00d68f;
+      --warning: #ffaa00;
+      --danger: #ff4757;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html { 
+      font-size: 15px; 
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(70px + var(--safe-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Animated gradient background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(200, 80, 192, 0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(65, 88, 208, 0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 80%, rgba(255, 110, 199, 0.04) 0%, transparent 50%);
+      z-index: -1;
+      animation: bgShift 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgShift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-5%, 3%) scale(1.05); }
+    }
+
+    /* ── Header ── */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12, 6, 24, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(200, 80, 192, 0.15);
+      padding: 14px 16px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .app-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .app-title span {
+      font-weight: 300;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      -webkit-text-fill-color: var(--text-dim);
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+
+    .icon-btn {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(200, 80, 192, 0.2);
+      background: var(--surface);
+      color: var(--text-dim);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+    .icon-btn:hover, .icon-btn:active {
+      background: var(--surface2);
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+
+    /* ── Main content ── */
+    .app-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* ── Status card ── */
+    .status-card {
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .status-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      pointer-events: none;
+    }
+    .status-card.empty {
+      background: linear-gradient(135deg, rgba(255,71,87,0.12), rgba(255,71,87,0.05));
+    }
+    .status-card.empty::before { border-color: rgba(255,71,87,0.3); }
+    .status-card.loaded {
+      background: linear-gradient(135deg, rgba(0,214,143,0.12), rgba(0,214,143,0.05));
+    }
+    .status-card.loaded::before { border-color: rgba(0,214,143,0.3); }
+    .status-card.importing {
+      background: linear-gradient(135deg, rgba(255,170,0,0.12), rgba(255,170,0,0.05));
+    }
+    .status-card.importing::before { border-color: rgba(255,170,0,0.3); }
+
+    .status-icon { font-size: 1.3rem; margin-bottom: 6px; }
+    .status-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+    .status-detail { font-size: 0.8rem; color: var(--text-dim); line-height: 1.4; }
+
+    .status-stats {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem; font-weight: 600;
+      color: var(--success);
+    }
+    .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Action buttons row ── */
+    .action-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      color: white;
+    }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(200,80,192,0.3);
+      color: var(--text-dim);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent2); }
+    .btn-success {
+      background: linear-gradient(135deg, #00d68f, #00b377);
+      color: white;
+    }
+    .btn-danger {
+      background: rgba(255,71,87,0.15);
+      border: 1px solid rgba(255,71,87,0.3);
+      color: var(--danger);
+    }
+    .btn-sm { padding: 7px 12px; font-size: 0.8rem; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Favorites ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid rgba(200,80,192,0.1);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .fav-input-row {
+      display: flex; gap: 8px; margin-bottom: 10px;
+    }
+    .fav-input-row input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid rgba(200,80,192,0.15);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .fav-input-row input::placeholder {
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .fav-input-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .fav-chips {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      min-height: 32px;
+    }
+    .fav-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: linear-gradient(135deg, rgba(200,80,192,0.2), rgba(65,88,208,0.15));
+      border: 1px solid rgba(200,80,192,0.3);
+      border-radius: 20px;
+      padding: 5px 10px 5px 12px;
+      font-size: 0.8rem;
+    }
+    .fav-chip .code {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+    .fav-chip .info { color: var(--text-muted); font-size: 0.7rem; }
+    .fav-chip .remove {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(255,71,87,0.2);
+      color: var(--danger);
+      border: none;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .fav-chip .remove:hover { background: rgba(255,71,87,0.4); }
+    .fav-empty { color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
+
+    /* ── Tabs / Mode switcher ── */
+    .mode-switcher {
+      display: flex;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(200,80,192,0.1);
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      color: white;
+      box-shadow: 0 4px 15px rgba(200,80,192,0.3);
+    }
+
+    /* ── Search panels ── */
+    .search-panel { display: none; }
+    .search-panel.active { display: block; }
+
+    .airport-search {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid rgba(200,80,192,0.15);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 10px;
+    }
+    .airport-search::placeholder { color: var(--text-muted); }
+    .airport-search:focus { outline: none; border-color: var(--accent); }
+
+    .select-row {
+      display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+    }
+
+    /* ── Airport list ── */
+    .airport-list-container {
+      max-height: 280px;
+      overflow-y: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(200,80,192,0.1);
+      background: var(--bg);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .airport-group-hdr {
+      position: sticky; top: 0;
+      background: var(--surface2);
+      padding: 9px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(200,80,192,0.08);
+      z-index: 2;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .airport-group-hdr:active { background: var(--surface3); }
+    .airport-group-hdr .arrow { transition: transform 0.2s; font-size: 0.7rem; }
+    .airport-group-hdr.open .arrow { transform: rotate(90deg); }
+
+    .airport-group-body {
+      display: none;
+      padding: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .airport-group-body.open { display: flex; }
+
+    .airport-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 7px 11px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid rgba(200,80,192,0.1);
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: all 0.15s;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .airport-chip:active { transform: scale(0.96); }
+    .airport-chip.selected {
+      background: linear-gradient(135deg, rgba(200,80,192,0.25), rgba(65,88,208,0.2));
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+    .airport-chip .acode {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .airport-chip .acity { color: var(--text-muted); font-size: 0.72rem; }
+    .airport-chip.is-fav { border-color: var(--warning); }
+
+    /* ── Date inputs ── */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .date-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
+    }
+    .date-field input[type="date"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid rgba(200,80,192,0.15);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      -webkit-appearance: none;
+    }
+    .date-field input[type="date"]:focus {
+      outline: none; border-color: var(--accent);
+    }
+    /* Fix date input color for webkit */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7);
+    }
+
+    /* ── Selects ── */
+    .option-row {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .option-row label {
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text-dim);
+    }
+    .option-row select {
+      background: var(--surface2);
+      border: 1px solid rgba(200,80,192,0.15);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+    }
+    .option-row select:focus { outline: none; border-color: var(--accent); }
+
+    /* ── Search button ── */
+    .search-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 14px 0;
+      transition: all 0.2s;
+      box-shadow: 0 6px 25px rgba(200,80,192,0.25);
+      letter-spacing: 0.02em;
+    }
+    .search-btn:active { transform: scale(0.98); filter: brightness(0.9); }
+    .search-btn:disabled {
+      opacity: 0.4; cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ── Results ── */
+    .results-area { margin-top: 10px; }
+
+    .msg-card {
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    .msg-info {
+      background: rgba(65,88,208,0.1);
+      border: 1px solid rgba(65,88,208,0.25);
+      color: #8b9cf7;
+    }
+    .msg-success {
+      background: rgba(0,214,143,0.1);
+      border: 1px solid rgba(0,214,143,0.25);
+      color: var(--success);
+    }
+    .msg-warning {
+      background: rgba(255,170,0,0.1);
+      border: 1px solid rgba(255,170,0,0.25);
+      color: var(--warning);
+    }
+    .msg-error {
+      background: rgba(255,71,87,0.1);
+      border: 1px solid rgba(255,71,87,0.25);
+      color: var(--danger);
+    }
+
+    .date-header {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin: 16px 0 8px;
+      padding: 8px 12px;
+      background: rgba(200,80,192,0.08);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--accent);
+    }
+
+    .dest-header {
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      margin: 14px 0 8px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      color: white;
+    }
+
+    .flight-card {
+      background: var(--surface);
+      border: 1px solid rgba(200,80,192,0.1);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .flight-card:active { border-color: var(--accent); }
+    .flight-card.indirect {
+      border-left: 3px solid var(--warning);
+    }
+
+    .flight-route {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .flight-route .route-text {
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-direct { background: rgba(0,214,143,0.15); color: var(--success); }
+    .badge-1stop { background: rgba(255,170,0,0.15); color: var(--warning); }
+    .badge-2stop { background: rgba(255,71,87,0.15); color: var(--danger); }
+
+    .flight-info {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .flight-info .mono {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+
+    .book-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 8px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #00d68f, #00b377);
+      color: white;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: filter 0.2s;
+    }
+    .book-link:active { filter: brightness(0.85); }
+
+    .layover-box {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+
+    /* Trip path */
+    .trip-path {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+      margin: 8px 0;
+    }
+    .trip-path .leg-badge {
+      background: var(--surface2);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+    .trip-path .leg-badge .acode {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600; color: var(--accent2);
+    }
+    .trip-path .leg-badge small { display: block; color: var(--text-muted); font-size: 0.68rem; }
+    .trip-path .arrow-sep { color: var(--accent); font-weight: 700; font-size: 0.85rem; }
+
+    .trip-duration {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+
+    .trip-leg {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(200,80,192,0.06);
+      font-size: 0.8rem;
+    }
+    .trip-leg:last-child { border-bottom: none; }
+
+    /* ── Bottom navigation ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(12, 6, 24, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(200,80,192,0.15);
+      display: flex;
+      padding: 6px 8px calc(6px + var(--safe-bottom));
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 8px 4px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+    .nav-btn .nav-icon { font-size: 1.2rem; }
+    .nav-btn.active {
+      color: var(--accent2);
+      background: rgba(200,80,192,0.1);
+    }
+
+    /* ── Modal (for import/export) ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-sheet {
+      width: 100%; max-width: 500px;
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 16px calc(20px + var(--safe-bottom));
+      animation: sheetUp 0.3s ease-out;
+      max-height: 80dvh;
+      overflow-y: auto;
+    }
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .modal-title {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(200,80,192,0.3); border-radius: 2px; }
+
+    /* ── File drop zone ── */
+    .drop-zone {
+      border: 2px dashed rgba(200,80,192,0.3);
+      border-radius: var(--radius);
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(200,80,192,0.05);
+    }
+    .drop-zone .drop-icon { font-size: 2rem; margin-bottom: 8px; }
+    .drop-zone p { font-size: 0.85rem; }
+    .drop-zone small { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* ── Utility ── */
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mb-2 { margin-bottom: 8px; }
+    .gap-2 { gap: 8px; }
+
+    .footer-text {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 20px 0;
+    }
+    .footer-text a { color: var(--accent); text-decoration: none; }
+
+    /* Desktop tweaks */
+    @media (min-width: 600px) {
+      .app-content { padding: 16px; }
+      .flight-card { padding: 16px; }
+      .airport-list-container { max-height: 350px; }
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 6px;
+      background: rgba(200,80,192,0.15);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(200,80,192,0.2);
+      border-top-color: var(--accent2);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-row">
+      <div class="app-title">
+        ✈️ Wizz AYCF Finder <span>v3.0</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-import-export" title="Import/Export">📦</button>
+        <button class="icon-btn" id="btn-clear-cache" title="Clear cache">🗑️</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-content">
+
+    <!-- Status Card -->
+    <div class="status-card empty" id="status-card">
+      <div class="status-icon" id="status-icon">📭</div>
+      <div class="status-title" id="status-title">No Flight Data</div>
+      <div class="status-detail" id="status-detail">
+        Import a JSON file exported from the Chrome extension, or use the extension to download data.
+      </div>
+      <div class="status-stats hidden" id="status-stats">
+        <div class="stat">
+          <div class="stat-num" id="stat-flights">0</div>
+          <div class="stat-label">Flights</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-origins">0</div>
+          <div class="stat-label">Origins</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-routes">0</div>
+          <div class="stat-label">Routes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-days">0</div>
+          <div class="stat-label">Days</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick import button -->
+    <div class="action-row" id="quick-import-row">
+      <button class="btn btn-primary btn-full" id="btn-quick-import">📥 Import Flight Data (JSON)</button>
+    </div>
+
+    <!-- Favorites -->
+    <div class="section-card">
+      <div class="section-title">⭐ Favorite Airports</div>
+      <div class="fav-input-row">
+        <input type="text" id="fav-input" placeholder="Airport code (TLV, BCN...)" maxlength="3" autocomplete="off" autocapitalize="characters">
+        <button class="btn btn-primary btn-sm" id="btn-add-fav">Add</button>
+      </div>
+      <div class="fav-chips" id="fav-chips">
+        <span class="fav-empty">No favorites yet</span>
+      </div>
+    </div>
+
+    <!-- Mode Switcher -->
+    <div class="mode-switcher">
+      <button class="mode-btn active" data-mode="departure">✈️ From Origin</button>
+      <button class="mode-btn" data-mode="destination">🎯 To Dest</button>
+      <button class="mode-btn" data-mode="trip">🗓️ Trip</button>
+    </div>
+
+    <!-- ═══ FROM ORIGIN Panel ═══ -->
+    <div class="search-panel active" id="panel-departure">
+      <div class="section-card">
+        <div class="section-title">🛫 Select Origin Airports</div>
+        <input type="text" class="airport-search" id="origin-search" placeholder="Search by code, city, or country...">
+        <div class="select-row">
+          <button class="btn btn-outline btn-sm sel-favs" data-list="origins-list">⭐ Faves</button>
+          <button class="btn btn-outline btn-sm sel-all" data-list="origins-list">All</button>
+          <button class="btn btn-outline btn-sm sel-clear" data-list="origins-list">Clear</button>
+        </div>
+        <div class="airport-list-container" id="origins-list"></div>
+      </div>
+      <div class="date-grid">
+        <div class="date-field">
+          <label>From</label>
+          <input type="date" id="dep-start">
+        </div>
+        <div class="date-field">
+          <label>To</label>
+          <input type="date" id="dep-end">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TO DESTINATION Panel ═══ -->
+    <div class="search-panel" id="panel-destination">
+      <div class="section-card">
+        <div class="section-title">🎯 Select Destination Airports</div>
+        <input type="text" class="airport-search" id="dest-search" placeholder="Search by code, city, or country...">
+        <div class="select-row">
+          <button class="btn btn-outline btn-sm sel-favs" data-list="dests-list">⭐ Faves</button>
+          <button class="btn btn-outline btn-sm sel-all" data-list="dests-list">All</button>
+          <button class="btn btn-outline btn-sm sel-clear" data-list="dests-list">Clear</button>
+        </div>
+        <div class="airport-list-container" id="dests-list"></div>
+      </div>
+      <div class="date-grid">
+        <div class="date-field">
+          <label>From</label>
+          <input type="date" id="dest-start">
+        </div>
+        <div class="date-field">
+          <label>To</label>
+          <input type="date" id="dest-end">
+        </div>
+      </div>
+      <div class="option-row">
+        <label>Max connections:</label>
+        <select id="max-hops">
+          <option value="0">Direct only</option>
+          <option value="1">Up to 1 stop</option>
+          <option value="2" selected>Up to 2 stops</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ═══ TRIP EXPLORER Panel ═══ -->
+    <div class="search-panel" id="panel-trip">
+      <div class="section-card">
+        <div class="section-title">🏠 Home Airports (Start & End)</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">
+          Your trip starts and ends here. E.g. TLV → BUD → RHO → TLV
+        </p>
+        <input type="text" class="airport-search" id="trip-search" placeholder="Search by code, city, or country...">
+        <div class="select-row">
+          <button class="btn btn-outline btn-sm sel-favs" data-list="trip-list">⭐ Faves</button>
+          <button class="btn btn-outline btn-sm sel-all" data-list="trip-list">All</button>
+          <button class="btn btn-outline btn-sm sel-clear" data-list="trip-list">Clear</button>
+        </div>
+        <div class="airport-list-container" id="trip-list"></div>
+      </div>
+      <div class="date-grid">
+        <div class="date-field">
+          <label>From</label>
+          <input type="date" id="trip-start">
+        </div>
+        <div class="date-field">
+          <label>To</label>
+          <input type="date" id="trip-end">
+        </div>
+      </div>
+      <div class="option-row">
+        <label>Extra stops:</label>
+        <select id="return-hops">
+          <option value="0">Direct round-trip (A→B→A)</option>
+          <option value="1" selected>1 extra (A→B→C→A)</option>
+          <option value="2">2 extra (A→B→C→D→A)</option>
+        </select>
+      </div>
+      <div class="option-row">
+        <label>Min duration:</label>
+        <select id="min-trip-days">
+          <option value="0">Any</option>
+          <option value="1">1+ days</option>
+          <option value="2">2+ days</option>
+          <option value="3" selected>3+ days</option>
+          <option value="5">5+ days</option>
+          <option value="7">7+ days</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Search Button -->
+    <button class="search-btn" id="btn-search">🔍 Search Flights</button>
+
+    <!-- Results -->
+    <div class="results-area" id="results-area"></div>
+
+    <!-- Footer -->
+    <div class="footer-text">
+      Not affiliated with Wizz Air. 
+      <a href="https://github.com/vloss3/wizz-aycf-route-finder" target="_blank">GitHub</a> · 
+      <a href="https://discord.gg/k3eRaSBez4" target="_blank">Discord</a>
+    </div>
+  </main>
+
+  <!-- Import/Export Modal -->
+  <div class="modal-overlay" id="modal-ie">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">📦 Import / Export Data</div>
+
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-icon">📂</div>
+        <p>Tap to select or drop a JSON file</p>
+        <small>Exported from the Chrome extension</small>
+      </div>
+      <input type="file" id="file-input" accept=".json" style="display:none">
+
+      <div class="action-row">
+        <button class="btn btn-success" id="btn-export" style="flex:1">📤 Export Data</button>
+      </div>
+
+      <div id="import-status" class="hidden mt-2"></div>
+
+      <button class="btn btn-outline btn-full mt-3" id="btn-close-modal">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    //  WIZZ AYCF WEB - MOBILE FRIENDLY VERSION
+    // ═══════════════════════════════════════════════════
+    
+    const DB_NAME = 'WizzFlightDataWeb';
+    const DB_VERSION = 1;
+    const CACHE_HOURS = 48; // Longer cache for web version
+    const MIN_LAYOVER_MINS = 120;
+
+    const AIRPORT_COUNTRIES = {
+      'TLV':'Israel','ETH':'Israel','VDA':'Israel',
+      'LTN':'United Kingdom','LGW':'United Kingdom','STN':'United Kingdom',
+      'LHR':'United Kingdom','BHX':'United Kingdom','BRS':'United Kingdom',
+      'MAN':'United Kingdom','EDI':'United Kingdom','GLA':'United Kingdom',
+      'LPL':'United Kingdom','NCL':'United Kingdom','EMA':'United Kingdom',
+      'ABZ':'United Kingdom','CWL':'United Kingdom','DSA':'United Kingdom',
+      'FCO':'Italy','CIA':'Italy','MXP':'Italy','BGY':'Italy',
+      'VCE':'Italy','TSF':'Italy','NAP':'Italy','BRI':'Italy',
+      'CTA':'Italy','PMO':'Italy','BLQ':'Italy','TRN':'Italy',
+      'PSA':'Italy','VRN':'Italy','GOA':'Italy','TRS':'Italy',
+      'BCN':'Spain','MAD':'Spain','AGP':'Spain','ALC':'Spain',
+      'PMI':'Spain','IBZ':'Spain','VLC':'Spain','SVQ':'Spain',
+      'BIO':'Spain','TFS':'Spain','LPA':'Spain','ACE':'Spain','FUE':'Spain',
+      'BER':'Germany','CGN':'Germany','DTM':'Germany','DUS':'Germany',
+      'FRA':'Germany','HHN':'Germany','HAM':'Germany','HAJ':'Germany',
+      'MUC':'Germany','NUE':'Germany','STR':'Germany','FMM':'Germany',
+      'WAW':'Poland','WMI':'Poland','KRK':'Poland','KTW':'Poland',
+      'GDN':'Poland','POZ':'Poland','WRO':'Poland','LUZ':'Poland',
+      'RZE':'Poland','SZZ':'Poland','BZG':'Poland','LCJ':'Poland',
+      'OTP':'Romania','CLJ':'Romania','TSR':'Romania','IAS':'Romania',
+      'SBZ':'Romania','SUJ':'Romania','CRA':'Romania','BCM':'Romania','OMR':'Romania',
+      'BUD':'Hungary','VIE':'Austria',
+      'ATH':'Greece','SKG':'Greece','HER':'Greece','RHO':'Greece',
+      'CFU':'Greece','ZTH':'Greece','KGS':'Greece','CHQ':'Greece',
+      'LCA':'Cyprus','PFO':'Cyprus',
+      'DXB':'UAE','AUH':'UAE',
+      'SOF':'Bulgaria','VAR':'Bulgaria','BOJ':'Bulgaria',
+      'CDG':'France','ORY':'France','BVA':'France','NCE':'France',
+      'MRS':'France','LYS':'France','TLS':'France','BOD':'France','NTE':'France',
+      'LIS':'Portugal','OPO':'Portugal','FAO':'Portugal',
+      'AMS':'Netherlands','EIN':'Netherlands',
+      'BRU':'Belgium','CRL':'Belgium',
+      'GVA':'Switzerland','ZRH':'Switzerland','BSL':'Switzerland',
+      'ARN':'Sweden','GOT':'Sweden','CPH':'Denmark',
+      'OSL':'Norway','BGO':'Norway','TRD':'Norway',
+      'HEL':'Finland','TMP':'Finland',
+      'BEG':'Serbia','PRN':'Kosovo','SKP':'North Macedonia',
+      'TGD':'Montenegro','SJJ':'Bosnia','ZAG':'Croatia',
+      'SPU':'Croatia','DBV':'Croatia',
+      'TIA':'Albania','PRG':'Czech Republic','BTS':'Slovakia',
+      'LJU':'Slovenia','RIX':'Latvia','VNO':'Lithuania',
+      'TLL':'Estonia','KIV':'Moldova','KBP':'Ukraine','IEV':'Ukraine',
+    };
+
+    // ── State ──
+    let db = null;
+    let airportInfo = new Map();
+    let favorites = [];
+    let currentMode = 'departure';
+
+    // ── Utilities ──
+    const $ = id => document.getElementById(id);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    function fmtDate(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function fmtDMY(s) {
+      if (!s) return '';
+      const [y,m,d] = s.split('-');
+      return `${d}-${m}-${y}`;
+    }
+    function fmtDisplayDate(s) {
+      if (!s) return '';
+      const [y,m,d] = s.split('-');
+      const dt = new Date(+y, +m-1, +d);
+      return `${dt.toLocaleDateString('en-US',{weekday:'short'})} ${d}-${m}-${y}`;
+    }
+    function fmtTime(t) {
+      if (!t) return '';
+      if (t.includes(':') && !t.includes('AM') && !t.includes('PM')) {
+        const p = t.split(':');
+        return String(parseInt(p[0])).padStart(2,'0') + ':' + String(parseInt(p[1]||0)).padStart(2,'0');
+      }
+      return t;
+    }
+    function parseTime(t) {
+      if (!t) return 0;
+      const p = t.split(':');
+      return parseInt(p[0])*60 + parseInt(p[1]||0);
+    }
+    function getDateRange(s, e) {
+      const dates = [];
+      const [sy,sm,sd] = s.split('-').map(Number);
+      const [ey,em,ed] = e.split('-').map(Number);
+      let c = new Date(sy,sm-1,sd);
+      const end = new Date(ey,em-1,ed);
+      while (c <= end) { dates.push(fmtDate(c)); c.setDate(c.getDate()+1); }
+      return dates;
+    }
+    function airportDisplay(code) {
+      const i = airportInfo.get(code);
+      if (!i) return code;
+      const parts = [code];
+      if (i.name && i.name !== code) parts.push(i.name);
+      if (i.country) parts.push(i.country);
+      return parts.join(' · ');
+    }
+    function airportShort(code) {
+      const i = airportInfo.get(code);
+      return i && i.name && i.name !== code ? `${code} (${i.name})` : code;
+    }
+    function bookingLink(o, d, date) {
+      return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${date}`;
+    }
+
+    // ── IndexedDB ──
+    function initDB() {
+      return new Promise((ok, no) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onerror = () => no(new Error('IndexedDB error'));
+        req.onsuccess = () => { db = req.result; ok(db); };
+        req.onupgradeneeded = e => {
+          const d = e.target.result;
+          if (!d.objectStoreNames.contains('flights')) d.createObjectStore('flights', {keyPath:'id'});
+          if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', {keyPath:'key'});
+        };
+      });
+    }
+    function dbPut(store, data) {
+      return new Promise((ok, no) => {
+        const tx = db.transaction(store,'readwrite');
+        const s = tx.objectStore(store);
+        const r = s.put(data);
+        r.onsuccess = () => ok();
+        r.onerror = () => no(r.error);
+      });
+    }
+    function dbGetAll(store) {
+      return new Promise((ok, no) => {
+        const tx = db.transaction(store,'readonly');
+        const r = tx.objectStore(store).getAll();
+        r.onsuccess = () => ok(r.result || []);
+        r.onerror = () => no(r.error);
+      });
+    }
+    function dbClear(store) {
+      return new Promise((ok, no) => {
+        const tx = db.transaction(store,'readwrite');
+        const r = tx.objectStore(store).clear();
+        r.onsuccess = () => ok();
+        r.onerror = () => no(r.error);
+      });
+    }
+
+    // ── Favorites ──
+    function loadFavs() {
+      try { favorites = JSON.parse(localStorage.getItem('wizz_favs_web') || '[]'); } catch { favorites = []; }
+    }
+    function saveFavs() { localStorage.setItem('wizz_favs_web', JSON.stringify(favorites)); }
+    function addFav(code) {
+      code = code.toUpperCase().trim();
+      if (!code || code.length < 2 || code.length > 3) return false;
+      if (favorites.some(f => f.code === code)) return false;
+      const info = airportInfo.get(code) || { code, name: code, country: AIRPORT_COUNTRIES[code] || '' };
+      favorites.push({ code: info.code, name: info.name || code, country: info.country || AIRPORT_COUNTRIES[code] || '' });
+      saveFavs(); renderFavs(); renderAllLists();
+      return true;
+    }
+    function removeFav(code) {
+      favorites = favorites.filter(f => f.code !== code);
+      saveFavs(); renderFavs(); renderAllLists();
+    }
+    function renderFavs() {
+      const c = $('fav-chips');
+      if (!favorites.length) { c.innerHTML = '<span class="fav-empty">No favorites yet</span>'; return; }
+      c.innerHTML = favorites.map(f => `
+        <span class="fav-chip">
+          <span class="code">${f.code}</span>
+          <span class="info">${f.country || ''}</span>
+          <button class="remove" data-code="${f.code}">×</button>
+        </span>
+      `).join('');
+      c.querySelectorAll('.remove').forEach(b => b.onclick = e => { e.stopPropagation(); removeFav(b.dataset.code); });
+    }
+
+    // ── Airport Lists ──
+    function buildAirportInfo(data) {
+      airportInfo = new Map();
+      data.forEach(d => {
+        if (!airportInfo.has(d.origin)) {
+          airportInfo.set(d.origin, { code: d.origin, name: d.origin, country: AIRPORT_COUNTRIES[d.origin] || '' });
+        }
+        if (!airportInfo.has(d.dest)) {
+          airportInfo.set(d.dest, { code: d.dest, name: d.dest, country: AIRPORT_COUNTRIES[d.dest] || '' });
+        }
+      });
+    }
+
+    function renderAirportList(containerId, searchId) {
+      const c = $(containerId);
+      if (!c) return;
+      if (airportInfo.size === 0) {
+        c.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.82rem;">No airports loaded. Import data first.</div>';
+        return;
+      }
+      const byCountry = {};
+      airportInfo.forEach((info, code) => {
+        const country = info.country || 'Other';
+        if (!byCountry[country]) byCountry[country] = [];
+        byCountry[country].push(info);
+      });
+      const favCountries = new Set(favorites.map(f => f.country));
+      const sorted = Object.keys(byCountry).sort((a,b) => {
+        if (favCountries.has(a) && !favCountries.has(b)) return -1;
+        if (!favCountries.has(a) && favCountries.has(b)) return 1;
+        return a.localeCompare(b);
+      });
+      let html = '';
+      sorted.forEach(country => {
+        const airports = byCountry[country].sort((a,b) => a.code.localeCompare(b.code));
+        const hasFav = airports.some(a => favorites.some(f => f.code === a.code));
+        html += `<div class="airport-group" data-country="${country}">
+          <div class="airport-group-hdr" data-country="${country}">
+            <span>${hasFav ? '⭐ ' : ''}${country} (${airports.length})</span>
+            <span class="arrow">▶</span>
+          </div>
+          <div class="airport-group-body">`;
+        airports.forEach(a => {
+          const isFav = favorites.some(f => f.code === a.code);
+          html += `<div class="airport-chip${isFav ? ' is-fav' : ''}" data-code="${a.code}" data-country="${country}" data-name="${a.name}">
+            <span class="acode">${a.code}</span>
+            ${a.name !== a.code ? `<span class="acity">${a.name}</span>` : ''}
+          </div>`;
+        });
+        html += '</div></div>';
+      });
+      c.innerHTML = html;
+
+      // Toggle groups
+      c.querySelectorAll('.airport-group-hdr').forEach(h => {
+        h.addEventListener('click', () => {
+          h.classList.toggle('open');
+          h.nextElementSibling.classList.toggle('open');
+        });
+      });
+
+      // Toggle chips
+      c.querySelectorAll('.airport-chip').forEach(chip => {
+        chip.addEventListener('click', () => chip.classList.toggle('selected'));
+      });
+
+      // Search
+      if (searchId) {
+        const input = $(searchId);
+        if (input) {
+          input.addEventListener('input', () => {
+            const q = input.value.toLowerCase();
+            c.querySelectorAll('.airport-chip').forEach(ch => {
+              const match = ch.dataset.code.toLowerCase().includes(q) ||
+                            ch.dataset.country.toLowerCase().includes(q) ||
+                            (ch.dataset.name||'').toLowerCase().includes(q);
+              ch.style.display = match ? '' : 'none';
+            });
+            c.querySelectorAll('.airport-group').forEach(g => {
+              const hasVis = [...g.querySelectorAll('.airport-chip')].some(ch => ch.style.display !== 'none');
+              g.style.display = hasVis ? '' : 'none';
+              if (q && hasVis) {
+                g.querySelector('.airport-group-hdr').classList.add('open');
+                g.querySelector('.airport-group-body').classList.add('open');
+              }
+            });
+          });
+        }
+      }
+    }
+
+    function renderAllLists() {
+      renderAirportList('origins-list', 'origin-search');
+      renderAirportList('dests-list', 'dest-search');
+      renderAirportList('trip-list', 'trip-search');
+    }
+
+    function getSelected(containerId) {
+      const c = $(containerId);
+      if (!c) return [];
+      return [...c.querySelectorAll('.airport-chip.selected')].map(ch => ch.dataset.code);
+    }
+
+    function selectAirports(containerId, codes) {
+      const c = $(containerId);
+      if (!c) return;
+      const set = new Set(codes);
+      c.querySelectorAll('.airport-chip').forEach(ch => {
+        ch.classList.toggle('selected', set.has(ch.dataset.code));
+      });
+    }
+
+    // ── Status ──
+    async function updateStatus() {
+      const allData = await dbGetAll('flights');
+      const valid = allData.filter(d => Date.now() - d.timestamp < CACHE_HOURS * 3600000);
+      const card = $('status-card');
+      const stats = $('status-stats');
+
+      if (valid.length === 0) {
+        card.className = 'status-card empty';
+        $('status-icon').textContent = '📭';
+        $('status-title').textContent = 'No Flight Data';
+        $('status-detail').textContent = 'Import a JSON file from the Chrome extension to search flights offline.';
+        stats.classList.add('hidden');
+        $('quick-import-row').classList.remove('hidden');
+      } else {
+        const totalFlights = valid.reduce((s, d) => s + (d.flights?.length || 0), 0);
+        const origins = new Set(valid.map(d => d.origin));
+        const dests = new Set(valid.map(d => d.dest));
+        const dates = new Set(valid.map(d => d.date));
+
+        card.className = 'status-card loaded';
+        $('status-icon').textContent = '✅';
+        $('status-title').textContent = 'Flight Data Ready';
+        $('status-detail').textContent = `Cache valid for ${CACHE_HOURS}h. Dates: ${[...dates].sort().map(fmtDMY).join(', ')}`;
+        stats.classList.remove('hidden');
+        $('stat-flights').textContent = totalFlights.toLocaleString();
+        $('stat-origins').textContent = origins.size;
+        $('stat-routes').textContent = valid.length.toLocaleString();
+        $('stat-days').textContent = dates.size;
+        $('quick-import-row').classList.add('hidden');
+
+        // Build airport info from data
+        buildAirportInfo(valid);
+        renderAllLists();
+      }
+    }
+
+    // ── Import ──
+    async function importJSON(file) {
+      const card = $('status-card');
+      card.className = 'status-card importing';
+      $('status-icon').textContent = '⏳';
+      $('status-title').textContent = 'Importing...';
+      $('status-detail').textContent = 'Reading file...';
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (!data.data || !Array.isArray(data.data)) {
+          throw new Error('Invalid format — missing flight data array');
+        }
+
+        $('status-detail').textContent = `Importing ${data.data.length} routes...`;
+
+        let imported = 0;
+        for (const f of data.data) {
+          if (f.id && f.flights) {
+            await dbPut('flights', { ...f, timestamp: Date.now() });
+            imported++;
+          }
+        }
+
+        // Import favorites
+        if (data.favorites && Array.isArray(data.favorites)) {
+          data.favorites.forEach(f => {
+            if (!favorites.some(e => e.code === f.code)) {
+              favorites.push(f);
+            }
+          });
+          saveFavs(); renderFavs();
+        }
+
+        await updateStatus();
+        showResult('success', `Imported ${imported} routes successfully!`);
+
+        // Close modal if open
+        $('modal-ie').classList.remove('open');
+
+      } catch (e) {
+        card.className = 'status-card empty';
+        $('status-icon').textContent = '❌';
+        $('status-title').textContent = 'Import Failed';
+        $('status-detail').textContent = e.message;
+      }
+    }
+
+    async function exportJSON() {
+      const all = await dbGetAll('flights');
+      const valid = all.filter(d => Date.now() - d.timestamp < CACHE_HOURS * 3600000);
+      if (!valid.length) { alert('No data to export'); return; }
+
+      const exp = {
+        version: '3.0.0-web',
+        exportDate: new Date().toISOString(),
+        favorites,
+        flightCount: valid.reduce((s,f) => s + f.flights.length, 0),
+        routeCount: valid.length,
+        data: valid
+      };
+
+      const blob = new Blob([JSON.stringify(exp, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wizz-flights-${fmtDate(new Date())}.json`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ── Search ──
+    function showResult(type, msg) {
+      $('results-area').innerHTML = `<div class="msg-card msg-${type}">${msg}</div>`;
+    }
+
+    async function doSearch() {
+      const allData = await dbGetAll('flights');
+      const valid = allData.filter(d => Date.now() - d.timestamp < CACHE_HOURS * 3600000);
+      if (!valid.length) { showResult('error', 'No cached data. Import flight data first.'); return; }
+
+      // Build lookup
+      const byOrigin = new Map(), byDest = new Map(), byKey = new Map();
+      valid.forEach(d => {
+        byKey.set(`${d.origin}|${d.dest}|${d.date}`, d.flights || []);
+        if (!byOrigin.has(d.origin)) byOrigin.set(d.origin, []);
+        byOrigin.get(d.origin).push({ dest: d.dest, date: d.date, flights: d.flights || [] });
+        if (!byDest.has(d.dest)) byDest.set(d.dest, []);
+        byDest.get(d.dest).push({ origin: d.origin, date: d.date, flights: d.flights || [] });
+      });
+
+      const lookup = { byOrigin, byDest, byKey };
+
+      switch (currentMode) {
+        case 'departure': searchDeparture(lookup); break;
+        case 'destination': searchDestination(lookup); break;
+        case 'trip': searchTrip(lookup); break;
+      }
+    }
+
+    function searchDeparture(lookup) {
+      const origins = getSelected('origins-list');
+      const start = $('dep-start').value, end = $('dep-end').value;
+      if (!origins.length) { showResult('warning', 'Select at least one origin airport.'); return; }
+      if (!start || !end) { showResult('warning', 'Set both start and end dates.'); return; }
+
+      const dates = getDateRange(start, end);
+      const flights = [];
+
+      origins.forEach(o => {
+        const data = lookup.byOrigin.get(o) || [];
+        dates.forEach(d => {
+          data.filter(r => r.date === d).forEach(route => {
+            (route.flights || []).forEach(f => {
+              flights.push({ origin: o, dest: route.dest, date: d, flight: f });
+            });
+          });
+        });
+      });
+
+      displayDeparture(flights, origins, dates);
+    }
+
+    function searchDestination(lookup) {
+      const dests = getSelected('dests-list');
+      const start = $('dest-start').value, end = $('dest-end').value;
+      if (!dests.length) { showResult('warning', 'Select at least one destination.'); return; }
+      if (!start || !end) { showResult('warning', 'Set both dates.'); return; }
+
+      const dates = getDateRange(start, end);
+      const results = [];
+
+      dests.forEach(dest => {
+        const data = lookup.byDest.get(dest) || [];
+        dates.forEach(d => {
+          data.filter(r => r.date === d).forEach(route => {
+            (route.flights || []).forEach(f => {
+              results.push({ type:'direct', origin:route.origin, dest, date:d, flight:f });
+            });
+          });
+        });
+      });
+
+      displayDestination(results, dests);
+    }
+
+    function searchTrip(lookup) {
+      const homes = getSelected('trip-list');
+      const start = $('trip-start').value, end = $('trip-end').value;
+      const maxExtra = parseInt($('return-hops').value);
+      const minDays = parseInt($('min-trip-days').value);
+      if (!homes.length) { showResult('warning', 'Select at least one home airport.'); return; }
+      if (!start || !end) { showResult('warning', 'Set both dates.'); return; }
+
+      const dates = getDateRange(start, end);
+      const trips = [];
+      const getFlights = (from, to, date) => lookup.byKey.get(`${from}|${to}|${date}`) || [];
+
+      function tripDays(legs) {
+        if (legs.length < 2) return 0;
+        const [y1,m1,d1] = legs[0].date.split('-').map(Number);
+        const [y2,m2,d2] = legs[legs.length-1].date.split('-').map(Number);
+        return Math.floor((new Date(y2,m2-1,d2) - new Date(y1,m1-1,d1)) / 86400000);
+      }
+      function validConn(f1, d1, f2, d2) {
+        if (d2 > d1) return true;
+        if (d2 < d1) return false;
+        return parseTime(f2.departure) >= parseTime(f1.arrival) + MIN_LAYOVER_MINS;
+      }
+      function validReturn(f1, d1, f2, d2) {
+        if (d2 > d1) return true;
+        if (d2 < d1) return false;
+        return parseTime(f2.departure) >= parseTime(f1.arrival) + 60;
+      }
+
+      homes.forEach(home => {
+        const homeRoutes = lookup.byOrigin.get(home) || [];
+        const directDests = new Set(homeRoutes.map(r => r.dest));
+
+        // 1-stop: Home→A→Home
+        directDests.forEach(dest1 => {
+          const retRoutes = lookup.byOrigin.get(dest1) || [];
+          if (!retRoutes.some(r => r.dest === home)) return;
+
+          dates.forEach(d1 => {
+            const leg1s = getFlights(home, dest1, d1);
+            if (!leg1s.length) return;
+            leg1s.forEach(f1 => {
+              dates.forEach(d2 => {
+                if (d2 < d1) return;
+                getFlights(dest1, home, d2).forEach(f2 => {
+                  if (!validReturn(f1, d1, f2, d2)) return;
+                  const legs = [
+                    { from:home, to:dest1, date:d1, flight:f1 },
+                    { from:dest1, to:home, date:d2, flight:f2 }
+                  ];
+                  if (tripDays(legs) < minDays) return;
+                  trips.push({ home, hops:1, path:[home,dest1,home], legs });
+                });
+              });
+            });
+          });
+        });
+
+        // 2-stop: Home→A→B→Home
+        if (maxExtra >= 1) {
+          directDests.forEach(dest1 => {
+            const d1Routes = lookup.byOrigin.get(dest1) || [];
+            d1Routes.forEach(r => {
+              const dest2 = r.dest;
+              if (dest2 === home) return;
+              const retR = lookup.byOrigin.get(dest2) || [];
+              if (!retR.some(rr => rr.dest === home)) return;
+
+              dates.forEach(d1 => {
+                const l1 = getFlights(home, dest1, d1);
+                if (!l1.length) return;
+                const f1 = l1[0];
+                dates.forEach(d2 => {
+                  if (d2 < d1) return;
+                  const l2 = getFlights(dest1, dest2, d2);
+                  for (const f2 of l2) {
+                    if (!validConn(f1, d1, f2, d2)) continue;
+                    dates.forEach(d3 => {
+                      if (d3 < d2) return;
+                      for (const f3 of getFlights(dest2, home, d3)) {
+                        if (!validConn(f2, d2, f3, d3)) continue;
+                        const legs = [
+                          {from:home,to:dest1,date:d1,flight:f1},
+                          {from:dest1,to:dest2,date:d2,flight:f2},
+                          {from:dest2,to:home,date:d3,flight:f3}
+                        ];
+                        if (tripDays(legs) < minDays) continue;
+                        trips.push({home,hops:2,path:[home,dest1,dest2,home],legs});
+                        return;
+                      }
+                    });
+                    break;
+                  }
+                });
+              });
+            });
+          });
+        }
+      });
+
+      displayTrips(trips);
+    }
+
+    // ── Display Results ──
+    function displayDeparture(flights, origins, dates) {
+      const area = $('results-area');
+      if (!flights.length) {
+        area.innerHTML = `<div class="msg-card msg-warning">No flights found from ${origins.join(', ')} in the selected dates.</div>`;
+        return;
+      }
+
+      const byDate = {};
+      flights.forEach(f => { if (!byDate[f.date]) byDate[f.date] = []; byDate[f.date].push(f); });
+
+      let html = `<div class="msg-card msg-success">Found <strong>${flights.length}</strong> flights</div>`;
+
+      Object.keys(byDate).sort().forEach(date => {
+        html += `<div class="date-header">${fmtDisplayDate(date)} — ${byDate[date].length} flights</div>`;
+        byDate[date].forEach(f => {
+          html += `
+            <div class="flight-card">
+              <div class="flight-route">
+                <span class="route-text">${airportShort(f.origin)} → ${airportShort(f.dest)}</span>
+                <span class="badge badge-direct">Direct</span>
+              </div>
+              <div class="flight-info">
+                ✈️ <span class="mono">${fmtTime(f.flight.departure)}</span> → 
+                🛬 <span class="mono">${fmtTime(f.flight.arrival)}</span> · 
+                ⏱️ ${f.flight.duration || ''} · ${f.flight.flightCode || ''}
+              </div>
+              <a href="${bookingLink(f.origin, f.dest, f.date)}" target="_blank" class="book-link">🎫 Book</a>
+            </div>`;
+        });
+      });
+
+      area.innerHTML = html;
+    }
+
+    function displayDestination(results, dests) {
+      const area = $('results-area');
+      if (!results.length) {
+        area.innerHTML = `<div class="msg-card msg-warning">No routes found to ${dests.join(', ')}. Make sure origin airports are in the cached data.</div>`;
+        return;
+      }
+
+      const byDest = {};
+      results.forEach(f => { if (!byDest[f.dest]) byDest[f.dest] = []; byDest[f.dest].push(f); });
+
+      let html = `<div class="msg-card msg-success">Found <strong>${results.length}</strong> route options</div>`;
+
+      Object.keys(byDest).sort().forEach(dest => {
+        html += `<div class="dest-header">🎯 ${airportDisplay(dest)} (${byDest[dest].length})</div>`;
+        byDest[dest].slice(0, 30).forEach(f => {
+          html += `
+            <div class="flight-card">
+              <div class="flight-route">
+                <span class="route-text">${airportShort(f.origin)} → ${airportShort(f.dest)}</span>
+                <span class="badge badge-direct">Direct</span>
+              </div>
+              <div class="flight-info">
+                📅 ${fmtDisplayDate(f.date)}<br>
+                ✈️ <span class="mono">${fmtTime(f.flight.departure)}</span> → 
+                🛬 <span class="mono">${fmtTime(f.flight.arrival)}</span> · ${f.flight.duration || ''}
+              </div>
+              <a href="${bookingLink(f.origin, f.dest, f.date)}" target="_blank" class="book-link">🎫 Book</a>
+            </div>`;
+        });
+        if (byDest[dest].length > 30) html += `<div class="msg-card msg-info">...and ${byDest[dest].length - 30} more</div>`;
+      });
+
+      area.innerHTML = html;
+    }
+
+    function displayTrips(trips) {
+      const area = $('results-area');
+      if (!trips.length) {
+        area.innerHTML = `<div class="msg-card msg-warning">No round-trip itineraries found. Try reducing min duration or import more airport data.</div>`;
+        return;
+      }
+
+      const byHops = {1:[], 2:[], 3:[]};
+      trips.forEach(t => { if (byHops[t.hops]) byHops[t.hops].push(t); });
+
+      let html = `<div class="msg-card msg-success">Found <strong>${trips.length}</strong> round-trip itineraries</div>`;
+
+      [1,2,3].forEach(h => {
+        if (!byHops[h].length) return;
+        const label = h === 1 ? 'Direct Round Trip' : h === 2 ? '1 Extra Destination' : '2 Extra Destinations';
+        html += `<div class="dest-header" style="background:linear-gradient(135deg,#9b59b6,#6c3483)">🔄 ${label} (${byHops[h].length})</div>`;
+
+        const byPath = {};
+        byHops[h].forEach(t => { const k = t.path.join('-'); if (!byPath[k]) byPath[k]=[]; byPath[k].push(t); });
+
+        Object.keys(byPath).slice(0, 15).forEach(pk => {
+          const pts = byPath[pk];
+          const s = pts[0];
+          html += `<div class="flight-card" style="border-left:3px solid #9b59b6;">
+            <div class="trip-path">
+              ${s.path.map((p,i) => {
+                const info = airportInfo.get(p);
+                return `<span class="leg-badge"><span class="acode">${p}</span><small>${info?.name||''}</small></span>${i<s.path.length-1?'<span class="arrow-sep">→</span>':''}`;
+              }).join('')}
+            </div>`;
+
+          pts.slice(0,3).forEach(trip => {
+            const d1 = trip.legs[0].date, dN = trip.legs[trip.legs.length-1].date;
+            const [y1,m1,dd1] = d1.split('-').map(Number);
+            const [y2,m2,dd2] = dN.split('-').map(Number);
+            const days = Math.floor((new Date(y2,m2-1,dd2)-new Date(y1,m1-1,dd1))/86400000);
+            const dur = days === 0 ? 'Same day' : days === 1 ? '1 day' : `${days} days`;
+
+            html += `<div class="layover-box">
+              <div class="trip-duration">📅 ${dur}</div>`;
+            trip.legs.forEach((leg,i) => {
+              html += `<div class="trip-leg">
+                <strong>Leg ${i+1}:</strong> ${fmtDisplayDate(leg.date)}<br>
+                ${airportShort(leg.from)} → ${airportShort(leg.to)} · 
+                <span class="mono">${fmtTime(leg.flight.departure)}</span> → <span class="mono">${fmtTime(leg.flight.arrival)}</span> · ${leg.flight.duration||''}
+                <a href="${bookingLink(leg.from,leg.to,leg.date)}" target="_blank" class="book-link" style="padding:3px 8px;font-size:0.72rem;margin-left:6px;">Book</a>
+              </div>`;
+            });
+            html += '</div>';
+          });
+
+          if (pts.length > 3) html += `<div style="font-size:0.75rem;color:var(--text-muted);padding:6px 0;">...and ${pts.length-3} more date options</div>`;
+          html += '</div>';
+        });
+      });
+
+      area.innerHTML = html;
+    }
+
+    // ── Init ──
+    async function init() {
+      await initDB();
+      loadFavs();
+      renderFavs();
+
+      // Date pickers
+      const today = fmtDate(new Date());
+      const maxD = new Date(); maxD.setDate(maxD.getDate() + 3);
+      const maxStr = fmtDate(maxD);
+
+      ['dep-start','dest-start','trip-start'].forEach(id => { const e = $(id); if (e) { e.value = today; e.min = today; }});
+      ['dep-end','dest-end','trip-end'].forEach(id => { const e = $(id); if (e) { e.value = maxStr; e.min = today; }});
+
+      await updateStatus();
+    }
+
+    // ── Events ──
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mode tabs
+      $$('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          $$('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode;
+          $$('.search-panel').forEach(p => p.classList.remove('active'));
+          $('panel-' + currentMode).classList.add('active');
+        });
+      });
+
+      // Favorites
+      $('btn-add-fav').onclick = () => {
+        const inp = $('fav-input');
+        if (addFav(inp.value)) inp.value = '';
+      };
+      $('fav-input').onkeypress = e => {
+        if (e.key === 'Enter') { const inp = $('fav-input'); if (addFav(inp.value)) inp.value = ''; }
+      };
+
+      // Search
+      $('btn-search').onclick = doSearch;
+
+      // Select helpers
+      $$('.sel-favs').forEach(b => b.onclick = () => selectAirports(b.dataset.list, favorites.map(f => f.code)));
+      $$('.sel-all').forEach(b => b.onclick = () => selectAirports(b.dataset.list, [...airportInfo.keys()]));
+      $$('.sel-clear').forEach(b => b.onclick = () => selectAirports(b.dataset.list, []));
+
+      // Import/Export modal
+      $('btn-import-export').onclick = () => $('modal-ie').classList.add('open');
+      $('btn-close-modal').onclick = () => $('modal-ie').classList.remove('open');
+      $('modal-ie').addEventListener('click', e => { if (e.target === $('modal-ie')) $('modal-ie').classList.remove('open'); });
+
+      // Quick import
+      $('btn-quick-import').onclick = () => $('file-input').click();
+
+      // File input
+      $('file-input').onchange = e => { if (e.target.files.length) { importJSON(e.target.files[0]); e.target.value = ''; } };
+
+      // Drop zone
+      const dz = $('drop-zone');
+      dz.onclick = () => $('file-input').click();
+      dz.ondragover = e => { e.preventDefault(); dz.classList.add('dragover'); };
+      dz.ondragleave = () => dz.classList.remove('dragover');
+      dz.ondrop = e => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files.length) importJSON(e.dataTransfer.files[0]); };
+
+      // Export
+      $('btn-export').onclick = exportJSON;
+
+      // Clear cache
+      $('btn-clear-cache').onclick = async () => {
+        if (confirm('Clear all cached flight data?')) {
+          await dbClear('flights');
+          await updateStatus();
+          $('results-area').innerHTML = '';
+        }
+      };
+
+      init();
+    });
+  </script>
+</body>
+</html>
