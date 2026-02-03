@@ -48,7 +48,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 .ip{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:11px 12px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.88rem;min-height:42px}
 .ip:focus{outline:none;border-color:var(--acc)}
-select.ip{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select.ip{font-weight:600;color:#000;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 select.ip[multiple]{height:42px;overflow:hidden}
 .ip-row{display:flex;gap:8px;margin-bottom:8px}
 
@@ -133,7 +133,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v" id="versionDisplay">v4.8.0</span>
+    <span class="v" id="versionDisplay">v4.9.0</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -331,7 +331,7 @@ td{color:var(--tx)}
 //  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.8.0';
+const VERSION = '4.9.0';
 
 // UUID v4 generator for availability API
 function generateUUID() {
@@ -1053,37 +1053,27 @@ async function searchFlights() {
     L('═══ EXTRACTING DYNAMIC SEARCH URL ═══');
     dynamicSearchUrl = null;
 
-    // Method 1: Look for searchFlight pattern in page
-    const searchFlightMatch = pageHtml.match(/"searchFlight"\s*:\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
-    if (searchFlightMatch) {
-      dynamicSearchUrl = searchFlightMatch[1].replace(/\\\//g, '/');
-      L(`Found dynamic search URL (method 1 - searchFlight): ${dynamicSearchUrl}`);
+    // Extract UUID from any availability URL in page and build correct JSON API URL
+    // The Chrome extension does this: extracts UUID, then builds /w6/subscriptions/json/availability/{uuid}
+    // Critical: NO /en/ prefix, and must use /json/availability/ path
+
+    // Method 1: Extract UUID from any availability URL pattern (most common)
+    const uuidMatch = pageHtml.match(/\/availability\/([a-f0-9-]{36})/i);
+    if (uuidMatch && uuidMatch[1]) {
+      const uuid = uuidMatch[1];
+      dynamicSearchUrl = `https://multipass.wizzair.com/w6/subscriptions/json/availability/${uuid}`;
+      L(`Found UUID: ${uuid}`);
+      L(`Built JSON search URL: ${dynamicSearchUrl}`);
     }
 
-    // Method 2: Look for CVO.flightSearchUrlJson
+    // Method 2: Look for CVO.flightSearchUrlJson and extract UUID
     if (!dynamicSearchUrl) {
-      const cvoMatch = pageHtml.match(/window\.CVO\.flightSearchUrlJson\s*=\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
-      if (cvoMatch) {
-        dynamicSearchUrl = cvoMatch[1];
-        L(`Found dynamic search URL (method 2 - CVO): ${dynamicSearchUrl}`);
-      }
-    }
-
-    // Method 3: Extract UUID from any availability URL pattern
-    if (!dynamicSearchUrl) {
-      const uuidMatch = pageHtml.match(/\/json\/availability\/([a-f0-9-]{36})/i);
-      if (uuidMatch) {
-        dynamicSearchUrl = `https://multipass.wizzair.com/w6/subscriptions/json/availability/${uuidMatch[1]}`;
-        L(`Found dynamic search URL (method 3 - UUID pattern): ${dynamicSearchUrl}`);
-      }
-    }
-
-    // Method 4: Look for flightSearchUrl pattern
-    if (!dynamicSearchUrl) {
-      const flightSearchMatch = pageHtml.match(/"flightSearchUrl"\s*:\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
-      if (flightSearchMatch) {
-        dynamicSearchUrl = flightSearchMatch[1].replace(/\\\//g, '/');
-        L(`Found dynamic search URL (method 4 - flightSearchUrl): ${dynamicSearchUrl}`);
+      const cvoMatch = pageHtml.match(/flightSearchUrlJson[^"]*"https:\/\/multipass\.wizzair\.com[^"]*\/([a-f0-9-]{36})"/i);
+      if (cvoMatch && cvoMatch[1]) {
+        const uuid = cvoMatch[1];
+        dynamicSearchUrl = `https://multipass.wizzair.com/w6/subscriptions/json/availability/${uuid}`;
+        L(`Found UUID (method 2 - CVO): ${uuid}`);
+        L(`Built JSON search URL: ${dynamicSearchUrl}`);
       }
     }
 
