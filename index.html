@@ -342,6 +342,9 @@ function generateUUID() {
   });
 }
 
+// Dynamic search URL extracted from page (session-specific)
+let dynamicSearchUrl = null;
+
 // Airport Database
 const AIRPORTS = {
   TLV:{city:'Tel Aviv',airport:'Ben Gurion International',country:'Israel'},
@@ -1042,6 +1045,54 @@ async function searchFlights() {
       L(`Wallets page size: ${pageHtml.length} bytes`);
     }
 
+    // ═══════════════════════════════════════════════════
+    // Extract dynamic search URL with session-specific UUID
+    // (Like the Chrome extension does in content.js)
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ EXTRACTING DYNAMIC SEARCH URL ═══');
+    dynamicSearchUrl = null;
+
+    // Method 1: Look for searchFlight pattern in page
+    const searchFlightMatch = pageHtml.match(/"searchFlight"\s*:\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
+    if (searchFlightMatch) {
+      dynamicSearchUrl = searchFlightMatch[1].replace(/\\\//g, '/');
+      L(`Found dynamic search URL (method 1 - searchFlight): ${dynamicSearchUrl}`);
+    }
+
+    // Method 2: Look for CVO.flightSearchUrlJson
+    if (!dynamicSearchUrl) {
+      const cvoMatch = pageHtml.match(/window\.CVO\.flightSearchUrlJson\s*=\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
+      if (cvoMatch) {
+        dynamicSearchUrl = cvoMatch[1];
+        L(`Found dynamic search URL (method 2 - CVO): ${dynamicSearchUrl}`);
+      }
+    }
+
+    // Method 3: Extract UUID from any availability URL pattern
+    if (!dynamicSearchUrl) {
+      const uuidMatch = pageHtml.match(/\/json\/availability\/([a-f0-9-]{36})/i);
+      if (uuidMatch) {
+        dynamicSearchUrl = `https://multipass.wizzair.com/w6/subscriptions/json/availability/${uuidMatch[1]}`;
+        L(`Found dynamic search URL (method 3 - UUID pattern): ${dynamicSearchUrl}`);
+      }
+    }
+
+    // Method 4: Look for flightSearchUrl pattern
+    if (!dynamicSearchUrl) {
+      const flightSearchMatch = pageHtml.match(/"flightSearchUrl"\s*:\s*"(https:\/\/multipass\.wizzair\.com[^"]+)"/);
+      if (flightSearchMatch) {
+        dynamicSearchUrl = flightSearchMatch[1].replace(/\\\//g, '/');
+        L(`Found dynamic search URL (method 4 - flightSearchUrl): ${dynamicSearchUrl}`);
+      }
+    }
+
+    if (dynamicSearchUrl) {
+      L(`✓ Dynamic search URL ready: ${dynamicSearchUrl}`);
+    } else {
+      LW('Could not find dynamic search URL in page - will try fallback endpoint');
+    }
+
     // Try to find routes
     let routes = [];
 
@@ -1349,15 +1400,13 @@ async function searchFlights() {
 
         LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
 
-        // Generate unique session ID for this search
-        const searchUUID = generateUUID();
-        LV(`Generated search UUID: ${searchUUID}`);
+        // Use dynamic search URL extracted from page (with session UUID)
+        // or fallback to base endpoint
+        const searchUrl = dynamicSearchUrl || 'https://multipass.wizzair.com/w6/subscriptions/json/availability';
+        LV(`Using search URL: ${searchUrl}`);
 
-        // Step 1: Create availability session
-        const sessionUrl = `https://multipass.wizzair.com/w6/subscriptions/availability/${searchUUID}`;
-        LV(`Creating availability session: ${sessionUrl}`);
-
-        const sessionResult = await px(sessionUrl, {
+        // Single POST with search parameters in body (like Chrome extension)
+        const r = await px(searchUrl, {
           method: 'POST',
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1368,22 +1417,6 @@ async function searchFlights() {
             arrival: '',
             intervalSubtype: null
           })
-        });
-
-        if (sessionResult.status !== 200) {
-          LW(`Session creation failed with status ${sessionResult.status}`);
-          errorCount++;
-          continue;
-        }
-
-        LV(`Session created successfully, fetching availability data...`);
-        await sleep(100); // Small delay before fetching data
-
-        // Step 2: Fetch availability JSON data
-        const r = await px(`https://multipass.wizzair.com/w6/subscriptions/json/availability/${searchUUID}`, {
-          method: 'POST',
-          contentType: 'application/json',
-          body: JSON.stringify({})
         });
 
         if (r.status === 429) {
