@@ -48,7 +48,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 .ip{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:11px 12px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.88rem;min-height:42px}
 .ip:focus{outline:none;border-color:var(--acc)}
-select.ip{font-weight:600;color:#000;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select.ip{font-weight:600;color:var(--tx);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select.ip option{color:#000;background:#fff}
 select.ip[multiple]{height:42px;overflow:hidden}
 .ip-row{display:flex;gap:8px;margin-bottom:8px}
 
@@ -133,7 +134,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v" id="versionDisplay">v4.9.0</span>
+    <span class="v" id="versionDisplay">v4.10.0</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -195,10 +196,13 @@ td{color:var(--tx)}
   </div>
 
   <div class="filter-row">
-    <label>Date Flexibility:</label>
+    <label>Search Range:</label>
     <select class="ip" id="filterDateFlex" style="max-width:180px">
-      <option value="exact">Exact Date Only</option>
-      <option value="pm1">± 1 Day (3 days)</option>
+      <option value="1">Exact Date Only</option>
+      <option value="3">Next 3 Days</option>
+      <option value="7">Next 7 Days</option>
+      <option value="14">Next 14 Days</option>
+      <option value="30">Next 30 Days</option>
     </select>
   </div>
 
@@ -331,7 +335,7 @@ td{color:var(--tx)}
 //  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.9.0';
+const VERSION = '4.10.0';
 
 // UUID v4 generator for availability API
 function generateUUID() {
@@ -509,13 +513,27 @@ function formatDateTime(dt, tm) {
 }
 
 function formatTime(t) {
-  if (!t) return '';
+  if (!t || t === 'undefined' || t === 'null') return '--:--';
+
+  // Handle ISO datetime: "2026-02-03T07:30:00"
   if (t.includes('T')) t = t.split('T')[1];
+
+  // Remove timezone: "07:30:00+02:00" or "Z"
+  if (t.includes('+')) t = t.split('+')[0];
+  if (t.includes('Z')) t = t.replace('Z', '');
+
   if (t.includes(':')) {
-    const p = t.split(':');
-    return String(+p[0]).padStart(2, '0') + ':' + String(+(p[1] || 0)).padStart(2, '0');
+    const parts = t.split(':');
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+
+    if (isNaN(hours)) return '--:--';
+    if (isNaN(minutes)) return String(hours).padStart(2, '0') + ':00';
+
+    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
   }
-  return t;
+
+  return '--:--';
 }
 
 function addDays(dateStr, days) {
@@ -523,6 +541,33 @@ function addDays(dateStr, days) {
   const date = new Date(y, m - 1, d);
   date.setDate(date.getDate() + days);
   return formatDate(date);
+}
+
+// Group results by destination city for round trip display
+function groupByDestination(results) {
+  const groups = new Map();
+  results.forEach(flight => {
+    // For outbound: group by destination city
+    // For return: group by origin city (which was our outbound destination)
+    const key = flight.type === 'outbound' ? flight.destCity : flight.originCity;
+    const country = flight.type === 'outbound' ? flight.destCountry : flight.originCountry;
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        city: key,
+        country: country,
+        outbound: [],
+        returns: []
+      });
+    }
+
+    if (flight.type === 'outbound') {
+      groups.get(key).outbound.push(flight);
+    } else {
+      groups.get(key).returns.push(flight);
+    }
+  });
+  return groups;
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -533,7 +578,7 @@ function getPriorityCities() {
 }
 
 function bookingUrl(o, d, dt) {
-  return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`;
+  return `https://multipass.wizzair.com/en/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`;
 }
 
 // Credentials
@@ -781,7 +826,7 @@ function showMsg(type, msg) {
 function setProgress(p) { $('dlFill').style.width = Math.min(100, p) + '%'; }
 function showStatus(m) { $('dlStatus').textContent = m; }
 
-// Render results
+// Render results - supports both flat and grouped (round trip) display
 function renderResults() {
   const area = $('resultsArea');
   $('resultsCount').textContent = `${searchResults.length} flights`;
@@ -791,6 +836,84 @@ function renderResults() {
     return;
   }
 
+  // Check if we have round trip results (both outbound and return)
+  const hasRoundTrip = searchResults.some(r => r.type === 'return');
+
+  if (hasRoundTrip) {
+    renderGroupedResults(area);
+  } else {
+    renderFlatResults(area);
+  }
+}
+
+// Render results grouped by destination city (for round trips)
+function renderGroupedResults(area) {
+  const groups = groupByDestination(searchResults);
+  let html = '';
+
+  // Get the origin city from the first outbound flight
+  const firstOutbound = searchResults.find(r => r.type === 'outbound');
+  const originCity = firstOutbound ? firstOutbound.originCity : 'Origin';
+
+  groups.forEach((group, cityName) => {
+    // Only show groups that have BOTH outbound and return flights for valid round trips
+    const hasOutbound = group.outbound.length > 0;
+    const hasReturn = group.returns.length > 0;
+
+    html += `<div style="margin-bottom:20px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;">`;
+    html += `<div style="background:var(--s2);padding:12px 16px;border-bottom:1px solid var(--bdr);">`;
+    html += `<span style="font-size:1rem;font-weight:700;color:var(--acc);">`;
+    html += `🔄 Round Trip: ${originCity} ↔ ${group.city}, ${group.country}</span>`;
+    html += `<span style="margin-left:16px;font-size:.78rem;color:var(--tx2);">`;
+    html += `${group.outbound.length} outbound, ${group.returns.length} return</span>`;
+    html += `</div>`;
+
+    // Outbound flights section
+    if (hasOutbound) {
+      html += `<div style="padding:12px 16px;">`;
+      html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">✈️ Outbound Flights (${originCity} → ${group.city})</div>`;
+      html += renderFlightTable(group.outbound);
+      html += `</div>`;
+    }
+
+    // Return flights section
+    if (hasReturn) {
+      html += `<div style="padding:12px 16px;border-top:1px solid var(--bdr);background:var(--s1);">`;
+      html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">↩️ Return Flights (${group.city} → ${originCity})</div>`;
+      html += renderFlightTable(group.returns);
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  area.innerHTML = html;
+}
+
+// Render a simple table for a list of flights (used in grouped view)
+function renderFlightTable(flights) {
+  let html = '<div class="tbl-wrap"><table><thead><tr>';
+  html += '<th>Date</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Book</th>';
+  html += '</tr></thead><tbody>';
+
+  flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
+
+  flights.forEach(f => {
+    html += `<tr>`;
+    html += `<td class="mono">${formatDateDMY(f.date)}</td>`;
+    html += `<td class="mono">${formatTime(f.departure)}</td>`;
+    html += `<td class="mono">${formatTime(f.arrival)}</td>`;
+    html += `<td class="mono">${f.flightNumber || '-'}</td>`;
+    html += `<td><a href="${f.bookingUrl}" target="_blank" class="link-btn">Book</a></td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  return html;
+}
+
+// Render flat results table (for one-way flights)
+function renderFlatResults(area) {
   let sorted = [...searchResults];
   if (currentSort.field) {
     sorted.sort((a, b) => {
@@ -831,8 +954,6 @@ function renderResults() {
   html += '</tr></thead><tbody>';
 
   sorted.forEach((r, idx) => {
-    const depTime = formatDateTime(r.date, r.departure);
-    const arrTime = formatDateTime(r.date, r.arrival);
     html += `<tr data-idx="${idx}">
       <td>${r.type === 'return' ? '↩️ Return' : '✈️ Outbound'}</td>
       <td>${r.originCountry}</td>
@@ -843,8 +964,8 @@ function renderResults() {
       <td>${r.destAirport} (${r.destCode})</td>
       <td class="mono">${r.flightNumber || '-'}</td>
       <td class="mono">${formatDateDMY(r.date)}</td>
-      <td class="mono">${depTime}</td>
-      <td class="mono">${arrTime}</td>
+      <td class="mono">${formatTime(r.departure)}</td>
+      <td class="mono">${formatTime(r.arrival)}</td>
       <td><a href="${r.bookingUrl}" target="_blank" class="link-btn">Book</a></td>
     </tr>`;
   });
@@ -1309,13 +1430,13 @@ async function searchFlights() {
     L('');
     L('═══ STEP 4: SEARCH FLIGHTS ═══');
 
-    // Build dates
-    const outboundDates = [filterDate];
-    if (filterDateFlex === 'pm1') {
-      outboundDates.unshift(addDays(filterDate, -1));
-      outboundDates.push(addDays(filterDate, 1));
+    // Build dates - generate N days forward from selected date
+    const daysAhead = parseInt(filterDateFlex, 10) || 1;
+    const outboundDates = [];
+    for (let i = 0; i < daysAhead; i++) {
+      outboundDates.push(addDays(filterDate, i));
     }
-    L(`Outbound dates: ${outboundDates.join(', ')}`);
+    L(`Outbound dates (${daysAhead} days): ${outboundDates.join(', ')}`);
 
     const returnDates = [];
     if (isRoundTrip) {
