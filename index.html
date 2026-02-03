@@ -134,7 +134,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v" id="versionDisplay">v4.10.0</span>
+    <span class="v" id="versionDisplay">v4.11.0</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -199,6 +199,7 @@ td{color:var(--tx)}
     <label>Search Range:</label>
     <select class="ip" id="filterDateFlex" style="max-width:180px">
       <option value="1">Exact Date Only</option>
+      <option value="2">Next 2 Days</option>
       <option value="3">Next 3 Days</option>
       <option value="7">Next 7 Days</option>
       <option value="14">Next 14 Days</option>
@@ -335,7 +336,7 @@ td{color:var(--tx)}
 //  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.10.0';
+const VERSION = '4.11.0';
 
 // UUID v4 generator for availability API
 function generateUUID() {
@@ -855,10 +856,17 @@ function renderGroupedResults(area) {
   const firstOutbound = searchResults.find(r => r.type === 'outbound');
   const originCity = firstOutbound ? firstOutbound.originCity : 'Origin';
 
+  // Count valid round trips (destinations with BOTH outbound AND return)
+  let validGroups = 0;
+
   groups.forEach((group, cityName) => {
-    // Only show groups that have BOTH outbound and return flights for valid round trips
-    const hasOutbound = group.outbound.length > 0;
-    const hasReturn = group.returns.length > 0;
+    // ONLY show groups that have BOTH outbound AND return flights
+    // Skip destinations with only one leg - not a valid round trip
+    if (group.outbound.length === 0 || group.returns.length === 0) {
+      return; // Skip this destination
+    }
+
+    validGroups++;
 
     html += `<div style="margin-bottom:20px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;">`;
     html += `<div style="background:var(--s2);padding:12px 16px;border-bottom:1px solid var(--bdr);">`;
@@ -869,23 +877,24 @@ function renderGroupedResults(area) {
     html += `</div>`;
 
     // Outbound flights section
-    if (hasOutbound) {
-      html += `<div style="padding:12px 16px;">`;
-      html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">✈️ Outbound Flights (${originCity} → ${group.city})</div>`;
-      html += renderFlightTable(group.outbound);
-      html += `</div>`;
-    }
+    html += `<div style="padding:12px 16px;">`;
+    html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">✈️ Outbound Flights (${originCity} → ${group.city})</div>`;
+    html += renderFlightTable(group.outbound);
+    html += `</div>`;
 
     // Return flights section
-    if (hasReturn) {
-      html += `<div style="padding:12px 16px;border-top:1px solid var(--bdr);background:var(--s1);">`;
-      html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">↩️ Return Flights (${group.city} → ${originCity})</div>`;
-      html += renderFlightTable(group.returns);
-      html += `</div>`;
-    }
+    html += `<div style="padding:12px 16px;border-top:1px solid var(--bdr);background:var(--s1);">`;
+    html += `<div style="font-weight:600;color:var(--tx2);font-size:.78rem;margin-bottom:8px;">↩️ Return Flights (${group.city} → ${originCity})</div>`;
+    html += renderFlightTable(group.returns);
+    html += `</div>`;
 
     html += `</div>`;
   });
+
+  // If no valid round trips found, show message
+  if (validGroups === 0) {
+    html = '<div class="mg mg-w">No complete round trips found. Try expanding your date range or destinations.</div>';
+  }
 
   area.innerHTML = html;
 }
