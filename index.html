@@ -1337,7 +1337,7 @@ async function searchFlights() {
 
         LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
 
-        const r = await px('https://multipass.wizzair.com/w6/subscriptions/json/flight-search', {
+        const r = await px('https://multipass.wizzair.com/en/w6/subscriptions/json/flight-search', {
           method: 'POST',
           contentType: 'application/json',
           body: JSON.stringify({
