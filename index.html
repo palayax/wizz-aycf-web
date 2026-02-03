@@ -46,10 +46,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .ip{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rs);padding:11px 12px;color:var(--tx);font-family:'Inter',sans-serif;font-size:.88rem;min-height:42px}
 .ip:focus{outline:none;border-color:var(--acc)}
 select.ip{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b949e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select.ip[multiple]{height:auto;min-height:100px}
 .ip-row{display:flex;gap:8px;margin-bottom:8px}
 
-.filter-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
-.filter-row label{font-size:.75rem;font-weight:600;color:var(--tx2);min-width:100px}
+.filter-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap}
+.filter-row label{font-size:.75rem;font-weight:600;color:var(--tx2);min-width:100px;padding-top:12px}
 .filter-row select,.filter-row input{flex:1;min-width:120px}
 
 .chk-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
@@ -70,6 +71,12 @@ select.ip{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .sp-n{display:inline-block;width:14px;height:14px;border:2px solid rgba(88,166,255,.2);border-top-color:var(--acc);border-radius:50%;animation:spi .6s linear infinite}
 @keyframes spi{to{transform:rotate(360deg)}}
 
+/* Multi-select chips */
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:rgba(88,166,255,.15);border:1px solid var(--acc);border-radius:12px;padding:4px 8px;font-size:.72rem;color:var(--acc)}
+.chip .x{cursor:pointer;font-weight:bold;margin-left:2px}
+.chip .x:hover{color:var(--red)}
+
 /* Results Table */
 .results-controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
 .results-count{font-size:.8rem;color:var(--tx2);margin-left:auto}
@@ -86,9 +93,8 @@ td{color:var(--tx)}
 .mono{font-family:'JetBrains Mono',monospace}
 .link-btn{background:var(--grn);color:#0d1117;padding:4px 8px;border-radius:4px;text-decoration:none;font-size:.7rem;font-weight:600;white-space:nowrap}
 
-/* Filter inputs in table header */
 .th-filter{display:block;margin-top:4px}
-.th-filter input,.th-filter select{width:100%;padding:4px 6px;font-size:.7rem;background:var(--bg);border:1px solid var(--bdr);border-radius:3px;color:var(--tx)}
+.th-filter input{width:100%;padding:4px 6px;font-size:.7rem;background:var(--bg);border:1px solid var(--bdr);border-radius:3px;color:var(--tx)}
 
 /* Modal */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;justify-content:center}
@@ -97,8 +103,8 @@ td{color:var(--tx)}
 .mo-h{width:36px;height:3px;background:var(--tx3);border-radius:2px;margin:0 auto 12px}
 .mo-t{font-size:1rem;font-weight:700;margin-bottom:12px}
 
-.la{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);max-height:280px;overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--tx3);white-space:pre-wrap}
-.la .e{color:var(--red)}.la .w{color:var(--ylw)}.la .s{color:var(--grn)}.la .a{color:var(--acc)}
+.la{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);max-height:400px;overflow-y:auto;padding:8px;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx3);white-space:pre-wrap;word-break:break-all}
+.la .e{color:var(--red)}.la .w{color:var(--ylw)}.la .s{color:var(--grn)}.la .a{color:var(--acc)}.la .v{color:var(--acc2)}
 
 .cl-h{cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .cl-h .tg{font-size:.65rem;color:var(--tx3)}
@@ -108,15 +114,14 @@ td{color:var(--tx)}
 .sp::before{content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--acc);color:var(--bg);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
 .code-box{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);padding:8px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--acc);max-height:100px;overflow-y:auto;margin:6px 0}
 
-/* Footer with branding */
 .ft{display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--tx3);padding:18px 12px;max-width:900px;margin:0 auto}
 .ft a{color:var(--acc);text-decoration:none}
 .ft-brand{display:flex;align-items:center;gap:6px}
 .ft-brand img{width:20px;height:20px;border-radius:4px}
 .ft-brand span{font-weight:600;color:var(--tx2)}
 
-/* Date display box */
 .date-box{display:inline-flex;align-items:center;gap:6px;background:var(--s3);padding:8px 12px;border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--grn);font-weight:600}
+.date-note{font-size:.65rem;color:var(--tx3);margin-left:8px}
 </style>
 </head>
 <body>
@@ -125,7 +130,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v">v4.3</span>
+    <span class="v">v4.5</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -179,8 +184,11 @@ td{color:var(--tx)}
 
   <div class="filter-row">
     <label>Departure Date:</label>
-    <div class="date-box" id="dateDisplay">--/--/----</div>
-    <input type="date" class="ip" id="filterDate" style="max-width:140px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="date-box" id="dateDisplay" onclick="document.getElementById('filterDate').showPicker()" style="cursor:pointer">--/--/----</div>
+      <input type="date" class="ip" id="filterDate" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none">
+      <button class="bt bt-o bt-sm" type="button" onclick="document.getElementById('filterDate').showPicker()">📅 Pick</button>
+    </div>
   </div>
 
   <div class="filter-row">
@@ -192,15 +200,21 @@ td{color:var(--tx)}
   </div>
 
   <div class="filter-row">
-    <label>Origin City:</label>
-    <select class="ip" id="filterOrigin"></select>
+    <label>Origin Cities:</label>
+    <div style="flex:1">
+      <select class="ip" id="filterOrigin" multiple size="4"></select>
+      <div class="chips" id="originChips"></div>
+      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Hold Ctrl/Cmd to select multiple</div>
+    </div>
   </div>
 
   <div class="filter-row">
-    <label>Destination City:</label>
-    <select class="ip" id="filterDest">
-      <option value="">All Destinations</option>
-    </select>
+    <label>Destination Cities:</label>
+    <div style="flex:1">
+      <select class="ip" id="filterDest" multiple size="4"></select>
+      <div class="chips" id="destChips"></div>
+      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Leave empty for ALL destinations</div>
+    </div>
   </div>
 
   <div class="filter-row">
@@ -275,6 +289,14 @@ td{color:var(--tx)}
 
   <hr class="sep">
 
+  <div class="cd-t">Verbose Logging</div>
+  <div class="chk-row">
+    <input type="checkbox" id="verboseLog" checked>
+    <label for="verboseLog">Enable verbose logging (for troubleshooting)</label>
+  </div>
+
+  <hr class="sep">
+
   <div class="cd-t">Saved Credentials</div>
   <button class="bt bt-d bt-sm" id="bClearCredentials">🗑️ Clear Saved Credentials</button>
 
@@ -288,8 +310,10 @@ td{color:var(--tx)}
 <div class="mo-s">
   <div class="mo-h"></div>
   <div class="mo-t">🔧 Debug Log <span id="lCnt" style="font-size:.72rem;color:var(--tx3)">(0)</span></div>
+  <p style="font-size:.72rem;color:var(--tx2);margin-bottom:8px">Copy this log and send for troubleshooting support.</p>
   <div class="rw" style="margin-bottom:10px">
-    <button class="bt bt-o bt-sm" id="bCopyLog">📋 Copy</button>
+    <button class="bt bt-p bt-sm" id="bCopyLog">📋 Copy Full Log</button>
+    <button class="bt bt-o bt-sm" id="bDownloadLog">💾 Download</button>
     <button class="bt bt-d bt-sm" id="bClearLog">Clear</button>
   </div>
   <div class="la" id="logArea">Waiting for events...</div>
@@ -300,17 +324,16 @@ td{color:var(--tx)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  PALAYA LTD - WIZZ AYCF FINDER v4.3
+//  PALAYA LTD - WIZZ AYCF FINDER v4.4
+//  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.3.0';
+const VERSION = '4.5.0';
 
 // Airport Database
 const AIRPORTS = {
-  // Israel
   TLV:{city:'Tel Aviv',airport:'Ben Gurion International',country:'Israel'},
   ETH:{city:'Eilat',airport:'Ramon Airport',country:'Israel'},
-  // UK
   LTN:{city:'London',airport:'Luton Airport',country:'United Kingdom'},
   LGW:{city:'London',airport:'Gatwick Airport',country:'United Kingdom'},
   STN:{city:'London',airport:'Stansted Airport',country:'United Kingdom'},
@@ -319,7 +342,6 @@ const AIRPORTS = {
   EDI:{city:'Edinburgh',airport:'Edinburgh Airport',country:'United Kingdom'},
   GLA:{city:'Glasgow',airport:'Glasgow Airport',country:'United Kingdom'},
   LPL:{city:'Liverpool',airport:'John Lennon Airport',country:'United Kingdom'},
-  // Italy
   FCO:{city:'Rome',airport:'Fiumicino Airport',country:'Italy'},
   CIA:{city:'Rome',airport:'Ciampino Airport',country:'Italy'},
   MXP:{city:'Milan',airport:'Malpensa Airport',country:'Italy'},
@@ -332,14 +354,12 @@ const AIRPORTS = {
   BLQ:{city:'Bologna',airport:'Guglielmo Marconi',country:'Italy'},
   TRN:{city:'Turin',airport:'Turin Airport',country:'Italy'},
   PSA:{city:'Pisa',airport:'Galileo Galilei Airport',country:'Italy'},
-  // Spain
   BCN:{city:'Barcelona',airport:'El Prat Airport',country:'Spain'},
   MAD:{city:'Madrid',airport:'Barajas Airport',country:'Spain'},
   AGP:{city:'Malaga',airport:'Costa del Sol Airport',country:'Spain'},
   ALC:{city:'Alicante',airport:'Alicante-Elche Airport',country:'Spain'},
   PMI:{city:'Palma',airport:'Son Sant Joan',country:'Spain'},
   VLC:{city:'Valencia',airport:'Valencia Airport',country:'Spain'},
-  // Germany
   BER:{city:'Berlin',airport:'Brandenburg Airport',country:'Germany'},
   CGN:{city:'Cologne',airport:'Cologne Bonn Airport',country:'Germany'},
   DUS:{city:'Dusseldorf',airport:'Dusseldorf Airport',country:'Germany'},
@@ -350,7 +370,6 @@ const AIRPORTS = {
   STR:{city:'Stuttgart',airport:'Stuttgart Airport',country:'Germany'},
   FMM:{city:'Memmingen',airport:'Allgau Airport',country:'Germany'},
   DTM:{city:'Dortmund',airport:'Dortmund Airport',country:'Germany'},
-  // Poland
   WAW:{city:'Warsaw',airport:'Chopin Airport',country:'Poland'},
   WMI:{city:'Warsaw',airport:'Modlin Airport',country:'Poland'},
   KRK:{city:'Krakow',airport:'John Paul II Airport',country:'Poland'},
@@ -358,48 +377,38 @@ const AIRPORTS = {
   GDN:{city:'Gdansk',airport:'Lech Walesa Airport',country:'Poland'},
   POZ:{city:'Poznan',airport:'Lawica Airport',country:'Poland'},
   WRO:{city:'Wroclaw',airport:'Copernicus Airport',country:'Poland'},
-  // Romania
   OTP:{city:'Bucharest',airport:'Henri Coanda Airport',country:'Romania'},
   CLJ:{city:'Cluj-Napoca',airport:'Avram Iancu Airport',country:'Romania'},
   TSR:{city:'Timisoara',airport:'Traian Vuia Airport',country:'Romania'},
   IAS:{city:'Iasi',airport:'Iasi Airport',country:'Romania'},
   SBZ:{city:'Sibiu',airport:'Sibiu Airport',country:'Romania'},
-  // Hungary & Austria
   BUD:{city:'Budapest',airport:'Ferenc Liszt Airport',country:'Hungary'},
   VIE:{city:'Vienna',airport:'Vienna International',country:'Austria'},
-  // Greece
   ATH:{city:'Athens',airport:'Eleftherios Venizelos',country:'Greece'},
   SKG:{city:'Thessaloniki',airport:'Macedonia Airport',country:'Greece'},
   HER:{city:'Heraklion',airport:'Nikos Kazantzakis',country:'Greece'},
   RHO:{city:'Rhodes',airport:'Diagoras Airport',country:'Greece'},
   CFU:{city:'Corfu',airport:'Ioannis Kapodistrias',country:'Greece'},
-  // Cyprus
   LCA:{city:'Larnaca',airport:'Larnaca Airport',country:'Cyprus'},
   PFO:{city:'Paphos',airport:'Paphos Airport',country:'Cyprus'},
-  // Bulgaria
   SOF:{city:'Sofia',airport:'Sofia Airport',country:'Bulgaria'},
   VAR:{city:'Varna',airport:'Varna Airport',country:'Bulgaria'},
-  // France
   CDG:{city:'Paris',airport:'Charles de Gaulle',country:'France'},
   ORY:{city:'Paris',airport:'Orly Airport',country:'France'},
   BVA:{city:'Paris',airport:'Beauvais-Tille',country:'France'},
   NCE:{city:'Nice',airport:'Cote d Azur Airport',country:'France'},
-  // Portugal
   LIS:{city:'Lisbon',airport:'Humberto Delgado',country:'Portugal'},
   OPO:{city:'Porto',airport:'Francisco Sa Carneiro',country:'Portugal'},
   FAO:{city:'Faro',airport:'Faro Airport',country:'Portugal'},
-  // Netherlands & Belgium
   AMS:{city:'Amsterdam',airport:'Schiphol Airport',country:'Netherlands'},
   EIN:{city:'Eindhoven',airport:'Eindhoven Airport',country:'Netherlands'},
   BRU:{city:'Brussels',airport:'Brussels Airport',country:'Belgium'},
   CRL:{city:'Brussels',airport:'Charleroi Airport',country:'Belgium'},
-  // Scandinavia
   ARN:{city:'Stockholm',airport:'Arlanda Airport',country:'Sweden'},
   GOT:{city:'Gothenburg',airport:'Landvetter Airport',country:'Sweden'},
   CPH:{city:'Copenhagen',airport:'Kastrup Airport',country:'Denmark'},
   OSL:{city:'Oslo',airport:'Gardermoen Airport',country:'Norway'},
   HEL:{city:'Helsinki',airport:'Helsinki-Vantaa',country:'Finland'},
-  // Balkans
   BEG:{city:'Belgrade',airport:'Nikola Tesla Airport',country:'Serbia'},
   PRN:{city:'Pristina',airport:'Adem Jashari Airport',country:'Kosovo'},
   SKP:{city:'Skopje',airport:'Skopje Airport',country:'North Macedonia'},
@@ -407,7 +416,6 @@ const AIRPORTS = {
   ZAG:{city:'Zagreb',airport:'Franjo Tudman Airport',country:'Croatia'},
   SPU:{city:'Split',airport:'Split Airport',country:'Croatia'},
   DBV:{city:'Dubrovnik',airport:'Dubrovnik Airport',country:'Croatia'},
-  // Other
   TIA:{city:'Tirana',airport:'Mother Teresa Airport',country:'Albania'},
   PRG:{city:'Prague',airport:'Vaclav Havel Airport',country:'Czechia'},
   BTS:{city:'Bratislava',airport:'M.R. Stefanik Airport',country:'Slovakia'},
@@ -429,6 +437,7 @@ let xsrfToken = '';
 let searchResults = [];
 let currentSort = { field: null, asc: true };
 let allDestinationsForReturn = new Set();
+let verboseMode = true;
 
 // Helpers
 const $ = id => document.getElementById(id);
@@ -437,8 +446,8 @@ const $$ = s => document.querySelectorAll(s);
 function L(m, c = '') {
   const ts = new Date().toISOString().slice(11, 23);
   const l = `[${ts}] ${m}`;
-  logs.push({ l, c });
-  if (logs.length > 3000) logs = logs.slice(-3000);
+  logs.push({ l, c, ts: Date.now() });
+  if (logs.length > 5000) logs = logs.slice(-5000);
   console.log('[AYCF]', m);
   const a = $('logArea');
   if (a) {
@@ -450,10 +459,11 @@ function L(m, c = '') {
   }
   $('lCnt').textContent = `(${logs.length})`;
 }
-function LE(m) { L('❌ ' + m, 'e'); }
-function LW(m) { L('⚠️ ' + m, 'w'); }
-function LS(m) { L('✅ ' + m, 's'); }
-function LA(m) { L('🌐 ' + m, 'a'); }
+function LE(m) { L('❌ ERROR: ' + m, 'e'); }
+function LW(m) { L('⚠️ WARN: ' + m, 'w'); }
+function LS(m) { L('✅ SUCCESS: ' + m, 's'); }
+function LA(m) { L('🌐 API: ' + m, 'a'); }
+function LV(m) { if (verboseMode) L('🔍 VERBOSE: ' + m, 'v'); }
 
 function getAirportInfo(code) {
   const info = AIRPORTS[code];
@@ -465,7 +475,6 @@ function formatDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-// Format date as DD/MM/YYYY for display
 function formatDateDMY(dateStr) {
   if (!dateStr) return '--/--/----';
   const [y, m, d] = dateStr.split('-');
@@ -512,7 +521,7 @@ function bookingUrl(o, d, dt) {
   return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`;
 }
 
-// Credentials management
+// Credentials
 function saveCredentials() {
   if ($('saveCredentials').checked) {
     const email = $('wizEmail').value.trim();
@@ -520,7 +529,7 @@ function saveCredentials() {
     if (email && pass) {
       localStorage.setItem('wz_email', btoa(email));
       localStorage.setItem('wz_pass', btoa(pass));
-      L('Credentials saved');
+      LV('Credentials saved to localStorage');
     }
   }
 }
@@ -533,10 +542,10 @@ function loadCredentials() {
       $('wizEmail').value = atob(email);
       $('wizPass').value = atob(pass);
       $('saveCredentials').checked = true;
-      L('Credentials loaded');
+      LV('Credentials loaded from localStorage');
     }
   } catch (e) {
-    LW('Failed to load credentials');
+    LW('Failed to load credentials: ' + e.message);
   }
 }
 
@@ -549,7 +558,29 @@ function clearCredentials() {
   LS('Credentials cleared');
 }
 
-// Populate city dropdowns
+// Multi-select chip rendering
+function updateChips(selectId, chipsId) {
+  const select = $(selectId);
+  const chipsDiv = $(chipsId);
+  const selected = Array.from(select.selectedOptions).map(o => ({ value: o.value, text: o.text }));
+
+  chipsDiv.innerHTML = selected.map(s =>
+    `<span class="chip" data-value="${s.value}">${s.text} <span class="x" data-value="${s.value}">×</span></span>`
+  ).join('');
+
+  chipsDiv.querySelectorAll('.x').forEach(x => {
+    x.onclick = (e) => {
+      e.stopPropagation();
+      const val = x.dataset.value;
+      Array.from(select.options).forEach(o => {
+        if (o.value === val) o.selected = false;
+      });
+      updateChips(selectId, chipsId);
+    };
+  });
+}
+
+// Populate dropdowns
 function populateCityDropdowns() {
   const cities = new Map();
   Object.entries(AIRPORTS).forEach(([code, info]) => {
@@ -569,20 +600,29 @@ function populateCityDropdowns() {
 
   const originSel = $('filterOrigin');
   originSel.innerHTML = sortedCities.map(([city, codes]) =>
-    `<option value="${codes.join(',')}" ${codes.includes('TLV') ? 'selected' : ''}>${city} (${codes.join('/')})</option>`
+    `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
   ).join('');
 
+  // Pre-select TLV
+  Array.from(originSel.options).forEach(o => {
+    if (o.value.includes('TLV')) o.selected = true;
+  });
+  updateChips('filterOrigin', 'originChips');
+
   const destSel = $('filterDest');
-  destSel.innerHTML = '<option value="" selected>All Destinations</option>' +
-    sortedCities.map(([city, codes]) =>
-      `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
-    ).join('');
+  destSel.innerHTML = sortedCities.map(([city, codes]) =>
+    `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
+  ).join('');
+  updateChips('filterDest', 'destChips');
 }
 
-// Proxy fetch
+// Proxy fetch with verbose logging
 async function px(url, opts = {}) {
   const proxy = getProxy();
   if (!proxy) throw new Error('Proxy not configured');
+
+  LV(`px() called for: ${url}`);
+  LV(`Options: method=${opts.method || 'GET'}, hasBody=${!!opts.body}`);
 
   const maxRedirects = opts.maxRedirects || 5;
   let currentUrl = url;
@@ -591,21 +631,40 @@ async function px(url, opts = {}) {
   while (attempt < maxRedirects) {
     attempt++;
     const headers = { 'X-Target': currentUrl };
-    if (cookieJar) headers['X-Cookies'] = cookieJar;
+    if (cookieJar) {
+      headers['X-Cookies'] = cookieJar;
+      LV(`Sending ${cookieJar.split(';').length} cookies`);
+    }
     if (opts.contentType) headers['Content-Type'] = opts.contentType;
-    if (xsrfToken) headers['X-XSRF-TOKEN'] = xsrfToken;
+    if (xsrfToken) {
+      headers['X-XSRF-TOKEN'] = xsrfToken;
+      LV(`XSRF token: ${xsrfToken.substring(0, 20)}...`);
+    }
 
     const fOpts = { method: (attempt === 1 ? opts.method : null) || 'GET', headers };
-    if (attempt === 1 && opts.body) fOpts.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
+    if (attempt === 1 && opts.body) {
+      fOpts.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
+      LV(`Request body: ${fOpts.body.substring(0, 200)}...`);
+    }
 
-    LA(`[${attempt}] ${fOpts.method || 'GET'} ${currentUrl.substring(0, 80)}...`);
+    LA(`[${attempt}/${maxRedirects}] ${fOpts.method} ${currentUrl.substring(0, 100)}...`);
 
-    const resp = await fetch(proxy, fOpts);
+    let resp;
+    try {
+      resp = await fetch(proxy, fOpts);
+    } catch (fetchErr) {
+      LE(`Fetch failed: ${fetchErr.message}`);
+      throw fetchErr;
+    }
+
+    LV(`Response status: ${resp.status}`);
+    LV(`Response headers: ${[...resp.headers.entries()].map(([k,v]) => `${k}=${v.substring(0,50)}`).join(', ')}`);
 
     const sc = resp.headers.get('X-Set-Cookies');
     if (sc) {
       try {
         const arr = JSON.parse(sc);
+        LV(`Received ${arr.length} Set-Cookie headers`);
         arr.forEach(c => {
           const parts = c.split(';')[0];
           const [name] = parts.split('=');
@@ -614,25 +673,47 @@ async function px(url, opts = {}) {
           cookieJar = existing.join('; ');
           if (name.trim() === 'XSRF-TOKEN') {
             xsrfToken = decodeURIComponent(parts.split('=').slice(1).join('='));
+            LV(`Got XSRF token: ${xsrfToken.substring(0, 30)}...`);
           }
         });
-      } catch (e) {}
+      } catch (e) {
+        LW(`Failed to parse Set-Cookie: ${e.message}`);
+      }
     }
 
     const loc = resp.headers.get('X-Location');
+    const xStatus = resp.headers.get('X-Status');
+
     if (loc) {
+      LV(`Redirect ${xStatus || '3xx'} -> ${loc}`);
       if (loc.startsWith('/')) currentUrl = new URL(currentUrl).origin + loc;
       else if (loc.startsWith('http')) currentUrl = loc;
       else currentUrl = new URL(loc, currentUrl).href;
       continue;
     }
 
-    const status = parseInt(resp.headers.get('X-Status')) || resp.status;
+    const status = parseInt(xStatus) || resp.status;
     const bodyText = await resp.text();
-    L(`  ✓ ${status} | ${bodyText.length} bytes`);
 
-    return { status, headers: resp.headers, url: currentUrl, bodyText,
-      json: () => { try { return JSON.parse(bodyText); } catch(e) { return null; } }
+    L(`  ✓ HTTP ${status} | ${bodyText.length} bytes`);
+    LV(`Response body preview: ${bodyText.substring(0, 500)}...`);
+
+    return {
+      status,
+      headers: resp.headers,
+      url: currentUrl,
+      bodyText,
+      json: () => {
+        try {
+          const parsed = JSON.parse(bodyText);
+          LV(`Parsed JSON successfully, keys: ${Object.keys(parsed).join(', ')}`);
+          return parsed;
+        } catch(e) {
+          LW(`JSON parse failed: ${e.message}`);
+          LV(`Raw body that failed to parse: ${bodyText.substring(0, 1000)}`);
+          return null;
+        }
+      }
     };
   }
   throw new Error('Too many redirects');
@@ -676,7 +757,6 @@ return new Response(resp.body,{status:resp.status,headers:rh});
 }};`;
 }
 
-// Show messages
 function showMsg(type, msg) {
   const c = { s: 'mg-s', e: 'mg-e', w: 'mg-w', i: 'mg-i' };
   $('loginMsg').innerHTML = `<div class="mg ${c[type] || 'mg-i'}">${msg}</div>`;
@@ -795,12 +875,21 @@ function addFlightResult(flight) {
   if (searchResults.length <= 3 || searchResults.length % 10 === 0) renderResults();
 }
 
-// Search flights
+// Main search function
 async function searchFlights() {
   if (searching) return;
 
+  L('════════════════════════════════════════════════════════');
+  L('STARTING NEW SEARCH');
+  L('════════════════════════════════════════════════════════');
+
   const email = $('wizEmail').value.trim();
   const pass = $('wizPass').value;
+
+  LV(`Email: ${email}`);
+  LV(`Password: ${'*'.repeat(pass.length)}`);
+  LV(`Proxy: ${getProxy()}`);
+
   if (!email || !pass) { showMsg('e', 'Enter email and password.'); return; }
   if (!getProxy()) { showMsg('e', 'Set up proxy first.'); return; }
 
@@ -808,15 +897,23 @@ async function searchFlights() {
 
   const filterDate = $('filterDate').value;
   const filterDateFlex = $('filterDateFlex').value;
-  const filterOrigin = $('filterOrigin').value;
-  const filterDest = $('filterDest').value;
+
+  // Get selected origins and destinations
+  const originSel = $('filterOrigin');
+  const destSel = $('filterDest');
+
+  const selectedOrigins = Array.from(originSel.selectedOptions).flatMap(o => o.value.split(','));
+  const selectedDests = Array.from(destSel.selectedOptions).flatMap(o => o.value.split(','));
+
   const isRoundTrip = $('filterRoundTrip').value === 'yes';
 
-  if (!filterDate) { showMsg('e', 'Select departure date.'); return; }
-  if (!filterOrigin) { showMsg('e', 'Select origin city.'); return; }
+  L(`Filter date: ${filterDate} (flex: ${filterDateFlex})`);
+  L(`Selected origins: ${selectedOrigins.join(', ')}`);
+  L(`Selected destinations: ${selectedDests.length ? selectedDests.join(', ') : 'ALL'}`);
+  L(`Round trip: ${isRoundTrip}`);
 
-  const originCodes = filterOrigin.split(',');
-  const destCodes = filterDest ? filterDest.split(',') : null;
+  if (!filterDate) { showMsg('e', 'Select departure date.'); return; }
+  if (!selectedOrigins.length) { showMsg('e', 'Select at least one origin city.'); return; }
 
   searching = true;
   paused = false;
@@ -825,6 +922,7 @@ async function searchFlights() {
   xsrfToken = '';
   searchResults = [];
   allDestinationsForReturn = new Set();
+  verboseMode = $('verboseLog').checked;
 
   $('bSearch').disabled = true;
   $('bPause').classList.remove('hd-n');
@@ -836,26 +934,54 @@ async function searchFlights() {
   renderResults();
 
   try {
-    // Step 1: Login
-    L('═══ Step 1: Getting login page ═══');
+    // ═══════════════════════════════════════════════════
+    // STEP 1: Get Login Page
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ STEP 1: GET LOGIN PAGE ═══');
     showStatus('Getting login page...');
 
     const loginR = await px('https://multipass.wizzair.com/w6/subscriptions/auth/login', { maxRedirects: 10 });
-    const loginHtml = loginR.bodyText;
 
-    const isKeycloak = loginR.url.includes('/auth/realms/') || loginHtml.includes('kc-form-login');
-    if (!isKeycloak) throw new Error('Could not reach login page');
+    LV(`Final URL after redirects: ${loginR.url}`);
+    LV(`Body length: ${loginR.bodyText.length}`);
 
-    // Step 2: Submit credentials
-    L('═══ Step 2: Submitting credentials ═══');
+    const isKeycloak = loginR.url.includes('/auth/realms/') || loginR.bodyText.includes('kc-form-login');
+    L(`Is Keycloak login page: ${isKeycloak}`);
+
+    if (!isKeycloak) {
+      LE('Did not reach Keycloak login page');
+      LV(`URL: ${loginR.url}`);
+      LV(`Body contains "login": ${loginR.bodyText.includes('login')}`);
+      LV(`Body contains "form": ${loginR.bodyText.includes('form')}`);
+      throw new Error('Could not reach login page');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // STEP 2: Submit Credentials
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ STEP 2: SUBMIT CREDENTIALS ═══');
     showStatus('Logging in...');
 
-    const formMatch = loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i) ||
-                      loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i);
-    if (!formMatch) throw new Error('Login form not found');
+    const formMatch = loginR.bodyText.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i) ||
+                      loginR.bodyText.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i);
+
+    if (!formMatch) {
+      LE('Could not find login form action');
+      LV(`Looking for form in body...`);
+      const formTags = loginR.bodyText.match(/<form[^>]*>/gi) || [];
+      LV(`Found ${formTags.length} form tags: ${formTags.join('\n')}`);
+      throw new Error('Login form not found');
+    }
 
     let formAction = formMatch[1].replace(/&amp;/g, '&');
-    if (formAction.startsWith('/')) formAction = 'https://multipass.wizzair.com' + formAction;
+    L(`Form action found: ${formAction}`);
+
+    if (formAction.startsWith('/')) {
+      formAction = 'https://multipass.wizzair.com' + formAction;
+    }
+    L(`Full form action URL: ${formAction}`);
 
     const authR = await px(formAction, {
       method: 'POST',
@@ -864,51 +990,165 @@ async function searchFlights() {
       maxRedirects: 10
     });
 
-    if (authR.bodyText.includes('Invalid username or password')) {
+    LV(`Auth response URL: ${authR.url}`);
+    LV(`Auth response length: ${authR.bodyText.length}`);
+
+    if (authR.bodyText.includes('Invalid username or password') || authR.bodyText.includes('Invalid credentials')) {
+      LE('Invalid credentials detected in response');
       throw new Error('Invalid username or password');
     }
 
-    LS('Login successful!');
+    const stillOnLogin = authR.url.includes('/auth/realms/') && authR.url.includes('login');
+    L(`Still on login page: ${stillOnLogin}`);
 
-    // Step 3: Get routes - use the page we already have from login redirect
-    L('═══ Step 3: Parsing routes ═══');
-    showStatus('Parsing routes...');
-
-    // The authR should have redirected to the private page with routes
-    let walletsHtml = authR.bodyText;
-
-    // If not enough content, fetch wallets page
-    if (walletsHtml.length < 50000 || !walletsHtml.includes('routes')) {
-      L('Fetching wallets page for routes...');
-      const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
-      walletsHtml = walletsR.bodyText;
+    if (stillOnLogin) {
+      LW('May still be on login page - checking for errors...');
+      const errorMatch = authR.bodyText.match(/class="[^"]*error[^"]*"[^>]*>([^<]+)/i) ||
+                        authR.bodyText.match(/pf-c-alert[^>]*>[\s\S]*?<[^>]*>([^<]+)/i);
+      if (errorMatch) {
+        LE(`Login error found: ${errorMatch[1]}`);
+        throw new Error(errorMatch[1]);
+      }
     }
 
-    // Parse routes
+    LS('Login appears successful!');
+
+    // ═══════════════════════════════════════════════════
+    // STEP 3: Parse Routes from Response
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ STEP 3: PARSE ROUTES ═══');
+    showStatus('Parsing routes...');
+
+    let pageHtml = authR.bodyText;
+
+    // Check if we need to fetch the wallets page
+    if (pageHtml.length < 50000 || !pageHtml.includes('"routes"')) {
+      L('Response too small or missing routes, fetching wallets page...');
+      const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
+      pageHtml = walletsR.bodyText;
+      L(`Wallets page size: ${pageHtml.length} bytes`);
+    }
+
+    // Try to find routes
     let routes = [];
 
-    // Method 1: Look for "routes" array
-    const routesMatch = walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
+    // First, check if we got valid HTML/JSON
+    L(`Page content type check:`);
+    L(`  - Starts with '<': ${pageHtml.trim().startsWith('<')}`);
+    L(`  - Starts with '{': ${pageHtml.trim().startsWith('{')}`);
+    L(`  - Contains 'routes': ${pageHtml.includes('routes')}`);
+    L(`  - Contains 'subscription': ${pageHtml.includes('subscription')}`);
+    L(`  - Contains 'AYCF': ${pageHtml.includes('AYCF')}`);
+
+    // Method 1: Standard "routes" array
+    L('Trying Method 1: Standard "routes" array...');
+    const routesMatch = pageHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
     if (routesMatch) {
       try {
         routes = JSON.parse(routesMatch[1]);
-        L(`Found ${routes.length} routes via "routes" pattern`);
-      } catch (e) { LW(`Parse routes failed: ${e.message}`); }
+        L(`Method 1 SUCCESS: Found ${routes.length} routes`);
+        LV(`First route: ${JSON.stringify(routes[0])}`);
+      } catch (e) {
+        LW(`Method 1 FAILED: ${e.message}`);
+      }
+    } else {
+      L('Method 1: No "routes" pattern found');
     }
 
-    // Method 2: Extract airport codes
+    // Method 2: Look for departureStation/arrivalStations pattern
     if (!routes.length) {
-      L('Trying fallback route extraction...');
+      L('Trying Method 2: departureStation/arrivalStations pattern...');
+      const stationPattern = /"departureStation"\s*:\s*(\{[^}]+\})\s*,\s*"arrivalStations"\s*:\s*(\[[^\]]*\])/g;
+      let match;
+      while ((match = stationPattern.exec(pageHtml)) !== null) {
+        try {
+          const dep = JSON.parse(match[1]);
+          const arr = JSON.parse(match[2]);
+          routes.push({ departureStation: dep, arrivalStations: arr });
+        } catch (e) {}
+      }
+      if (routes.length) {
+        L(`Method 2 SUCCESS: Found ${routes.length} routes`);
+      } else {
+        L('Method 2: No matches found');
+      }
+    }
+
+    // Method 2b: Try finding routes in embedded JSON
+    if (!routes.length) {
+      L('Trying Method 2b: Embedded JSON with routes...');
+      const jsonMatches = pageHtml.matchAll(/<script[^>]*>([^<]*"routes"[^<]*)<\/script>/gi);
+      for (const jm of jsonMatches) {
+        try {
+          // Try to extract JSON object containing routes
+          const jsonStr = jm[1].match(/\{[^{}]*"routes"\s*:\s*\[[^\]]*\][^{}]*\}/);
+          if (jsonStr) {
+            const parsed = JSON.parse(jsonStr[0]);
+            if (parsed.routes && Array.isArray(parsed.routes)) {
+              routes = parsed.routes;
+              L(`Method 2b SUCCESS: Found ${routes.length} routes in script tag`);
+              break;
+            }
+          }
+        } catch (e) { }
+      }
+    }
+
+    // Method 2c: Look for __NEXT_DATA__ or similar embedded state
+    if (!routes.length) {
+      L('Trying Method 2c: __NEXT_DATA__ or embedded state...');
+      const nextDataMatch = pageHtml.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>([^<]+)<\/script>/i) ||
+                           pageHtml.match(/<script>window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?\})\s*<\/script>/i);
+      if (nextDataMatch) {
+        try {
+          const state = JSON.parse(nextDataMatch[1]);
+          // Search for routes in the state object
+          const findRoutes = (obj, depth = 0) => {
+            if (depth > 5) return null;
+            if (!obj || typeof obj !== 'object') return null;
+            if (Array.isArray(obj.routes)) return obj.routes;
+            for (const key of Object.keys(obj)) {
+              const found = findRoutes(obj[key], depth + 1);
+              if (found) return found;
+            }
+            return null;
+          };
+          const foundRoutes = findRoutes(state);
+          if (foundRoutes) {
+            routes = foundRoutes;
+            L(`Method 2c SUCCESS: Found ${routes.length} routes in embedded state`);
+          }
+        } catch (e) {
+          LW(`Method 2c parse error: ${e.message}`);
+        }
+      }
+    }
+
+    // Method 3: Extract all airport codes
+    if (!routes.length) {
+      L('Trying Method 3: Extract all airport codes...');
       const allCodes = new Set();
-      const codeMatches = walletsHtml.matchAll(/"id"\s*:\s*"([A-Z]{3})"/g);
+      const codeMatches = pageHtml.matchAll(/"id"\s*:\s*"([A-Z]{3})"/g);
       for (const m of codeMatches) {
         if (AIRPORTS[m[1]]) allCodes.add(m[1]);
       }
-      L(`Found ${allCodes.size} known airport codes`);
+
+      // Also try to find codes in other formats
+      const altCodeMatches = pageHtml.matchAll(/"iata"\s*:\s*"([A-Z]{3})"/g);
+      for (const m of altCodeMatches) {
+        if (AIRPORTS[m[1]]) allCodes.add(m[1]);
+      }
+
+      const codeOnlyMatches = pageHtml.matchAll(/"code"\s*:\s*"([A-Z]{3})"/g);
+      for (const m of codeOnlyMatches) {
+        if (AIRPORTS[m[1]]) allCodes.add(m[1]);
+      }
+
+      L(`Found ${allCodes.size} known airport codes: ${[...allCodes].join(', ')}`);
 
       if (allCodes.size > 0) {
-        // Use selected origin and all found codes as destinations
-        originCodes.forEach(o => {
+        selectedOrigins.forEach(o => {
           const dests = [...allCodes].filter(c => c !== o);
           if (dests.length) {
             routes.push({
@@ -917,50 +1157,113 @@ async function searchFlights() {
             });
           }
         });
-        L(`Built ${routes.length} routes`);
+        L(`Method 3: Built ${routes.length} synthetic routes`);
       }
     }
 
-    // Parse into usable format
+    // Method 4: Fallback - use all known airports for selected origins
+    if (!routes.length) {
+      L('Trying Method 4: Using all known AIRPORTS as fallback...');
+      const allAirportCodes = Object.keys(AIRPORTS);
+      selectedOrigins.forEach(o => {
+        const dests = allAirportCodes.filter(c => c !== o);
+        routes.push({
+          departureStation: { id: o },
+          arrivalStations: dests.map(c => ({ id: c }))
+        });
+      });
+      L(`Method 4: Built ${routes.length} synthetic routes using ${allAirportCodes.length} airports`);
+      LW('Using fallback method - may result in many "no flights" responses');
+    }
+
+    L(`Total raw routes: ${routes.length}`);
+
+    // Parse routes into usable format
     const parsedRoutes = [];
-    routes.forEach(r => {
+    routes.forEach((r, idx) => {
       let origin = null, destinations = [];
+
       if (r.departureStation && r.departureStation.id) {
         origin = r.departureStation.id;
-        destinations = (r.arrivalStations || []).map(a => a.id || a).filter(Boolean);
+        destinations = (r.arrivalStations || []).map(a => typeof a === 'string' ? a : (a.id || a)).filter(Boolean);
       } else if (r.origin) {
         origin = r.origin;
         destinations = r.destinations || [];
       }
+
+      LV(`Route ${idx}: origin=${origin}, destinations=${destinations.length}`);
+
       if (origin && destinations.length) {
-        if (!originCodes.includes(origin)) return;
-        if (destCodes) destinations = destinations.filter(d => destCodes.includes(d));
+        // Filter by selected origins
+        if (!selectedOrigins.includes(origin)) {
+          LV(`  Skipping - origin ${origin} not in selected: ${selectedOrigins.join(',')}`);
+          return;
+        }
+
+        // Filter by selected destinations (if any)
+        if (selectedDests.length > 0) {
+          const before = destinations.length;
+          destinations = destinations.filter(d => selectedDests.includes(d));
+          LV(`  Filtered destinations: ${before} -> ${destinations.length}`);
+        }
+
         if (destinations.length) {
           parsedRoutes.push({ origin, destinations });
           destinations.forEach(d => allDestinationsForReturn.add(d));
+          LV(`  Added route: ${origin} -> ${destinations.join(', ')}`);
         }
       }
     });
 
-    L(`Found ${parsedRoutes.length} matching routes with ${allDestinationsForReturn.size} unique destinations`);
+    L(`Parsed routes: ${parsedRoutes.length}`);
+    L(`Unique destinations for return: ${allDestinationsForReturn.size}`);
 
     if (!parsedRoutes.length) {
-      LW('No routes matched - check filters');
-      L(`originCodes: ${originCodes.join(',')}, destCodes: ${destCodes ? destCodes.join(',') : 'ALL'}`);
+      LW('NO ROUTES MATCHED FILTERS!');
+      L('This could mean:');
+      L('  1. The API response format has changed');
+      L('  2. Your subscription does not include selected origins');
+      L('  3. There are no routes from selected origins');
+      L('  4. Login may have failed silently');
+      L('');
+      L('Page content analysis:');
+      L(`  - Contains "routes": ${pageHtml.includes('"routes"')}`);
+      L(`  - Contains "departureStation": ${pageHtml.includes('departureStation')}`);
+      L(`  - Contains "arrivalStations": ${pageHtml.includes('arrivalStations')}`);
+      L(`  - Contains "TLV": ${pageHtml.includes('TLV')}`);
+      L(`  - Contains "subscription": ${pageHtml.includes('subscription')}`);
+      L(`  - Contains "wallet": ${pageHtml.includes('wallet')}`);
+      L(`  - Contains "error": ${pageHtml.includes('error')}`);
+      L(`  - Contains "login": ${pageHtml.includes('login')}`);
+      L(`  - Page size: ${pageHtml.length} bytes`);
+      L('');
+      L('Looking for any JSON-like structures in the page...');
+
+      // Try to find any JSON objects in the page
+      const jsonPatterns = pageHtml.match(/\{[^{}]{50,500}\}/g) || [];
+      L(`Found ${jsonPatterns.length} potential JSON structures`);
+      if (jsonPatterns.length > 0 && jsonPatterns.length <= 5) {
+        jsonPatterns.forEach((jp, idx) => LV(`  JSON ${idx}: ${jp.substring(0, 200)}...`));
+      }
+
+      LV(`First 3000 chars of page: ${pageHtml.substring(0, 3000)}`);
+      LV(`Last 1000 chars of page: ${pageHtml.substring(pageHtml.length - 1000)}`);
     }
 
-    // Step 4: Build search dates
-    L('═══ Step 4: Searching flights ═══');
+    // ═══════════════════════════════════════════════════
+    // STEP 4: Search Flights
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ STEP 4: SEARCH FLIGHTS ═══');
 
-    // Build outbound dates based on flexibility
+    // Build dates
     const outboundDates = [filterDate];
     if (filterDateFlex === 'pm1') {
-      outboundDates.unshift(addDays(filterDate, -1)); // day before
-      outboundDates.push(addDays(filterDate, 1));     // day after
+      outboundDates.unshift(addDays(filterDate, -1));
+      outboundDates.push(addDays(filterDate, 1));
     }
     L(`Outbound dates: ${outboundDates.join(', ')}`);
 
-    // Return dates (3-4 days after EACH outbound date)
     const returnDates = [];
     if (isRoundTrip) {
       outboundDates.forEach(od => {
@@ -975,28 +1278,9 @@ async function searchFlights() {
     // Build tasks
     const tasks = [];
     const seen = new Set();
-    const priorityCodes = getPriorityCities();
 
-    // Sort routes by priority
-    parsedRoutes.sort((a, b) => {
-      const aP = priorityCodes.indexOf(a.origin);
-      const bP = priorityCodes.indexOf(b.origin);
-      if (aP >= 0 && bP < 0) return -1;
-      if (aP < 0 && bP >= 0) return 1;
-      return a.origin.localeCompare(b.origin);
-    });
-
-    // Outbound tasks
     parsedRoutes.forEach(r => {
-      const sortedDests = [...r.destinations].sort((a, b) => {
-        const aP = priorityCodes.indexOf(a);
-        const bP = priorityCodes.indexOf(b);
-        if (aP >= 0 && bP < 0) return -1;
-        if (aP < 0 && bP >= 0) return 1;
-        return a.localeCompare(b);
-      });
-
-      sortedDests.forEach(dest => {
+      r.destinations.forEach(dest => {
         outboundDates.forEach(dt => {
           const k = `${r.origin}|${dest}|${dt}`;
           if (!seen.has(k)) {
@@ -1010,7 +1294,7 @@ async function searchFlights() {
     // Return tasks
     if (isRoundTrip && allDestinationsForReturn.size > 0) {
       [...allDestinationsForReturn].forEach(returnOrigin => {
-        originCodes.forEach(returnDest => {
+        selectedOrigins.forEach(returnDest => {
           returnDates.forEach(dt => {
             const k = `${returnOrigin}|${returnDest}|${dt}`;
             if (!seen.has(k)) {
@@ -1024,14 +1308,21 @@ async function searchFlights() {
 
     const outboundCount = tasks.filter(t => t.type === 'outbound').length;
     const returnCount = tasks.filter(t => t.type === 'return').length;
-    L(`${tasks.length} searches: ${outboundCount} outbound, ${returnCount} return`);
+    L(`Total tasks: ${tasks.length} (${outboundCount} outbound, ${returnCount} return)`);
+
+    if (tasks.length === 0) {
+      LW('No search tasks to execute!');
+      showMsg('w', 'No routes to search. Check your filter settings.');
+    }
+
     showStatus(`Searching ${tasks.length} routes...`);
 
     let rateLimitCount = 0;
-    let consecutiveSuccess = 0;
+    let successCount = 0;
+    let errorCount = 0;
 
     for (let i = 0; i < tasks.length; i++) {
-      if (stopped) { L('Stopped by user'); break; }
+      if (stopped) { L('Search stopped by user'); break; }
       while (paused && !stopped) { showStatus('Paused...'); await sleep(500); }
       if (stopped) break;
 
@@ -1042,9 +1333,9 @@ async function searchFlights() {
       showStatus(`${t.type === 'return' ? '↩️' : '✈️'} ${oInfo.city} → ${dInfo.city} [${i + 1}/${tasks.length}]`);
 
       try {
-        // Optimized delay: faster after consecutive successes
-        const delay = consecutiveSuccess > 10 ? 200 : (consecutiveSuccess > 5 ? 300 : 400);
-        await sleep(delay + Math.random() * 200);
+        await sleep(300 + Math.random() * 200);
+
+        LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
 
         const r = await px('https://multipass.wizzair.com/w6/subscriptions/json/flight-search', {
           method: 'POST',
@@ -1061,8 +1352,8 @@ async function searchFlights() {
 
         if (r.status === 429) {
           rateLimitCount++;
-          consecutiveSuccess = 0;
           const waitTime = rateLimitCount >= 3 ? 60000 : 15000;
+          LW(`Rate limited! Waiting ${waitTime/1000}s...`);
           showStatus(`Rate limited — waiting ${waitTime/1000}s...`);
           await sleep(waitTime);
           if (rateLimitCount >= 3) rateLimitCount = 0;
@@ -1073,16 +1364,53 @@ async function searchFlights() {
         rateLimitCount = 0;
 
         if (r.status >= 200 && r.status < 300) {
-          consecutiveSuccess++;
           const data = r.json();
 
           if (data) {
-            let fl = data.flightsOutbound || data.flights || data.outbound || [];
-            if (Array.isArray(data) && data.length > 0 && data[0].departure) fl = data;
+            LV(`Response data keys: ${Object.keys(data).join(', ')}`);
+            LV(`Full response structure: ${JSON.stringify(data).substring(0, 1000)}`);
+
+            // Try multiple possible flight array locations
+            let fl = [];
+
+            // Method 1: Standard responses
+            if (data.flightsOutbound && Array.isArray(data.flightsOutbound)) fl = data.flightsOutbound;
+            else if (data.flights && Array.isArray(data.flights)) fl = data.flights;
+            else if (data.outbound && Array.isArray(data.outbound)) fl = data.outbound;
+            else if (data.outboundFlights && Array.isArray(data.outboundFlights)) fl = data.outboundFlights;
+
+            // Method 2: Direct array response
+            else if (Array.isArray(data)) fl = data;
+
+            // Method 3: Nested in result/data
+            else if (data.result && Array.isArray(data.result)) fl = data.result;
+            else if (data.data && Array.isArray(data.data)) fl = data.data;
+            else if (data.data && data.data.flights) fl = data.data.flights;
+            else if (data.response && data.response.flights) fl = data.response.flights;
+
+            // Method 4: Check for single flight object
+            else if (data.departure || data.departureTime || data.flightCode) fl = [data];
+
+            LV(`Extracted ${fl.length} flights using parsing methods`);
+
+            // Log the first flight structure for debugging
+            if (fl.length > 0) {
+              LV(`First flight object keys: ${Object.keys(fl[0]).join(', ')}`);
+              LV(`First flight raw: ${JSON.stringify(fl[0])}`);
+            }
 
             if (fl && fl.length > 0) {
-              L(`  ${t.o} → ${t.d} (${t.type}): ${fl.length} flights`);
+              successCount++;
+              L(`✈️ ${t.o} → ${t.d} (${t.type}): ${fl.length} flights found`);
+
               fl.forEach(f => {
+                // Try multiple field names for departure/arrival times
+                const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
+                const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
+                const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
+
+                LV(`  Flight: dep=${depTime}, arr=${arrTime}, code=${flightNum}`);
+
                 addFlightResult({
                   type: t.type,
                   originCode: t.o,
@@ -1094,36 +1422,68 @@ async function searchFlights() {
                   destCountry: dInfo.country,
                   destAirport: dInfo.airport,
                   date: t.dt,
-                  departure: f.departure || f.departureTime || '',
-                  arrival: f.arrival || f.arrivalTime || '',
-                  flightNumber: f.flightCode || f.flightNumber || '',
+                  departure: depTime,
+                  arrival: arrTime,
+                  flightNumber: flightNum,
                   bookingUrl: bookingUrl(t.o, t.d, t.dt)
                 });
               });
+            } else {
+              LV(`No flights found in parsed response for ${t.o}->${t.d}`);
+              // Log what we did find for troubleshooting
+              if (typeof data === 'object') {
+                const allKeys = [];
+                const findKeys = (obj, prefix = '') => {
+                  for (const key of Object.keys(obj || {})) {
+                    allKeys.push(prefix + key);
+                    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                      findKeys(obj[key], prefix + key + '.');
+                    }
+                  }
+                };
+                findKeys(data);
+                LV(`All nested keys in response: ${allKeys.slice(0, 30).join(', ')}`);
+              }
             }
+          } else {
+            LW(`Could not parse response as JSON for ${t.o}->${t.d}`);
+            LV(`Raw response body: ${r.bodyText.substring(0, 500)}`);
           }
+        } else {
+          errorCount++;
+          LW(`HTTP ${r.status} for ${t.o}->${t.d}`);
+          LV(`Error response body: ${r.bodyText.substring(0, 500)}`);
         }
 
-        // Only pause every 50 requests (optimized from 30)
+        // Reduced pause frequency
         if (i > 0 && i % 50 === 0 && i < tasks.length - 1) {
-          showStatus('Brief pause to avoid rate limits...');
-          await sleep(5000);
+          showStatus('Brief pause...');
+          await sleep(3000);
         }
       } catch (e) {
-        consecutiveSuccess = 0;
-        LW(`Error on ${t.o}→${t.d}: ${e.message}`);
+        errorCount++;
+        LE(`Search error for ${t.o}->${t.d}: ${e.message}`);
       }
     }
 
+    // ═══════════════════════════════════════════════════
+    // DONE
+    // ═══════════════════════════════════════════════════
+    L('');
+    L('═══ SEARCH COMPLETE ═══');
+    L(`Total flights found: ${searchResults.length}`);
+    L(`Successful route searches: ${successCount}`);
+    L(`Errors: ${errorCount}`);
+
     setProgress(100);
-    LS(`Done! Found ${searchResults.length} flights`);
     showStatus(`Found ${searchResults.length} flights`);
     showMsg(searchResults.length > 0 ? 's' : 'w',
-      searchResults.length > 0 ? `Found ${searchResults.length} flights!` : 'No flights found. Check debug log.');
+      searchResults.length > 0 ? `Found ${searchResults.length} flights!` : 'No flights found. Check debug log for details.');
     renderResults();
 
   } catch (e) {
-    LE(`Failed: ${e.message}`);
+    LE(`SEARCH FAILED: ${e.message}`);
+    LE(`Stack: ${e.stack}`);
     showMsg('e', e.message);
     renderResults();
   } finally {
@@ -1133,6 +1493,11 @@ async function searchFlights() {
     $('bPause').classList.add('hd-n');
     $('bResume').classList.add('hd-n');
     $('bStop').classList.add('hd-n');
+
+    L('');
+    L('════════════════════════════════════════════════════════');
+    L('SEARCH SESSION ENDED');
+    L('════════════════════════════════════════════════════════');
   }
 }
 
@@ -1142,13 +1507,6 @@ function exportResults() {
   const data = {
     version: VERSION,
     exportDate: new Date().toISOString(),
-    filters: {
-      date: $('filterDate').value,
-      dateFlex: $('filterDateFlex').value,
-      origin: $('filterOrigin').value,
-      destination: $('filterDest').value,
-      roundTrip: $('filterRoundTrip').value
-    },
     count: searchResults.length,
     flights: searchResults
   };
@@ -1180,11 +1538,46 @@ function importResults(file) {
   reader.readAsText(file);
 }
 
+function downloadLog() {
+  const logText = generateLogText();
+  const blob = new Blob([logText], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aycf-debug-log-${formatDate(new Date())}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function generateLogText() {
+  return `WIZZ AYCF DEBUG LOG
+Generated: ${new Date().toISOString()}
+Version: ${VERSION}
+User Agent: ${navigator.userAgent}
+Proxy: ${getProxy()}
+Verbose Mode: ${verboseMode}
+
+═══════════════════════════════════════════════════════════════
+LOG ENTRIES (${logs.length})
+═══════════════════════════════════════════════════════════════
+
+${logs.map(l => l.l).join('\n')}
+
+═══════════════════════════════════════════════════════════════
+END OF LOG
+═══════════════════════════════════════════════════════════════`;
+}
+
 // Initialize
 function init() {
-  L(`Init v${VERSION}`);
+  L(`Initializing AYCF Finder v${VERSION}`);
+  L(`User Agent: ${navigator.userAgent}`);
 
   const proxy = getProxy();
+  L(`Proxy configured: ${proxy ? 'Yes' : 'No'}`);
+
   if (proxy) {
     $('proxySetup').classList.add('hd-n');
     $('proxyUrl').value = proxy;
@@ -1195,6 +1588,7 @@ function init() {
 
   loadCredentials();
   $('priorityCities').value = localStorage.getItem('wz_priority_cities') || 'TLV';
+  $('verboseLog').checked = true;
 
   $('filterDate').value = formatDate(new Date());
   $('filterDate').min = formatDate(new Date());
@@ -1202,9 +1596,14 @@ function init() {
   $('filterDate').addEventListener('change', updateDateDisplay);
 
   populateCityDropdowns();
+
+  // Multi-select change handlers
+  $('filterOrigin').addEventListener('change', () => updateChips('filterOrigin', 'originChips'));
+  $('filterDest').addEventListener('change', () => updateChips('filterDest', 'destChips'));
+
   $('workerCode').textContent = workerCode();
 
-  LS('Ready');
+  LS('Initialization complete');
 }
 
 // Event listeners
@@ -1254,13 +1653,13 @@ document.addEventListener('DOMContentLoaded', () => {
     paused = true;
     $('bPause').classList.add('hd-n');
     $('bResume').classList.remove('hd-n');
-    L('Paused');
+    L('Search paused by user');
   };
   $('bResume').onclick = () => {
     paused = false;
     $('bResume').classList.add('hd-n');
     $('bPause').classList.remove('hd-n');
-    L('Resumed');
+    L('Search resumed');
   };
   $('bStop').onclick = () => { stopped = true; paused = false; };
 
@@ -1291,7 +1690,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('bSavePriority').onclick = () => {
     localStorage.setItem('wz_priority_cities', $('priorityCities').value.trim().toUpperCase());
     populateCityDropdowns();
-    LS('Priority saved');
+    LS('Priority cities saved');
   };
   $('bClearCredentials').onclick = () => { clearCredentials(); showMsg('s', 'Credentials cleared'); };
 
@@ -1300,11 +1699,12 @@ document.addEventListener('DOMContentLoaded', () => {
   $('mLog').onclick = e => { if (e.target === $('mLog')) $('mLog').classList.remove('op'); };
   $('bClearLog').onclick = () => { logs = []; $('logArea').innerHTML = ''; $('lCnt').textContent = '(0)'; };
   $('bCopyLog').onclick = () => {
-    navigator.clipboard.writeText(`WIZZ AYCF LOG — ${new Date().toISOString()}\nVersion: ${VERSION}\n\n${logs.map(l => l.l).join('\n')}`).then(() => {
-      $('bCopyLog').textContent = '✅ Copied';
-      setTimeout(() => { $('bCopyLog').textContent = '📋 Copy'; }, 1500);
+    navigator.clipboard.writeText(generateLogText()).then(() => {
+      $('bCopyLog').textContent = '✅ Copied!';
+      setTimeout(() => { $('bCopyLog').textContent = '📋 Copy Full Log'; }, 2000);
     });
   };
+  $('bDownloadLog').onclick = downloadLog;
 
   init();
 });
