@@ -140,7 +140,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v" id="versionDisplay">v5.0.0</span>
+    <span class="v" id="versionDisplay">v5.1.0</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -237,7 +237,7 @@ td{color:var(--tx)}
       <option value="no">No</option>
       <option value="yes">Yes</option>
     </select>
-    <span style="font-size:.72rem;color:var(--tx3)">(Returns 3 & 4 days after each outbound)</span>
+    <span style="font-size:.72rem;color:var(--tx3)">(Returns 3-7 days after each outbound)</span>
   </div>
 
   <div class="rw" style="margin-top:14px">
@@ -338,7 +338,7 @@ td{color:var(--tx)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  PALAYA LTD - WIZZ AYCF FINDER v5.0.0
+//  PALAYA LTD - WIZZ AYCF FINDER v5.1.0
 //  Round Trip: searches returns 3 & 4 days after each found outbound
 // ══════════════════════════════════════════════════════
 
@@ -1601,8 +1601,8 @@ async function searchFlights() {
         L(`  ${returnOrigin}: outbound dates ${[...outboundDates].join(', ')}`);
 
         outboundDates.forEach(outboundDate => {
-          // Search returns 3 and 4 days after each outbound date
-          [3, 4].forEach(daysAfter => {
+          // Search returns 3, 4, 5, 6, and 7 days after each outbound date
+          [3, 4, 5, 6, 7].forEach(daysAfter => {
             const returnDate = addDays(outboundDate, daysAfter);
             selectedOrigins.forEach(returnDest => {
               const k = `${returnOrigin}|${returnDest}|${returnDate}|return`;
