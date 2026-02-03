@@ -111,7 +111,7 @@ td{color:var(--tx)}
 
 <header class="hd">
 <div class="hd-r">
-  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v4.0</span></div>
+  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v4.1</span></div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
     <button class="ib" id="bSettings" title="Settings">⚙️</button>
@@ -161,6 +161,7 @@ td{color:var(--tx)}
   <div class="filter-row">
     <label>Departure Date:</label>
     <input type="date" class="ip" id="filterDate" style="max-width:180px">
+    <span id="dateDisplay" style="font-size:.8rem;color:var(--acc);font-family:'JetBrains Mono',monospace"></span>
   </div>
 
   <div class="filter-row">
@@ -245,10 +246,10 @@ td{color:var(--tx)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  WIZZ AYCF FINDER v4.0 — Simplified & Streamlined
+//  WIZZ AYCF FINDER v4.1 — Simplified & Streamlined
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.0.0';
+const VERSION = '4.1.0';
 const CACHE_HOURS = 72;
 
 // Airport Database
@@ -407,6 +408,18 @@ function getAirportInfo(code) {
 
 function formatDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function formatDateDisplay(dateStr) {
+  // Convert YYYY-MM-DD to DD/MM/YYYY
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function updateDateDisplay() {
+  const dateVal = $('filterDate').value;
+  $('dateDisplay').textContent = dateVal ? `(${formatDateDisplay(dateVal)})` : '';
 }
 
 function formatDateTime(dt, tm) {
@@ -663,12 +676,68 @@ async function searchFlights() {
     const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
     const walletsHtml = walletsR.bodyText;
 
-    // Parse routes
+    // Parse routes - try multiple patterns
     let routes = [];
+
+    // Method 1: Look for "routes" array
     const routesMatch = walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
     if (routesMatch) {
-      try { routes = JSON.parse(routesMatch[1]); } catch (e) {}
+      try {
+        routes = JSON.parse(routesMatch[1]);
+        L(`Found ${routes.length} routes via "routes" pattern`);
+      } catch (e) { LW(`Parse routes failed: ${e.message}`); }
     }
+
+    // Method 2: Look for departureStation patterns
+    if (!routes.length) {
+      const stationMatches = walletsHtml.matchAll(/"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"/g);
+      const stationSet = new Set();
+      for (const m of stationMatches) {
+        stationSet.add(m[1]);
+      }
+      if (stationSet.size > 0) {
+        L(`Found ${stationSet.size} departure stations via pattern match`);
+        // For each station, find its arrival stations
+        for (const code of stationSet) {
+          const arrMatch = walletsHtml.match(new RegExp(`"departureStation"\\s*:\\s*\\{[^}]*"id"\\s*:\\s*"${code}"[^}]*\\}[^"]*"arrivalStations"\\s*:\\s*(\\[[^\\]]*\\])`, 's'));
+          if (arrMatch) {
+            try {
+              const arrivals = JSON.parse(arrMatch[1]);
+              routes.push({
+                departureStation: { id: code },
+                arrivalStations: arrivals
+              });
+            } catch (e) {}
+          }
+        }
+      }
+    }
+
+    // Method 3: Look for any 3-letter airport codes in route context
+    if (!routes.length) {
+      L('Trying fallback route extraction...');
+      const allCodes = new Set();
+      const codeMatches = walletsHtml.matchAll(/"id"\s*:\s*"([A-Z]{3})"/g);
+      for (const m of codeMatches) {
+        if (AIRPORTS[m[1]]) allCodes.add(m[1]);
+      }
+      L(`Found ${allCodes.size} known airport codes in response`);
+
+      // If we found TLV or other origin codes, assume all other codes are destinations
+      const foundOrigins = [...allCodes].filter(c => originCodes.includes(c));
+      if (foundOrigins.length > 0) {
+        const otherCodes = [...allCodes].filter(c => !originCodes.includes(c));
+        foundOrigins.forEach(o => {
+          routes.push({
+            departureStation: { id: o },
+            arrivalStations: otherCodes.map(c => ({ id: c }))
+          });
+        });
+        L(`Built ${routes.length} routes from ${foundOrigins.length} origins to ${otherCodes.length} destinations`);
+      }
+    }
+
+    L(`Total routes to process: ${routes.length}`);
 
     const parsedRoutes = [];
     routes.forEach(r => {
@@ -682,18 +751,27 @@ async function searchFlights() {
       }
       if (origin && destinations.length) {
         // Filter by selected origin
-        if (!originCodes.includes(origin)) return;
+        if (!originCodes.includes(origin)) {
+          L(`Skipping origin ${origin} (not in filter: ${originCodes.join(',')})`);
+          return;
+        }
         // Filter by destination if specified
         if (destCodes) {
           destinations = destinations.filter(d => destCodes.includes(d));
         }
         if (destinations.length) {
           parsedRoutes.push({ origin, destinations });
+          L(`Added route: ${origin} -> ${destinations.length} destinations`);
         }
       }
     });
 
-    if (!parsedRoutes.length) throw new Error('No routes found matching your filters');
+    if (!parsedRoutes.length) {
+      L(`DEBUG: originCodes = ${originCodes.join(',')}`);
+      L(`DEBUG: destCodes = ${destCodes ? destCodes.join(',') : 'ALL'}`);
+      L(`DEBUG: First 2000 chars of response: ${walletsHtml.substring(0, 2000)}`);
+      throw new Error('No routes found matching your filters');
+    }
 
     L(`Found ${parsedRoutes.length} origin airports with destinations`);
 
@@ -1031,6 +1109,10 @@ function init() {
   // Set default date to today
   $('filterDate').value = formatDate(new Date());
   $('filterDate').min = formatDate(new Date());
+  updateDateDisplay();
+
+  // Add date change listener
+  $('filterDate').addEventListener('change', updateDateDisplay);
 
   // Populate city dropdowns
   populateCityDropdowns();
