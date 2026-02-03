@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0d1117">
-<title>Palaya - Wizz AYCF Flight Finder</title>
+<title>Wizz AYCF Flight Finder</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -24,9 +24,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .hd{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr);padding:10px 14px}
 .hd-r{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto}
 .hd-t{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
-.hd-t .logo{width:28px;height:28px;border-radius:6px}
 .hd-t .g{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hd-t .org{font-size:.7rem;color:var(--ylw);font-weight:600}
 .hd-t .v{font-weight:400;font-size:.6rem;color:var(--tx3)}
 .hd-a{display:flex;gap:4px}
 .ib{width:36px;height:36px;border-radius:8px;border:1px solid var(--bdr);background:var(--s1);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -52,7 +50,7 @@ select.ip{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 
 .filter-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 .filter-row label{font-size:.75rem;font-weight:600;color:var(--tx2);min-width:100px}
-.filter-row select,.filter-row input{flex:1;min-width:150px}
+.filter-row select,.filter-row input{flex:1;min-width:120px}
 
 .chk-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .chk-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--acc)}
@@ -110,11 +108,15 @@ td{color:var(--tx)}
 .sp::before{content:counter(step);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--acc);color:var(--bg);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
 .code-box{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--rs);padding:8px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--acc);max-height:100px;overflow-y:auto;margin:6px 0}
 
-.ft{text-align:center;font-size:.68rem;color:var(--tx3);padding:18px 0}
+/* Footer with branding */
+.ft{display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--tx3);padding:18px 12px;max-width:900px;margin:0 auto}
 .ft a{color:var(--acc);text-decoration:none}
+.ft-brand{display:flex;align-items:center;gap:6px}
+.ft-brand img{width:20px;height:20px;border-radius:4px}
+.ft-brand span{font-weight:600;color:var(--tx2)}
 
-/* Date display */
-.date-display{display:inline-block;background:var(--s3);padding:8px 12px;border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--acc);min-width:100px;text-align:center}
+/* Date display box */
+.date-box{display:inline-flex;align-items:center;gap:6px;background:var(--s3);padding:8px 12px;border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--grn);font-weight:600}
 </style>
 </head>
 <body>
@@ -122,12 +124,8 @@ td{color:var(--tx)}
 <header class="hd">
 <div class="hd-r">
   <div class="hd-t">
-<img src="Palaya_Logo.png" alt="Palaya" class="logo">
-    <div>
-      <span class="org">PALAYA</span>
-      <span class="g">AYCF Finder</span>
-      <span class="v">v4.2</span>
-    </div>
+    <span class="g">✈️ AYCF Finder</span>
+    <span class="v">v4.3</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -181,8 +179,16 @@ td{color:var(--tx)}
 
   <div class="filter-row">
     <label>Departure Date:</label>
-    <span id="dateDisplay" class="date-display">--/--/----</span>
-    <input type="date" class="ip" id="filterDate" style="max-width:160px">
+    <div class="date-box" id="dateDisplay">--/--/----</div>
+    <input type="date" class="ip" id="filterDate" style="max-width:140px">
+  </div>
+
+  <div class="filter-row">
+    <label>Date Flexibility:</label>
+    <select class="ip" id="filterDateFlex" style="max-width:180px">
+      <option value="exact">Exact Date Only</option>
+      <option value="pm1">± 1 Day (3 days)</option>
+    </select>
   </div>
 
   <div class="filter-row">
@@ -234,8 +240,15 @@ td{color:var(--tx)}
   </div>
 </div>
 
-<div class="ft">Powered by <strong>Palaya</strong> • Not affiliated with Wizz Air</div>
 </main>
+
+<footer class="ft">
+  <div class="ft-brand">
+    <img src="Palaya_Logo.png" alt="Palaya">
+    <span>Palaya LTD</span>
+  </div>
+  <div>Not affiliated with Wizz Air</div>
+</footer>
 
 <!-- Settings Modal -->
 <div class="mo" id="mSettings">
@@ -253,7 +266,7 @@ td{color:var(--tx)}
 
   <div class="cd-t">Priority Cities (Search Order)</div>
   <p style="font-size:.75rem;color:var(--tx2);margin-bottom:8px">
-    Enter city codes separated by commas. These will be searched first, then alphabetically.
+    Enter city codes separated by commas. These will be searched first.
   </p>
   <div class="ip-row">
     <input class="ip" id="priorityCities" placeholder="TLV, BCN, FCO, ATH" style="text-transform:uppercase">
@@ -287,11 +300,10 @@ td{color:var(--tx)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  PALAYA - WIZZ AYCF FINDER v4.2
+//  PALAYA LTD - WIZZ AYCF FINDER v4.3
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.2.0';
-const CACHE_HOURS = 72;
+const VERSION = '4.3.0';
 
 // Airport Database
 const AIRPORTS = {
@@ -416,7 +428,7 @@ let cookieJar = '';
 let xsrfToken = '';
 let searchResults = [];
 let currentSort = { field: null, asc: true };
-let allDestinationsForReturn = new Set(); // Track all destinations for return flights
+let allDestinationsForReturn = new Set();
 
 // Helpers
 const $ = id => document.getElementById(id);
@@ -453,7 +465,8 @@ function formatDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function formatDateDisplay(dateStr) {
+// Format date as DD/MM/YYYY for display
+function formatDateDMY(dateStr) {
   if (!dateStr) return '--/--/----';
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
@@ -461,7 +474,7 @@ function formatDateDisplay(dateStr) {
 
 function updateDateDisplay() {
   const dateVal = $('filterDate').value;
-  $('dateDisplay').textContent = formatDateDisplay(dateVal);
+  $('dateDisplay').textContent = formatDateDMY(dateVal);
 }
 
 function formatDateTime(dt, tm) {
@@ -479,6 +492,13 @@ function formatTime(t) {
     return String(+p[0]).padStart(2, '0') + ':' + String(+(p[1] || 0)).padStart(2, '0');
   }
   return t;
+}
+
+function addDays(dateStr, days) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  date.setDate(date.getDate() + days);
+  return formatDate(date);
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -529,20 +549,16 @@ function clearCredentials() {
   LS('Credentials cleared');
 }
 
-// Populate city dropdowns with priority sorting
+// Populate city dropdowns
 function populateCityDropdowns() {
   const cities = new Map();
   Object.entries(AIRPORTS).forEach(([code, info]) => {
     const key = `${info.city}, ${info.country}`;
-    if (!cities.has(key)) {
-      cities.set(key, []);
-    }
+    if (!cities.has(key)) cities.set(key, []);
     cities.get(key).push(code);
   });
 
   const priorityCodes = getPriorityCities();
-
-  // Sort with priority cities first
   const sortedCities = [...cities.entries()].sort((a, b) => {
     const aHasPriority = a[1].some(c => priorityCodes.includes(c));
     const bHasPriority = b[1].some(c => priorityCodes.includes(c));
@@ -551,13 +567,11 @@ function populateCityDropdowns() {
     return a[0].localeCompare(b[0]);
   });
 
-  // Origin dropdown - default TLV
   const originSel = $('filterOrigin');
   originSel.innerHTML = sortedCities.map(([city, codes]) =>
     `<option value="${codes.join(',')}" ${codes.includes('TLV') ? 'selected' : ''}>${city} (${codes.join('/')})</option>`
   ).join('');
 
-  // Destination dropdown - default ALL
   const destSel = $('filterDest');
   destSel.innerHTML = '<option value="" selected>All Destinations</option>' +
     sortedCities.map(([city, codes]) =>
@@ -618,8 +632,7 @@ async function px(url, opts = {}) {
     L(`  ✓ ${status} | ${bodyText.length} bytes`);
 
     return { status, headers: resp.headers, url: currentUrl, bodyText,
-      text: () => Promise.resolve(bodyText),
-      json: () => Promise.resolve(JSON.parse(bodyText))
+      json: () => { try { return JSON.parse(bodyText); } catch(e) { return null; } }
     };
   }
   throw new Error('Too many redirects');
@@ -673,17 +686,16 @@ function showMsg(type, msg) {
 function setProgress(p) { $('dlFill').style.width = Math.min(100, p) + '%'; }
 function showStatus(m) { $('dlStatus').textContent = m; }
 
-// Render results immediately
+// Render results
 function renderResults() {
   const area = $('resultsArea');
   $('resultsCount').textContent = `${searchResults.length} flights`;
 
   if (!searchResults.length) {
-    area.innerHTML = '<div class="mg mg-w">No flights found yet. Results will appear here as they are discovered.</div>';
+    area.innerHTML = '<div class="mg mg-w">No flights found yet.</div>';
     return;
   }
 
-  // Sort results
   let sorted = [...searchResults];
   if (currentSort.field) {
     sorted.sort((a, b) => {
@@ -713,7 +725,6 @@ function renderResults() {
   ];
 
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-
   columns.forEach(col => {
     const sortClass = currentSort.field === col.key ? (currentSort.asc ? 'sorted-asc' : 'sorted-desc') : '';
     html += `<th class="${sortClass}" data-sort="${col.key}">${col.label}`;
@@ -722,13 +733,11 @@ function renderResults() {
     }
     html += '</th>';
   });
-
   html += '</tr></thead><tbody>';
 
   sorted.forEach((r, idx) => {
     const depTime = formatDateTime(r.date, r.departure);
     const arrTime = formatDateTime(r.date, r.arrival);
-
     html += `<tr data-idx="${idx}">
       <td>${r.type === 'return' ? '↩️ Return' : '✈️ Outbound'}</td>
       <td>${r.originCountry}</td>
@@ -738,68 +747,52 @@ function renderResults() {
       <td>${r.destCity}</td>
       <td>${r.destAirport} (${r.destCode})</td>
       <td class="mono">${r.flightNumber || '-'}</td>
-      <td class="mono">${r.date}</td>
+      <td class="mono">${formatDateDMY(r.date)}</td>
       <td class="mono">${depTime}</td>
       <td class="mono">${arrTime}</td>
       <td><a href="${r.bookingUrl}" target="_blank" class="link-btn">Book</a></td>
     </tr>`;
   });
-
   html += '</tbody></table></div>';
   area.innerHTML = html;
 
-  // Add sort handlers
+  // Sort handlers
   area.querySelectorAll('th[data-sort]').forEach(th => {
     th.addEventListener('click', e => {
       if (e.target.tagName === 'INPUT') return;
       const field = th.dataset.sort;
       if (field === 'bookingUrl') return;
-      if (currentSort.field === field) {
-        currentSort.asc = !currentSort.asc;
-      } else {
-        currentSort.field = field;
-        currentSort.asc = true;
-      }
+      if (currentSort.field === field) currentSort.asc = !currentSort.asc;
+      else { currentSort.field = field; currentSort.asc = true; }
       renderResults();
     });
   });
 
-  // Add filter handlers
+  // Filter handlers
   area.querySelectorAll('input[data-filter]').forEach(inp => {
     inp.addEventListener('input', () => {
       const filters = {};
       area.querySelectorAll('input[data-filter]').forEach(i => {
         if (i.value.trim()) filters[i.dataset.filter] = i.value.trim().toLowerCase();
       });
-
       area.querySelectorAll('tbody tr').forEach(tr => {
         const idx = parseInt(tr.dataset.idx);
         const row = searchResults[idx];
         let show = true;
-
         for (const [key, val] of Object.entries(filters)) {
           const cellVal = String(row[key] || '').toLowerCase();
-          if (!cellVal.includes(val)) {
-            show = false;
-            break;
-          }
+          if (!cellVal.includes(val)) { show = false; break; }
         }
-
         tr.style.display = show ? '' : 'none';
       });
     });
   });
 }
 
-// Add single flight result and update display
 function addFlightResult(flight) {
   searchResults.push(flight);
-  // Update count immediately
   $('resultsCount').textContent = `${searchResults.length} flights`;
-  // Re-render every 5 flights or immediately for first few
-  if (searchResults.length <= 3 || searchResults.length % 5 === 0) {
-    renderResults();
-  }
+  if (searchResults.length <= 3 || searchResults.length % 10 === 0) renderResults();
 }
 
 // Search flights
@@ -811,10 +804,10 @@ async function searchFlights() {
   if (!email || !pass) { showMsg('e', 'Enter email and password.'); return; }
   if (!getProxy()) { showMsg('e', 'Set up proxy first.'); return; }
 
-  // Save credentials if checkbox is checked
   saveCredentials();
 
   const filterDate = $('filterDate').value;
+  const filterDateFlex = $('filterDateFlex').value;
   const filterOrigin = $('filterOrigin').value;
   const filterDest = $('filterDest').value;
   const isRoundTrip = $('filterRoundTrip').value === 'yes';
@@ -840,7 +833,7 @@ async function searchFlights() {
   $('dlProg').classList.remove('hd-n');
   showStatus('Connecting...');
   setProgress(0);
-  renderResults(); // Show empty state
+  renderResults();
 
   try {
     // Step 1: Login
@@ -859,7 +852,6 @@ async function searchFlights() {
 
     const formMatch = loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i) ||
                       loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i);
-
     if (!formMatch) throw new Error('Login form not found');
 
     let formAction = formMatch[1].replace(/&amp;/g, '&');
@@ -878,14 +870,21 @@ async function searchFlights() {
 
     LS('Login successful!');
 
-    // Step 3: Get routes
-    L('═══ Step 3: Fetching routes ═══');
-    showStatus('Getting routes...');
+    // Step 3: Get routes - use the page we already have from login redirect
+    L('═══ Step 3: Parsing routes ═══');
+    showStatus('Parsing routes...');
 
-    const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
-    const walletsHtml = walletsR.bodyText;
+    // The authR should have redirected to the private page with routes
+    let walletsHtml = authR.bodyText;
 
-    // Parse routes - try multiple patterns
+    // If not enough content, fetch wallets page
+    if (walletsHtml.length < 50000 || !walletsHtml.includes('routes')) {
+      L('Fetching wallets page for routes...');
+      const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
+      walletsHtml = walletsR.bodyText;
+    }
+
+    // Parse routes
     let routes = [];
 
     // Method 1: Look for "routes" array
@@ -897,19 +896,7 @@ async function searchFlights() {
       } catch (e) { LW(`Parse routes failed: ${e.message}`); }
     }
 
-    // Method 2: Look for departureStation patterns
-    if (!routes.length) {
-      const stationMatches = walletsHtml.matchAll(/"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"/g);
-      const stationSet = new Set();
-      for (const m of stationMatches) {
-        stationSet.add(m[1]);
-      }
-      if (stationSet.size > 0) {
-        L(`Found ${stationSet.size} departure stations via pattern match`);
-      }
-    }
-
-    // Method 3: Extract all airport codes and build routes
+    // Method 2: Extract airport codes
     if (!routes.length) {
       L('Trying fallback route extraction...');
       const allCodes = new Set();
@@ -917,37 +904,24 @@ async function searchFlights() {
       for (const m of codeMatches) {
         if (AIRPORTS[m[1]]) allCodes.add(m[1]);
       }
-      L(`Found ${allCodes.size} known airport codes in response`);
+      L(`Found ${allCodes.size} known airport codes`);
 
-      // Build routes from all codes
       if (allCodes.size > 0) {
-        const foundOrigins = [...allCodes].filter(c => originCodes.includes(c));
-        const otherCodes = [...allCodes].filter(c => !originCodes.includes(c));
-
-        if (foundOrigins.length > 0 && otherCodes.length > 0) {
-          foundOrigins.forEach(o => {
+        // Use selected origin and all found codes as destinations
+        originCodes.forEach(o => {
+          const dests = [...allCodes].filter(c => c !== o);
+          if (dests.length) {
             routes.push({
               departureStation: { id: o },
-              arrivalStations: otherCodes.map(c => ({ id: c }))
+              arrivalStations: dests.map(c => ({ id: c }))
             });
-          });
-          L(`Built ${routes.length} routes from ${foundOrigins.length} origins to ${otherCodes.length} destinations`);
-        } else if (otherCodes.length > 0) {
-          // If no exact origin match, use all codes as potential destinations from selected origin
-          originCodes.forEach(o => {
-            routes.push({
-              departureStation: { id: o },
-              arrivalStations: [...allCodes].filter(c => c !== o).map(c => ({ id: c }))
-            });
-          });
-          L(`Built ${routes.length} routes using selected origin to ${allCodes.size} destinations`);
-        }
+          }
+        });
+        L(`Built ${routes.length} routes`);
       }
     }
 
-    L(`Total routes to process: ${routes.length}`);
-
-    // Parse routes into usable format
+    // Parse into usable format
     const parsedRoutes = [];
     routes.forEach(r => {
       let origin = null, destinations = [];
@@ -959,12 +933,8 @@ async function searchFlights() {
         destinations = r.destinations || [];
       }
       if (origin && destinations.length) {
-        // Filter by selected origin
         if (!originCodes.includes(origin)) return;
-        // Filter by destination if specified
-        if (destCodes) {
-          destinations = destinations.filter(d => destCodes.includes(d));
-        }
+        if (destCodes) destinations = destinations.filter(d => destCodes.includes(d));
         if (destinations.length) {
           parsedRoutes.push({ origin, destinations });
           destinations.forEach(d => allDestinationsForReturn.add(d));
@@ -972,51 +942,52 @@ async function searchFlights() {
       }
     });
 
+    L(`Found ${parsedRoutes.length} matching routes with ${allDestinationsForReturn.size} unique destinations`);
+
     if (!parsedRoutes.length) {
-      LW('No routes matched filters, but continuing for diagnostics...');
-      L(`DEBUG: originCodes = ${originCodes.join(',')}`);
-      L(`DEBUG: destCodes = ${destCodes ? destCodes.join(',') : 'ALL'}`);
-      // Don't throw - let search continue with empty results for debugging
+      LW('No routes matched - check filters');
+      L(`originCodes: ${originCodes.join(',')}, destCodes: ${destCodes ? destCodes.join(',') : 'ALL'}`);
     }
 
-    L(`Found ${parsedRoutes.length} origin airports with destinations`);
-    if (isRoundTrip) {
-      L(`Round trip enabled - will search returns from ${allDestinationsForReturn.size} destinations`);
-    }
-
-    // Step 4: Search flights
+    // Step 4: Build search dates
     L('═══ Step 4: Searching flights ═══');
 
-    // Build date list
+    // Build outbound dates based on flexibility
     const outboundDates = [filterDate];
+    if (filterDateFlex === 'pm1') {
+      outboundDates.unshift(addDays(filterDate, -1)); // day before
+      outboundDates.push(addDays(filterDate, 1));     // day after
+    }
+    L(`Outbound dates: ${outboundDates.join(', ')}`);
+
+    // Return dates (3-4 days after EACH outbound date)
     const returnDates = [];
     if (isRoundTrip) {
-      const baseDate = new Date(filterDate);
-      for (let i = 3; i <= 4; i++) {
-        const rd = new Date(baseDate);
-        rd.setDate(rd.getDate() + i);
-        returnDates.push(formatDate(rd));
-      }
+      outboundDates.forEach(od => {
+        for (let i = 3; i <= 4; i++) {
+          const rd = addDays(od, i);
+          if (!returnDates.includes(rd)) returnDates.push(rd);
+        }
+      });
       L(`Return dates: ${returnDates.join(', ')}`);
     }
 
-    // Build tasks with priority sorting
+    // Build tasks
     const tasks = [];
     const seen = new Set();
     const priorityCodes = getPriorityCities();
 
-    // Sort parsedRoutes by priority
+    // Sort routes by priority
     parsedRoutes.sort((a, b) => {
       const aP = priorityCodes.indexOf(a.origin);
       const bP = priorityCodes.indexOf(b.origin);
       if (aP >= 0 && bP < 0) return -1;
       if (aP < 0 && bP >= 0) return 1;
-      if (aP >= 0 && bP >= 0) return aP - bP;
       return a.origin.localeCompare(b.origin);
     });
 
+    // Outbound tasks
     parsedRoutes.forEach(r => {
-      // Sort destinations by priority
       const sortedDests = [...r.destinations].sort((a, b) => {
         const aP = priorityCodes.indexOf(a);
         const bP = priorityCodes.indexOf(b);
@@ -1026,7 +997,6 @@ async function searchFlights() {
       });
 
       sortedDests.forEach(dest => {
-        // Outbound flights
         outboundDates.forEach(dt => {
           const k = `${r.origin}|${dest}|${dt}`;
           if (!seen.has(k)) {
@@ -1037,10 +1007,9 @@ async function searchFlights() {
       });
     });
 
-    // Add return flight tasks AFTER all outbound
+    // Return tasks
     if (isRoundTrip && allDestinationsForReturn.size > 0) {
-      const returnOrigins = [...allDestinationsForReturn];
-      returnOrigins.forEach(returnOrigin => {
+      [...allDestinationsForReturn].forEach(returnOrigin => {
         originCodes.forEach(returnDest => {
           returnDates.forEach(dt => {
             const k = `${returnOrigin}|${returnDest}|${dt}`;
@@ -1053,24 +1022,17 @@ async function searchFlights() {
       });
     }
 
-    L(`${tasks.length} flight searches to perform (${tasks.filter(t => t.type === 'outbound').length} outbound, ${tasks.filter(t => t.type === 'return').length} return)`);
+    const outboundCount = tasks.filter(t => t.type === 'outbound').length;
+    const returnCount = tasks.filter(t => t.type === 'return').length;
+    L(`${tasks.length} searches: ${outboundCount} outbound, ${returnCount} return`);
     showStatus(`Searching ${tasks.length} routes...`);
 
-    let done = 0;
     let rateLimitCount = 0;
+    let consecutiveSuccess = 0;
 
     for (let i = 0; i < tasks.length; i++) {
-      // Check for stop/pause
-      if (stopped) {
-        L('Search stopped by user');
-        break;
-      }
-
-      while (paused && !stopped) {
-        showStatus('Paused...');
-        await sleep(500);
-      }
-
+      if (stopped) { L('Stopped by user'); break; }
+      while (paused && !stopped) { showStatus('Paused...'); await sleep(500); }
       if (stopped) break;
 
       const t = tasks[i];
@@ -1080,7 +1042,9 @@ async function searchFlights() {
       showStatus(`${t.type === 'return' ? '↩️' : '✈️'} ${oInfo.city} → ${dInfo.city} [${i + 1}/${tasks.length}]`);
 
       try {
-        await sleep(400 + Math.random() * 400);
+        // Optimized delay: faster after consecutive successes
+        const delay = consecutiveSuccess > 10 ? 200 : (consecutiveSuccess > 5 ? 300 : 400);
+        await sleep(delay + Math.random() * 200);
 
         const r = await px('https://multipass.wizzair.com/w6/subscriptions/json/flight-search', {
           method: 'POST',
@@ -1097,14 +1061,11 @@ async function searchFlights() {
 
         if (r.status === 429) {
           rateLimitCount++;
-          if (rateLimitCount >= 3) {
-            showStatus('Rate limited — waiting 60s...');
-            await sleep(60000);
-            rateLimitCount = 0;
-          } else {
-            showStatus('Rate limited — waiting 15s...');
-            await sleep(15000);
-          }
+          consecutiveSuccess = 0;
+          const waitTime = rateLimitCount >= 3 ? 60000 : 15000;
+          showStatus(`Rate limited — waiting ${waitTime/1000}s...`);
+          await sleep(waitTime);
+          if (rateLimitCount >= 3) rateLimitCount = 0;
           i--;
           continue;
         }
@@ -1112,59 +1073,59 @@ async function searchFlights() {
         rateLimitCount = 0;
 
         if (r.status >= 200 && r.status < 300) {
-          const data = await r.json();
-          let fl = data.flightsOutbound || data.flights || data.outbound || [];
-          if (Array.isArray(data) && data.length > 0 && data[0].departure) fl = data;
+          consecutiveSuccess++;
+          const data = r.json();
 
-          fl.forEach(f => {
-            addFlightResult({
-              type: t.type,
-              originCode: t.o,
-              originCity: oInfo.city,
-              originCountry: oInfo.country,
-              originAirport: oInfo.airport,
-              destCode: t.d,
-              destCity: dInfo.city,
-              destCountry: dInfo.country,
-              destAirport: dInfo.airport,
-              date: t.dt,
-              departure: f.departure || f.departureTime || '',
-              arrival: f.arrival || f.arrivalTime || '',
-              flightNumber: f.flightCode || f.flightNumber || '',
-              bookingUrl: bookingUrl(t.o, t.d, t.dt)
-            });
-          });
+          if (data) {
+            let fl = data.flightsOutbound || data.flights || data.outbound || [];
+            if (Array.isArray(data) && data.length > 0 && data[0].departure) fl = data;
 
-          done++;
-          if (fl.length > 0) L(`  ${t.o} → ${t.d} (${t.type}): ${fl.length} flights`);
+            if (fl && fl.length > 0) {
+              L(`  ${t.o} → ${t.d} (${t.type}): ${fl.length} flights`);
+              fl.forEach(f => {
+                addFlightResult({
+                  type: t.type,
+                  originCode: t.o,
+                  originCity: oInfo.city,
+                  originCountry: oInfo.country,
+                  originAirport: oInfo.airport,
+                  destCode: t.d,
+                  destCity: dInfo.city,
+                  destCountry: dInfo.country,
+                  destAirport: dInfo.airport,
+                  date: t.dt,
+                  departure: f.departure || f.departureTime || '',
+                  arrival: f.arrival || f.arrivalTime || '',
+                  flightNumber: f.flightCode || f.flightNumber || '',
+                  bookingUrl: bookingUrl(t.o, t.d, t.dt)
+                });
+              });
+            }
+          }
         }
 
-        if (done % 30 === 0 && i < tasks.length - 1) {
-          showStatus('Brief pause...');
-          await sleep(10000);
+        // Only pause every 50 requests (optimized from 30)
+        if (i > 0 && i % 50 === 0 && i < tasks.length - 1) {
+          showStatus('Brief pause to avoid rate limits...');
+          await sleep(5000);
         }
       } catch (e) {
-        done++;
-        LW(`Error: ${e.message}`);
+        consecutiveSuccess = 0;
+        LW(`Error on ${t.o}→${t.d}: ${e.message}`);
       }
     }
 
     setProgress(100);
     LS(`Done! Found ${searchResults.length} flights`);
     showStatus(`Found ${searchResults.length} flights`);
-
-    if (searchResults.length > 0) {
-      showMsg('s', `Found ${searchResults.length} flights!`);
-    } else {
-      showMsg('w', 'No flights found. Check the debug log for details.');
-    }
-
+    showMsg(searchResults.length > 0 ? 's' : 'w',
+      searchResults.length > 0 ? `Found ${searchResults.length} flights!` : 'No flights found. Check debug log.');
     renderResults();
 
   } catch (e) {
     LE(`Failed: ${e.message}`);
     showMsg('e', e.message);
-    renderResults(); // Show whatever we have
+    renderResults();
   } finally {
     searching = false;
     paused = false;
@@ -1175,18 +1136,15 @@ async function searchFlights() {
   }
 }
 
-// Export results
+// Export/Import
 function exportResults() {
-  if (!searchResults.length) {
-    showMsg('w', 'No results to export');
-    return;
-  }
-
+  if (!searchResults.length) { showMsg('w', 'No results to export'); return; }
   const data = {
     version: VERSION,
     exportDate: new Date().toISOString(),
     filters: {
       date: $('filterDate').value,
+      dateFlex: $('filterDateFlex').value,
       origin: $('filterOrigin').value,
       destination: $('filterDest').value,
       roundTrip: $('filterRoundTrip').value
@@ -1194,7 +1152,6 @@ function exportResults() {
     count: searchResults.length,
     flights: searchResults
   };
-
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1204,24 +1161,20 @@ function exportResults() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-
   showMsg('s', 'Results exported!');
 }
 
-// Import results
 function importResults(file) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (!data.flights || !Array.isArray(data.flights)) {
-        throw new Error('Invalid file format');
-      }
+      if (!data.flights || !Array.isArray(data.flights)) throw new Error('Invalid format');
       searchResults = data.flights;
       renderResults();
       showMsg('s', `Imported ${searchResults.length} flights!`);
     } catch (err) {
-      showMsg('e', 'Failed to import: ' + err.message);
+      showMsg('e', 'Import failed: ' + err.message);
     }
   };
   reader.readAsText(file);
@@ -1231,7 +1184,6 @@ function importResults(file) {
 function init() {
   L(`Init v${VERSION}`);
 
-  // Load proxy
   const proxy = getProxy();
   if (proxy) {
     $('proxySetup').classList.add('hd-n');
@@ -1241,24 +1193,15 @@ function init() {
     $('loginCard').style.opacity = '.5';
   }
 
-  // Load saved credentials
   loadCredentials();
-
-  // Load priority cities
   $('priorityCities').value = localStorage.getItem('wz_priority_cities') || 'TLV';
 
-  // Set default date to today
   $('filterDate').value = formatDate(new Date());
   $('filterDate').min = formatDate(new Date());
   updateDateDisplay();
-
-  // Add date change listener
   $('filterDate').addEventListener('change', updateDateDisplay);
 
-  // Populate city dropdowns
   populateCityDropdowns();
-
-  // Worker code
   $('workerCode').textContent = workerCode();
 
   LS('Ready');
@@ -1266,7 +1209,6 @@ function init() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Proxy setup
   $('setupHdr').onclick = () => {
     $('setupHdr').classList.toggle('op');
     $('setupBody').classList.toggle('op');
@@ -1307,46 +1249,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Search controls
   $('bSearch').onclick = searchFlights;
   $('bPause').onclick = () => {
     paused = true;
     $('bPause').classList.add('hd-n');
     $('bResume').classList.remove('hd-n');
-    L('Search paused');
+    L('Paused');
   };
   $('bResume').onclick = () => {
     paused = false;
     $('bResume').classList.add('hd-n');
     $('bPause').classList.remove('hd-n');
-    L('Search resumed');
+    L('Resumed');
   };
-  $('bStop').onclick = () => {
-    stopped = true;
-    paused = false;
-  };
+  $('bStop').onclick = () => { stopped = true; paused = false; };
 
-  // Results
   $('bExportResults').onclick = exportResults;
   $('bImportResults').onclick = () => $('importFile').click();
   $('importFile').onchange = e => {
-    if (e.target.files.length) {
-      importResults(e.target.files[0]);
-      e.target.value = '';
-    }
+    if (e.target.files.length) { importResults(e.target.files[0]); e.target.value = ''; }
   };
   $('bClearResults').onclick = () => {
     searchResults = [];
     currentSort = { field: null, asc: true };
-    $('resultsArea').innerHTML = '<div class="mg mg-i">No results yet. Search for flights above.</div>';
+    $('resultsArea').innerHTML = '<div class="mg mg-i">No results yet.</div>';
     $('resultsCount').textContent = '0 flights';
   };
 
-  // Settings modal
   $('bSettings').onclick = () => $('mSettings').classList.add('op');
   $('bCloseSettings').onclick = () => $('mSettings').classList.remove('op');
   $('mSettings').onclick = e => { if (e.target === $('mSettings')) $('mSettings').classList.remove('op'); };
-
   $('bSaveSettingsProxy').onclick = () => {
     const u = $('settingsProxy').value.trim();
     if (u) {
@@ -1356,31 +1288,19 @@ document.addEventListener('DOMContentLoaded', () => {
       $('loginCard').style.opacity = '1';
     }
   };
-
   $('bSavePriority').onclick = () => {
-    const val = $('priorityCities').value.trim().toUpperCase();
-    localStorage.setItem('wz_priority_cities', val);
-    populateCityDropdowns(); // Refresh dropdowns with new priority
-    LS('Priority cities saved');
+    localStorage.setItem('wz_priority_cities', $('priorityCities').value.trim().toUpperCase());
+    populateCityDropdowns();
+    LS('Priority saved');
   };
+  $('bClearCredentials').onclick = () => { clearCredentials(); showMsg('s', 'Credentials cleared'); };
 
-  $('bClearCredentials').onclick = () => {
-    clearCredentials();
-    showMsg('s', 'Credentials cleared');
-  };
-
-  // Log modal
   $('bLog').onclick = () => $('mLog').classList.add('op');
   $('bCloseLog').onclick = () => $('mLog').classList.remove('op');
   $('mLog').onclick = e => { if (e.target === $('mLog')) $('mLog').classList.remove('op'); };
-  $('bClearLog').onclick = () => {
-    logs = [];
-    $('logArea').innerHTML = '';
-    $('lCnt').textContent = '(0)';
-  };
+  $('bClearLog').onclick = () => { logs = []; $('logArea').innerHTML = ''; $('lCnt').textContent = '(0)'; };
   $('bCopyLog').onclick = () => {
-    const logText = `WIZZ AYCF LOG — ${new Date().toISOString()}\nVersion: ${VERSION}\n\n${logs.map(l => l.l).join('\n')}`;
-    navigator.clipboard.writeText(logText).then(() => {
+    navigator.clipboard.writeText(`WIZZ AYCF LOG — ${new Date().toISOString()}\nVersion: ${VERSION}\n\n${logs.map(l => l.l).join('\n')}`).then(() => {
       $('bCopyLog').textContent = '✅ Copied';
       setTimeout(() => { $('bCopyLog').textContent = '📋 Copy'; }, 1500);
     });
