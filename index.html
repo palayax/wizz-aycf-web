@@ -215,7 +215,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <header class="hd">
 <div class="hd-r">
-  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.4</span></div>
+  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v3.5</span></div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
     <button class="ib" id="bGH" title="Settings">⚙️</button>
@@ -276,23 +276,72 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   </div>
 
   <div class="filter-box">
-    <div class="cd-t" style="margin-bottom:8px">🎯 Download Filters (Optional)</div>
+    <div class="cd-t" style="margin-bottom:8px">🎯 Download Filters</div>
+
     <div class="filter-row">
-      <span class="filter-label">Origin:</span>
-      <input class="ip" id="dlOriginFilter" placeholder="Filter by airport, city, or country..." style="flex:1">
+      <span class="filter-label">Origin Country:</span>
+      <select class="ip" id="dlOriginCountry" style="flex:1"><option value="">All Countries</option></select>
     </div>
     <div class="filter-row">
-      <span class="filter-label">Destination:</span>
-      <input class="ip" id="dlDestFilter" placeholder="Filter by airport, city, or country..." style="flex:1">
+      <span class="filter-label">Origin City:</span>
+      <select class="ip" id="dlOriginCity" style="flex:1"><option value="">All Cities</option></select>
     </div>
     <div class="filter-row">
-      <span class="filter-label">Dates:</span>
+      <span class="filter-label">Origin Airport:</span>
+      <select class="ip" id="dlOriginAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row">
+      <span class="filter-label">Dest Country:</span>
+      <select class="ip" id="dlDestCountry" style="flex:1"><option value="">All Countries</option></select>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Dest City:</span>
+      <select class="ip" id="dlDestCity" style="flex:1"><option value="">All Cities</option></select>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Dest Airport:</span>
+      <select class="ip" id="dlDestAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row">
+      <span class="filter-label">Departure:</span>
       <input type="date" class="ip" id="dlDateStart" style="width:140px">
       <span style="color:var(--tx3)">to</span>
       <input type="date" class="ip" id="dlDateEnd" style="width:140px">
     </div>
+    <div class="filter-row">
+      <span class="filter-label">Departure Time:</span>
+      <input type="time" class="ip" id="dlDepTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="dlDepTimeEnd" style="width:100px" value="23:59">
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Arrival Time:</span>
+      <input type="time" class="ip" id="dlArrTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="dlArrTimeEnd" style="width:100px" value="23:59">
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row">
+      <span class="filter-label">RoundTrip Interval:</span>
+      <select class="ip" id="dlRoundTripInterval" style="width:120px">
+        <option value="1">1 Day</option>
+        <option value="2">2 Days</option>
+        <option value="3">3 Days</option>
+        <option value="4" selected>4 Days (Max)</option>
+      </select>
+      <span style="font-size:.68rem;color:var(--tx3)">Return flight search window</span>
+    </div>
+
     <div class="date-warn" id="dateWarn"></div>
-    <p style="font-size:.68rem;color:var(--tx3);margin-top:6px">Leave empty to download all. Max 4 days range.</p>
+    <p style="font-size:.68rem;color:var(--tx3);margin-top:6px">Max 4 days date range. Default: Israel origin, today's date.</p>
   </div>
 
   <div class="rw mb">
@@ -335,7 +384,39 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <div class="pn on" id="p-dep">
   <div class="cd">
-    <div class="cd-t">🛫 Origin Airports</div>
+    <div class="cd-t">🛫 Origin Filters</div>
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Country:</span>
+      <select class="ip" id="depOriginCountry" style="flex:1"><option value="">All Countries</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">City:</span>
+      <select class="ip" id="depOriginCity" style="flex:1"><option value="">All Cities</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Airport:</span>
+      <select class="ip" id="depOriginAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dep Time:</span>
+      <input type="time" class="ip" id="depTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="depTimeEnd" style="width:100px" value="23:59">
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Arr Time:</span>
+      <input type="time" class="ip" id="depArrTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="depArrTimeEnd" style="width:100px" value="23:59">
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div style="font-size:.72rem;color:var(--tx3);margin-bottom:6px">Or select manually:</div>
     <input class="ip" id="dSr" placeholder="Search by airport, city, or country..." style="margin-bottom:6px">
     <div class="rw mb">
       <button class="bt bt-o bt-sm sf" data-l="dL">⭐</button>
@@ -353,7 +434,39 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <div class="pn" id="p-dest">
   <div class="cd">
-    <div class="cd-t">🎯 Destination Airports</div>
+    <div class="cd-t">🎯 Destination Filters</div>
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Country:</span>
+      <select class="ip" id="destDestCountry" style="flex:1"><option value="">All Countries</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">City:</span>
+      <select class="ip" id="destDestCity" style="flex:1"><option value="">All Cities</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Airport:</span>
+      <select class="ip" id="destDestAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dep Time:</span>
+      <input type="time" class="ip" id="destDepTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="destDepTimeEnd" style="width:100px" value="23:59">
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Arr Time:</span>
+      <input type="time" class="ip" id="destArrTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="destArrTimeEnd" style="width:100px" value="23:59">
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div style="font-size:.72rem;color:var(--tx3);margin-bottom:6px">Or select manually:</div>
     <input class="ip" id="sSr" placeholder="Search by airport, city, or country..." style="margin-bottom:6px">
     <div class="rw mb">
       <button class="bt bt-o bt-sm sf" data-l="sL">⭐</button>
@@ -372,18 +485,66 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
   <div class="cd">
     <div class="cd-t">🔄 Round Trip Search</div>
     <p style="font-size:.76rem;color:var(--tx2);margin-bottom:8px">Find round-trip flights in cached data.</p>
-    <div class="or"><label>Origin:</label><input class="ip" id="rtO" placeholder="Airport, city or country" style="width:200px"></div>
-    <div class="or"><label>Dest:</label><input class="ip" id="rtD" placeholder="Airport, city or country" style="width:200px"></div>
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Origin Country:</span>
+      <select class="ip" id="rtOriginCountry" style="flex:1"><option value="">All Countries</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Origin City:</span>
+      <select class="ip" id="rtOriginCity" style="flex:1"><option value="">All Cities</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Origin Airport:</span>
+      <select class="ip" id="rtOriginAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dest Country:</span>
+      <select class="ip" id="rtDestCountry" style="flex:1"><option value="">All Countries</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dest City:</span>
+      <select class="ip" id="rtDestCity" style="flex:1"><option value="">All Cities</option></select>
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dest Airport:</span>
+      <select class="ip" id="rtDestAirport" style="flex:1"><option value="">All Airports</option></select>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Dep Time:</span>
+      <input type="time" class="ip" id="rtDepTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="rtDepTimeEnd" style="width:100px" value="23:59">
+    </div>
+    <div class="filter-row" style="margin-bottom:8px">
+      <span class="filter-label">Arr Time:</span>
+      <input type="time" class="ip" id="rtArrTimeStart" style="width:100px" value="00:00">
+      <span style="color:var(--tx3)">to</span>
+      <input type="time" class="ip" id="rtArrTimeEnd" style="width:100px" value="23:59">
+    </div>
   </div>
   <div class="dg">
     <div><label>Depart after</label><input type="date" id="rtS"></div>
     <div><label>Return before (max 4 days)</label><input type="date" id="rtE"></div>
   </div>
   <div class="or">
+    <label>RoundTrip Interval:</label>
+    <select class="ip" id="rtInterval" style="width:100px">
+      <option value="1">1 Day</option>
+      <option value="2">2 Days</option>
+      <option value="3">3 Days</option>
+      <option value="4" selected>4 Days</option>
+    </select>
     <label>Min stay:</label>
-    <select class="ip" id="rtMn" style="width:90px"><option value="0">Any</option><option value="1">1d</option><option value="2" selected>2d</option><option value="3">3d</option><option value="5">5d</option><option value="7">7d</option></select>
+    <select class="ip" id="rtMn" style="width:80px"><option value="0">Any</option><option value="1">1d</option><option value="2" selected>2d</option><option value="3">3d</option><option value="5">5d</option><option value="7">7d</option></select>
     <label>Max:</label>
-    <select class="ip" id="rtMx" style="width:90px"><option value="3">3d</option><option value="5">5d</option><option value="7" selected>7d</option><option value="14">14d</option><option value="30">30d</option><option value="99">Any</option></select>
+    <select class="ip" id="rtMx" style="width:80px"><option value="3">3d</option><option value="5">5d</option><option value="7" selected>7d</option><option value="14">14d</option><option value="30">30d</option><option value="99">Any</option></select>
   </div>
 </div>
 
@@ -436,9 +597,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.55)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  WIZZ AYCF WEB v3.4 — Enhanced filters & display
+//  WIZZ AYCF WEB v3.5 — Advanced filters & full display
 // ══════════════════════════════════════════════════════
-const V='3.4.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120,MAX_DAYS=4;
+const V='3.5.0',DB_N='WizzAYCF3',DB_V=1,CACHE_H=72,MIN_LAY=120,MAX_DAYS=4,MAX_RT_INTERVAL=4;
 
 // Extended airport database with full names
 const AIRPORTS={
@@ -666,6 +827,159 @@ function validateDateRange(startId,endId,warnId){
   return true;
 }
 
+// Parse time to minutes for comparison
+function timeToMinutes(t){
+  if(!t)return 0;
+  if(t.includes('T'))t=t.split('T')[1];
+  const p=t.split(':');
+  return (+p[0])*60+(+p[1]||0);
+}
+
+// Check if flight time is within range
+function isTimeInRange(flightTime,startTime,endTime){
+  if(!startTime&&!endTime)return true;
+  const ft=timeToMinutes(flightTime);
+  const st=timeToMinutes(startTime||'00:00');
+  const et=timeToMinutes(endTime||'23:59');
+  return ft>=st&&ft<=et;
+}
+
+// Populate filter dropdowns from AIRPORTS database
+function populateFilterDropdowns(){
+  const countries=new Set();
+  const citiesByCountry={};
+  const airportsByCity={};
+
+  Object.entries(AIRPORTS).forEach(([code,info])=>{
+    countries.add(info.country);
+    if(!citiesByCountry[info.country])citiesByCountry[info.country]=new Set();
+    citiesByCountry[info.country].add(info.city);
+    const cityKey=`${info.country}|${info.city}`;
+    if(!airportsByCity[cityKey])airportsByCity[cityKey]=[];
+    airportsByCity[cityKey].push({code,airport:info.airport});
+  });
+
+  const sortedCountries=[...countries].sort();
+
+  // Populate all country dropdowns
+  const countrySelects=['dlOriginCountry','dlDestCountry','rtOriginCountry','rtDestCountry','depOriginCountry','destDestCountry'];
+  countrySelects.forEach(id=>{
+    const sel=$(id);
+    if(!sel)return;
+    sel.innerHTML='<option value="">All Countries</option>'+
+      sortedCountries.map(c=>`<option value="${c}">${c}</option>`).join('');
+  });
+
+  // Set Israel as default for origin country dropdowns
+  ['dlOriginCountry','rtOriginCountry','depOriginCountry'].forEach(id=>{
+    const sel=$(id);
+    if(sel)sel.value='Israel';
+  });
+
+  // Setup cascading filter logic
+  setupCascadingFilters('dlOrigin',citiesByCountry,airportsByCity);
+  setupCascadingFilters('dlDest',citiesByCountry,airportsByCity);
+  setupCascadingFilters('rtOrigin',citiesByCountry,airportsByCity);
+  setupCascadingFilters('rtDest',citiesByCountry,airportsByCity);
+  setupCascadingFilters('depOrigin',citiesByCountry,airportsByCity);
+  setupCascadingFilters('destDest',citiesByCountry,airportsByCity);
+
+  // Trigger initial cascade for default values
+  ['dlOriginCountry','rtOriginCountry','depOriginCountry'].forEach(id=>{
+    const sel=$(id);
+    if(sel)sel.dispatchEvent(new Event('change'));
+  });
+}
+
+function setupCascadingFilters(prefix,citiesByCountry,airportsByCity){
+  const countryEl=$(prefix+'Country');
+  const cityEl=$(prefix+'City');
+  const airportEl=$(prefix+'Airport');
+
+  if(!countryEl||!cityEl||!airportEl)return;
+
+  countryEl.addEventListener('change',()=>{
+    const country=countryEl.value;
+    cityEl.innerHTML='<option value="">All Cities</option>';
+    airportEl.innerHTML='<option value="">All Airports</option>';
+
+    if(country&&citiesByCountry[country]){
+      const cities=[...citiesByCountry[country]].sort();
+      cityEl.innerHTML+= cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+  });
+
+  cityEl.addEventListener('change',()=>{
+    const country=countryEl.value;
+    const city=cityEl.value;
+    airportEl.innerHTML='<option value="">All Airports</option>';
+
+    if(country&&city){
+      const key=`${country}|${city}`;
+      if(airportsByCity[key]){
+        const airports=airportsByCity[key].sort((a,b)=>a.airport.localeCompare(b.airport));
+        airportEl.innerHTML+= airports.map(a=>`<option value="${a.code}">${a.airport} (${a.code})</option>`).join('');
+      }
+    }
+  });
+}
+
+// Get filter values for download
+function getDownloadFilters(){
+  return{
+    originCountry:$('dlOriginCountry')?.value||'',
+    originCity:$('dlOriginCity')?.value||'',
+    originAirport:$('dlOriginAirport')?.value||'',
+    destCountry:$('dlDestCountry')?.value||'',
+    destCity:$('dlDestCity')?.value||'',
+    destAirport:$('dlDestAirport')?.value||'',
+    depTimeStart:$('dlDepTimeStart')?.value||'00:00',
+    depTimeEnd:$('dlDepTimeEnd')?.value||'23:59',
+    arrTimeStart:$('dlArrTimeStart')?.value||'00:00',
+    arrTimeEnd:$('dlArrTimeEnd')?.value||'23:59',
+    roundTripInterval:+($('dlRoundTripInterval')?.value||4)
+  };
+}
+
+// Check if an airport matches the filter criteria
+function matchesLocationFilter(code,country,city,airport){
+  const info=getAirportInfo(code);
+  if(airport&&code!==airport)return false;
+  if(city&&info.city!==city)return false;
+  if(country&&info.country!==country)return false;
+  return true;
+}
+
+// Get search filters for each mode
+function getSearchFilters(mode){
+  let prefix='';
+  if(mode==='dep')prefix='depOrigin';
+  else if(mode==='dest')prefix='destDest';
+  else if(mode==='rt')return{
+    originCountry:$('rtOriginCountry')?.value||'',
+    originCity:$('rtOriginCity')?.value||'',
+    originAirport:$('rtOriginAirport')?.value||'',
+    destCountry:$('rtDestCountry')?.value||'',
+    destCity:$('rtDestCity')?.value||'',
+    destAirport:$('rtDestAirport')?.value||'',
+    depTimeStart:$('rtDepTimeStart')?.value||'00:00',
+    depTimeEnd:$('rtDepTimeEnd')?.value||'23:59',
+    arrTimeStart:$('rtArrTimeStart')?.value||'00:00',
+    arrTimeEnd:$('rtArrTimeEnd')?.value||'23:59',
+    interval:+($('rtInterval')?.value||4)
+  };
+
+  return{
+    country:$(prefix+'Country')?.value||'',
+    city:$(prefix+'City')?.value||'',
+    airport:$(prefix+'Airport')?.value||'',
+    depTimeStart:$(mode==='dep'?'depTimeStart':'destDepTimeStart')?.value||'00:00',
+    depTimeEnd:$(mode==='dep'?'depTimeEnd':'destDepTimeEnd')?.value||'23:59',
+    arrTimeStart:$(mode==='dep'?'depArrTimeStart':'destArrTimeStart')?.value||'00:00',
+    arrTimeEnd:$(mode==='dep'?'depArrTimeEnd':'destArrTimeEnd')?.value||'23:59'
+  };
+}
+
 function initDB(){return new Promise((ok,no)=>{L('Opening IndexedDB...');const r=indexedDB.open(DB_N,DB_V);
   r.onerror=()=>{LE('DB error');no(r.error)};r.onsuccess=()=>{db=r.result;LS('DB ready');ok(db)};
   r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('flights'))d.createObjectStore('flights',{keyPath:'id'});
@@ -855,9 +1169,9 @@ async function loginAndDownload(){
     showDM('e',`Date range exceeds ${MAX_DAYS} days. Please select a shorter range.`);return;
   }
 
-  // Get filters
-  const originFilter=$('dlOriginFilter').value.trim();
-  const destFilter=$('dlDestFilter').value.trim();
+  // Get filters (new structured filters)
+  const filters=getDownloadFilters();
+  L(`Download filters: Origin=${filters.originCountry||'*'}/${filters.originCity||'*'}/${filters.originAirport||'*'}, Dest=${filters.destCountry||'*'}/${filters.destCity||'*'}/${filters.destAirport||'*'}, RT Interval=${filters.roundTripInterval}d`);
 
   downloading=true;paused=false;stopped=false;
   cookieJar='';xsrfToken='';
@@ -1016,12 +1330,10 @@ async function loginAndDownload(){
         destinations=r.destinations||[];
       }
       if(origin&&destinations.length){
-        // Apply origin filter
-        if(originFilter&&!matchesFilter(origin,originFilter))return;
-        // Apply destination filter
-        if(destFilter){
-          destinations=destinations.filter(d=>matchesFilter(d,destFilter));
-        }
+        // Apply origin filter (country/city/airport)
+        if(!matchesLocationFilter(origin,filters.originCountry,filters.originCity,filters.originAirport))return;
+        // Apply destination filter (country/city/airport)
+        destinations=destinations.filter(d=>matchesLocationFilter(d,filters.destCountry,filters.destCity,filters.destAirport));
         if(destinations.length){
           parsedRoutes.push({origin,destinations});
         }
@@ -1139,7 +1451,12 @@ async function loginAndDownload(){
                 arrival:f.arrival||f.arrivalTime||'',
                 duration:f.duration||'',
                 flightCode:f.flightCode||f.flightNumber||''
-              }));
+              })).filter(f=>{
+                // Apply time filters
+                if(!isTimeInRange(f.departure,filters.depTimeStart,filters.depTimeEnd))return false;
+                if(!isTimeInRange(f.arrival,filters.arrTimeStart,filters.arrTimeEnd))return false;
+                return true;
+              });
 
               await dbP('flights',{id:`${t.o}-${t.d}-${t.dt}`,origin:t.o,dest:t.d,date:t.dt,flights:fl,timestamp:Date.now()});
               done++;flights+=fl.length;
@@ -1246,42 +1563,106 @@ async function doSearch(){
   switch(mode){case'dep':sDep(lu);break;case'dest':sDest(lu);break;case'rt':sRT(lu);break}}
 
 function sDep(lu){
-  const ori=gSel('dL'),s=$('dS').value,e=$('dE').value;
-  if(!ori.length){sR('mg-w','Select origins.');return}
+  const s=$('dS').value,e=$('dE').value;
   if(!s||!e){sR('mg-w','Set dates.');return}
   if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
+
+  const filters=getSearchFilters('dep');
+  const manualOri=gSel('dL');
   const dates=dRng(s,e),fl=[];
-  ori.forEach(o=>{(lu.bO.get(o)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{fl.push({o,d:r.d,dt:r.dt,f})})})});
+
+  lu.bO.forEach((routes,o)=>{
+    // Check if origin matches filters or manual selection
+    const matchesFilter=matchesLocationFilter(o,filters.country,filters.city,filters.airport);
+    const matchesManual=manualOri.length===0||manualOri.includes(o);
+    if(!matchesFilter||!matchesManual)return;
+
+    routes.forEach(r=>{
+      if(!dates.includes(r.dt))return;
+      r.fl.forEach(f=>{
+        // Apply time filters
+        if(!isTimeInRange(f.departure,filters.depTimeStart,filters.depTimeEnd))return;
+        if(!isTimeInRange(f.arrival,filters.arrTimeStart,filters.arrTimeEnd))return;
+        fl.push({o,d:r.d,dt:r.dt,f});
+      });
+    });
+  });
   dispDep(fl)}
 
 function sDest(lu){
-  const dst=gSel('sL'),s=$('sS').value,e=$('sE').value;
-  if(!dst.length){sR('mg-w','Select destinations.');return}
+  const s=$('sS').value,e=$('sE').value;
   if(!s||!e){sR('mg-w','Set dates.');return}
   if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
+
+  const filters=getSearchFilters('dest');
+  const manualDst=gSel('sL');
   const dates=dRng(s,e),rl=[];
-  dst.forEach(d=>{(lu.bD.get(d)||[]).forEach(r=>{if(dates.includes(r.dt))r.fl.forEach(f=>{rl.push({o:r.o,d,dt:r.dt,f})})})});
-  dispDest(rl,dst)}
+
+  lu.bD.forEach((routes,d)=>{
+    // Check if destination matches filters or manual selection
+    const matchesFilter=matchesLocationFilter(d,filters.country,filters.city,filters.airport);
+    const matchesManual=manualDst.length===0||manualDst.includes(d);
+    if(!matchesFilter||!matchesManual)return;
+
+    routes.forEach(r=>{
+      if(!dates.includes(r.dt))return;
+      r.fl.forEach(f=>{
+        // Apply time filters
+        if(!isTimeInRange(f.departure,filters.depTimeStart,filters.depTimeEnd))return;
+        if(!isTimeInRange(f.arrival,filters.arrTimeStart,filters.arrTimeEnd))return;
+        rl.push({o:r.o,d,dt:r.dt,f});
+      });
+    });
+  });
+  dispDest(rl,manualDst)}
 
 function sRT(lu){
   const s=$('rtS').value,e=$('rtE').value,mn=+$('rtMn').value,mx=+$('rtMx').value;
   if(!s||!e){sR('mg-w','Set dates.');return}
   if(dB(s,e)>MAX_DAYS-1){sR('mg-e',`Date range exceeds ${MAX_DAYS} days.`);return}
-  const oF=$('rtO').value.trim(),dF=$('rtD').value.trim();
+
+  const filters=getSearchFilters('rt');
+  const rtInterval=Math.min(filters.interval||4,MAX_RT_INTERVAL);
+
   sR('mg-i','<span class="sp-n"></span> Searching...');
-  setTimeout(()=>{const dates=dRng(s,e),res=[],seen=new Set();
+  setTimeout(()=>{
+    const dates=dRng(s,e),res=[],seen=new Set();
     lu.bO.forEach((routes,orig)=>{
-      // Filter by origin (airport, city, or country)
-      if(oF&&!matchesFilter(orig,oF))return;
+      // Filter by origin (country/city/airport)
+      if(!matchesLocationFilter(orig,filters.originCountry,filters.originCity,filters.originAirport))return;
+
       routes.forEach(r=>{
-        // Filter by destination
-        if(dF&&!matchesFilter(r.d,dF))return;
+        // Filter by destination (country/city/airport)
+        if(!matchesLocationFilter(r.d,filters.destCountry,filters.destCity,filters.destAirport))return;
         if(!r.fl.length||!dates.includes(r.dt))return;
-        r.fl.forEach(of=>{(lu.bO.get(r.d)||[]).forEach(rr=>{if(rr.d!==orig||!dates.includes(rr.dt))return;
-          const stay=dB(r.dt,rr.dt);if(stay<mn||stay>mx)return;if(!rr.fl.length)return;
-          rr.fl.forEach(rf=>{const k=`${orig}|${r.d}|${r.dt}|${rr.dt}`;
-            if(seen.has(k))return;seen.add(k);
-            res.push({o:orig,d:r.d,oD:r.dt,rD:rr.dt,oF:of,rF:rf,stay})})})})})});
+
+        r.fl.forEach(of=>{
+          // Apply outbound time filters
+          if(!isTimeInRange(of.departure,filters.depTimeStart,filters.depTimeEnd))return;
+          if(!isTimeInRange(of.arrival,filters.arrTimeStart,filters.arrTimeEnd))return;
+
+          // Look for return flights within the RT interval
+          (lu.bO.get(r.d)||[]).forEach(rr=>{
+            if(rr.d!==orig)return;
+            const stay=dB(r.dt,rr.dt);
+            // Limit return search by RT interval
+            if(stay<0||stay>rtInterval)return;
+            if(stay<mn||stay>mx)return;
+            if(!rr.fl.length)return;
+
+            rr.fl.forEach(rf=>{
+              // Apply return time filters
+              if(!isTimeInRange(rf.departure,filters.depTimeStart,filters.depTimeEnd))return;
+              if(!isTimeInRange(rf.arrival,filters.arrTimeStart,filters.arrTimeEnd))return;
+
+              const k=`${orig}|${r.d}|${r.dt}|${rr.dt}|${of.departure}|${rf.departure}`;
+              if(seen.has(k))return;seen.add(k);
+              res.push({o:orig,d:r.d,oD:r.dt,rD:rr.dt,oF:of,rF:rf,stay});
+            });
+          });
+        });
+      });
+    });
     res.sort((a,b)=>a.stay-b.stay);dispRT(res)},50)}
 
 function sR(c,h){$('res').innerHTML=`<div class="mg ${c}">${h}</div>`}
@@ -1401,9 +1782,19 @@ async function init(){
   if(proxy){$('proxySetup').classList.add('hd-n');$('proxyUrl').value=proxy;$('gPx').value=proxy}
   else{$('loginCard').style.opacity='.5'}
   $('workerCode').textContent=workerCode();
+
+  // Set default dates: today to today+MAX_DAYS-1
   const today=fD(new Date()),mx=fD((()=>{const d=new Date();d.setDate(d.getDate()+MAX_DAYS-1);return d})());
   ['dS','sS','rtS','dlDateStart'].forEach(id=>{const e=$(id);if(e){e.value=today;e.min=today}});
   ['dE','sE','rtE','dlDateEnd'].forEach(id=>{const e=$(id);if(e){e.value=mx;e.min=today}});
+
+  // Populate filter dropdowns from AIRPORTS database
+  populateFilterDropdowns();
+
+  // Set default RoundTrip Interval to 4 days (max)
+  if($('dlRoundTripInterval'))$('dlRoundTripInterval').value='4';
+  if($('rtInterval'))$('rtInterval').value='4';
+
   await upSt();LS('Ready')}
 
 document.addEventListener('DOMContentLoaded',()=>{
