@@ -134,7 +134,7 @@ td{color:var(--tx)}
 <div class="hd-r">
   <div class="hd-t">
     <span class="g">✈️ AYCF Finder</span>
-    <span class="v" id="versionDisplay">v4.11.0</span>
+    <span class="v" id="versionDisplay">v4.12.0</span>
   </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
@@ -336,7 +336,7 @@ td{color:var(--tx)}
 //  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.11.0';
+const VERSION = '4.12.0';
 
 // UUID v4 generator for availability API
 function generateUUID() {
@@ -1067,6 +1067,7 @@ async function searchFlights() {
   xsrfToken = '';
   searchResults = [];
   allDestinationsForReturn = new Set();
+  let foundDestinationsWithFlights = new Set();  // Track destinations where outbound flights were actually found
   verboseMode = $('verboseLog').checked;
 
   $('bSearch').disabled = true;
@@ -1474,24 +1475,10 @@ async function searchFlights() {
       });
     });
 
-    // Return tasks
-    if (isRoundTrip && allDestinationsForReturn.size > 0) {
-      [...allDestinationsForReturn].forEach(returnOrigin => {
-        selectedOrigins.forEach(returnDest => {
-          returnDates.forEach(dt => {
-            const k = `${returnOrigin}|${returnDest}|${dt}`;
-            if (!seen.has(k)) {
-              seen.add(k);
-              tasks.push({ o: returnOrigin, d: returnDest, dt, type: 'return' });
-            }
-          });
-        });
-      });
-    }
+    // NOTE: Return tasks are now created AFTER outbound search completes
+    // Only destinations with actual flights found will be searched for returns
 
-    const outboundCount = tasks.filter(t => t.type === 'outbound').length;
-    const returnCount = tasks.filter(t => t.type === 'return').length;
-    L(`Total tasks: ${tasks.length} (${outboundCount} outbound, ${returnCount} return)`);
+    L(`Total outbound tasks: ${tasks.length}`);
 
     if (tasks.length === 0) {
       LW('No search tasks to execute!');
@@ -1592,6 +1579,11 @@ async function searchFlights() {
               successCount++;
               L(`✈️ ${t.o} → ${t.d} (${t.type}): ${fl.length} flights found`);
 
+              // Track destinations where we actually found outbound flights (for round trip return search)
+              if (t.type === 'outbound' && isRoundTrip) {
+                foundDestinationsWithFlights.add(t.d);
+              }
+
               fl.forEach(f => {
                 // Try multiple field names for departure/arrival times
                 const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
@@ -1653,6 +1645,131 @@ async function searchFlights() {
         errorCount++;
         LE(`Search error for ${t.o}->${t.d}: ${e.message}`);
       }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // STEP 5: Search Return Flights (only for found destinations)
+    // ═══════════════════════════════════════════════════
+    if (isRoundTrip && foundDestinationsWithFlights.size > 0 && !stopped) {
+      L('');
+      L('═══ STEP 5: SEARCH RETURN FLIGHTS ═══');
+      L(`Found ${foundDestinationsWithFlights.size} destinations with outbound flights: ${[...foundDestinationsWithFlights].join(', ')}`);
+
+      const returnTasks = [];
+      [...foundDestinationsWithFlights].forEach(returnOrigin => {
+        selectedOrigins.forEach(returnDest => {
+          returnDates.forEach(dt => {
+            const k = `${returnOrigin}|${returnDest}|${dt}|return`;
+            if (!seen.has(k)) {
+              seen.add(k);
+              returnTasks.push({ o: returnOrigin, d: returnDest, dt, type: 'return' });
+            }
+          });
+        });
+      });
+
+      L(`Return tasks to search: ${returnTasks.length}`);
+      showStatus(`Searching ${returnTasks.length} return routes...`);
+
+      for (let i = 0; i < returnTasks.length; i++) {
+        if (stopped) { L('Search stopped by user'); break; }
+        while (paused && !stopped) { showStatus('Paused...'); await sleep(500); }
+        if (stopped) break;
+
+        const t = returnTasks[i];
+        setProgress(50 + (i / returnTasks.length) * 50);  // Progress 50-100% for returns
+        const oInfo = getAirportInfo(t.o);
+        const dInfo = getAirportInfo(t.d);
+        showStatus(`↩️ ${oInfo.city} → ${dInfo.city} [${i + 1}/${returnTasks.length}]`);
+
+        try {
+          await sleep(300 + Math.random() * 200);
+
+          LV(`Searching return: ${t.o} -> ${t.d} on ${t.dt}`);
+
+          const searchUrl = dynamicSearchUrl || 'https://multipass.wizzair.com/w6/subscriptions/json/availability';
+
+          const r = await px(searchUrl, {
+            method: 'POST',
+            contentType: 'application/json',
+            body: JSON.stringify({
+              flightType: 'OW',
+              origin: t.o,
+              destination: t.d,
+              departure: t.dt,
+              arrival: '',
+              intervalSubtype: null
+            })
+          });
+
+          if (r.status === 429) {
+            rateLimitCount++;
+            const waitTime = rateLimitCount >= 3 ? 60000 : 15000;
+            LW(`Rate limited! Waiting ${waitTime/1000}s...`);
+            showStatus(`Rate limited — waiting ${waitTime/1000}s...`);
+            await sleep(waitTime);
+            if (rateLimitCount >= 3) rateLimitCount = 0;
+            i--;
+            continue;
+          }
+
+          rateLimitCount = 0;
+
+          if (r.status >= 200 && r.status < 300) {
+            const data = r.json();
+
+            if (data) {
+              let fl = [];
+              if (data.flightsOutbound && Array.isArray(data.flightsOutbound)) fl = data.flightsOutbound;
+              else if (data.flights && Array.isArray(data.flights)) fl = data.flights;
+              else if (data.outbound && Array.isArray(data.outbound)) fl = data.outbound;
+              else if (data.outboundFlights && Array.isArray(data.outboundFlights)) fl = data.outboundFlights;
+              else if (Array.isArray(data)) fl = data;
+              else if (data.result && Array.isArray(data.result)) fl = data.result;
+              else if (data.data && Array.isArray(data.data)) fl = data.data;
+
+              if (fl && fl.length > 0) {
+                successCount++;
+                L(`↩️ ${t.o} → ${t.d} (return): ${fl.length} flights found`);
+
+                fl.forEach(f => {
+                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
+                  const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
+                  const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
+
+                  addFlightResult({
+                    type: 'return',
+                    originCode: t.o,
+                    originCity: oInfo.city,
+                    originCountry: oInfo.country,
+                    originAirport: oInfo.airport,
+                    destCode: t.d,
+                    destCity: dInfo.city,
+                    destCountry: dInfo.country,
+                    destAirport: dInfo.airport,
+                    date: t.dt,
+                    departure: depTime,
+                    arrival: arrTime,
+                    flightNumber: flightNum,
+                    bookingUrl: bookingUrl(t.o, t.d, t.dt)
+                  });
+                });
+              }
+            }
+          } else if (r.status === 400) {
+            // Expected for some routes - log at verbose level only
+            LV(`No return route available: ${t.o}->${t.d} (HTTP 400)`);
+          } else {
+            errorCount++;
+            LW(`HTTP ${r.status} for return ${t.o}->${t.d}`);
+          }
+        } catch (e) {
+          errorCount++;
+          LE(`Return search error for ${t.o}->${t.d}: ${e.message}`);
+        }
+      }
+    } else if (isRoundTrip) {
+      L('No destinations with outbound flights found - skipping return search');
     }
 
     // ═══════════════════════════════════════════════════
