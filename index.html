@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0d1117">
-<title>Wizz AYCF Flight Finder</title>
+<title>Palaya - Wizz AYCF Flight Finder</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -23,9 +23,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 
 .hd{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr);padding:10px 14px}
 .hd-r{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto}
-.hd-t{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:6px}
+.hd-t{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.hd-t .logo{width:28px;height:28px;border-radius:6px}
 .hd-t .g{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hd-t .v{font-weight:400;font-size:.65rem;color:var(--tx3)}
+.hd-t .org{font-size:.7rem;color:var(--ylw);font-weight:600}
+.hd-t .v{font-weight:400;font-size:.6rem;color:var(--tx3)}
 .hd-a{display:flex;gap:4px}
 .ib{width:36px;height:36px;border-radius:8px;border:1px solid var(--bdr);background:var(--s1);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer}
 
@@ -37,6 +39,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .bt:disabled{opacity:.3;pointer-events:none}
 .bt-p{background:var(--acc);color:#0d1117}
 .bt-g{background:var(--grn);color:#0d1117}
+.bt-y{background:var(--ylw);color:#0d1117}
 .bt-o{background:transparent;border:1px solid var(--bdr);color:var(--tx2)}
 .bt-d{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:var(--red)}
 .bt-sm{padding:7px 10px;font-size:.76rem;min-height:34px}
@@ -50,6 +53,10 @@ select.ip{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .filter-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 .filter-row label{font-size:.75rem;font-weight:600;color:var(--tx2);min-width:100px}
 .filter-row select,.filter-row input{flex:1;min-width:150px}
+
+.chk-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chk-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--acc)}
+.chk-row label{font-size:.78rem;color:var(--tx2)}
 
 .mg{padding:12px;border-radius:var(--rs);margin-bottom:8px;font-size:.82rem}
 .mg-i{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);color:#79c0ff}
@@ -105,13 +112,23 @@ td{color:var(--tx)}
 
 .ft{text-align:center;font-size:.68rem;color:var(--tx3);padding:18px 0}
 .ft a{color:var(--acc);text-decoration:none}
+
+/* Date display */
+.date-display{display:inline-block;background:var(--s3);padding:8px 12px;border-radius:var(--rs);font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--acc);min-width:100px;text-align:center}
 </style>
 </head>
 <body>
 
 <header class="hd">
 <div class="hd-r">
-  <div class="hd-t">✈️ <span class="g">AYCF Finder</span> <span class="v">v4.1</span></div>
+  <div class="hd-t">
+<img src="Palaya_Logo.png" alt="Palaya" class="logo">
+    <div>
+      <span class="org">PALAYA</span>
+      <span class="g">AYCF Finder</span>
+      <span class="v">v4.2</span>
+    </div>
+  </div>
   <div class="hd-a">
     <button class="ib" id="bLog" title="Debug Log">🔧</button>
     <button class="ib" id="bSettings" title="Settings">⚙️</button>
@@ -152,16 +169,20 @@ td{color:var(--tx)}
 <div class="cd" id="loginCard">
   <div class="cd-t">🔑 Login & Search Flights</div>
   <div class="ip-row">
-    <input class="ip" id="wizEmail" type="email" placeholder="Wizz Air Email">
-    <input class="ip" id="wizPass" type="password" placeholder="Password">
+    <input class="ip" id="wizEmail" type="email" placeholder="Wizz Air Email" autocomplete="email">
+    <input class="ip" id="wizPass" type="password" placeholder="Password" autocomplete="current-password">
+  </div>
+  <div class="chk-row">
+    <input type="checkbox" id="saveCredentials">
+    <label for="saveCredentials">Remember credentials on this device</label>
   </div>
 
   <div class="cd-t" style="margin-top:14px">🎯 Search Filters</div>
 
   <div class="filter-row">
     <label>Departure Date:</label>
-    <input type="date" class="ip" id="filterDate" style="max-width:180px">
-    <span id="dateDisplay" style="font-size:.8rem;color:var(--acc);font-family:'JetBrains Mono',monospace"></span>
+    <span id="dateDisplay" class="date-display">--/--/----</span>
+    <input type="date" class="ip" id="filterDate" style="max-width:160px">
   </div>
 
   <div class="filter-row">
@@ -187,7 +208,9 @@ td{color:var(--tx)}
 
   <div class="rw" style="margin-top:14px">
     <button class="bt bt-p" id="bSearch">🔍 Search Flights</button>
-    <button class="bt bt-o hd-n" id="bStop">⏹ Stop</button>
+    <button class="bt bt-y hd-n" id="bPause">⏸️ Pause</button>
+    <button class="bt bt-o hd-n" id="bResume">▶️ Resume</button>
+    <button class="bt bt-d hd-n" id="bStop">⏹️ Stop</button>
   </div>
   <div class="pg hd-n" id="dlProg"><div class="fl" id="dlFill"></div></div>
   <div id="dlStatus" style="font-size:.75rem;color:var(--tx2);margin-top:4px"></div>
@@ -211,7 +234,7 @@ td{color:var(--tx)}
   </div>
 </div>
 
-<div class="ft">Not affiliated with Wizz Air. For personal use only.</div>
+<div class="ft">Powered by <strong>Palaya</strong> • Not affiliated with Wizz Air</div>
 </main>
 
 <!-- Settings Modal -->
@@ -219,11 +242,29 @@ td{color:var(--tx)}
 <div class="mo-s">
   <div class="mo-h"></div>
   <div class="mo-t">⚙️ Settings</div>
+
   <div class="cd-t">Proxy URL</div>
   <div class="ip-row">
     <input class="ip" id="settingsProxy" placeholder="https://your-worker.workers.dev">
     <button class="bt bt-g bt-sm" id="bSaveSettingsProxy">Save</button>
   </div>
+
+  <hr class="sep">
+
+  <div class="cd-t">Priority Cities (Search Order)</div>
+  <p style="font-size:.75rem;color:var(--tx2);margin-bottom:8px">
+    Enter city codes separated by commas. These will be searched first, then alphabetically.
+  </p>
+  <div class="ip-row">
+    <input class="ip" id="priorityCities" placeholder="TLV, BCN, FCO, ATH" style="text-transform:uppercase">
+    <button class="bt bt-g bt-sm" id="bSavePriority">Save</button>
+  </div>
+
+  <hr class="sep">
+
+  <div class="cd-t">Saved Credentials</div>
+  <button class="bt bt-d bt-sm" id="bClearCredentials">🗑️ Clear Saved Credentials</button>
+
   <hr class="sep">
   <button class="bt bt-o" style="width:100%" id="bCloseSettings">Close</button>
 </div>
@@ -246,10 +287,10 @@ td{color:var(--tx)}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  WIZZ AYCF FINDER v4.1 — Simplified & Streamlined
+//  PALAYA - WIZZ AYCF FINDER v4.2
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.1.0';
+const VERSION = '4.2.0';
 const CACHE_HOURS = 72;
 
 // Airport Database
@@ -369,11 +410,13 @@ const AIRPORTS = {
 // State
 let logs = [];
 let searching = false;
+let paused = false;
 let stopped = false;
 let cookieJar = '';
 let xsrfToken = '';
 let searchResults = [];
 let currentSort = { field: null, asc: true };
+let allDestinationsForReturn = new Set(); // Track all destinations for return flights
 
 // Helpers
 const $ = id => document.getElementById(id);
@@ -411,15 +454,14 @@ function formatDate(d) {
 }
 
 function formatDateDisplay(dateStr) {
-  // Convert YYYY-MM-DD to DD/MM/YYYY
-  if (!dateStr) return '';
+  if (!dateStr) return '--/--/----';
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
 }
 
 function updateDateDisplay() {
   const dateVal = $('filterDate').value;
-  $('dateDisplay').textContent = dateVal ? `(${formatDateDisplay(dateVal)})` : '';
+  $('dateDisplay').textContent = formatDateDisplay(dateVal);
 }
 
 function formatDateTime(dt, tm) {
@@ -439,33 +481,55 @@ function formatTime(t) {
   return t;
 }
 
-function dateRange(start, end) {
-  const r = [];
-  const [sy, sm, sd] = start.split('-').map(Number);
-  const [ey, em, ed] = end.split('-').map(Number);
-  let c = new Date(sy, sm - 1, sd);
-  const endD = new Date(ey, em - 1, ed);
-  while (c <= endD) {
-    r.push(formatDate(c));
-    c.setDate(c.getDate() + 1);
-  }
-  return r;
-}
-
-function daysBetween(d1, d2) {
-  const [y1, m1, dd1] = d1.split('-').map(Number);
-  const [y2, m2, dd2] = d2.split('-').map(Number);
-  return Math.floor((new Date(y2, m2 - 1, dd2) - new Date(y1, m1 - 1, dd1)) / 864e5);
-}
-
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function getProxy() { return localStorage.getItem('wz_proxy') || ''; }
+function getPriorityCities() {
+  const saved = localStorage.getItem('wz_priority_cities') || 'TLV';
+  return saved.split(',').map(c => c.trim().toUpperCase()).filter(c => c.length === 3);
+}
 
 function bookingUrl(o, d, dt) {
   return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`;
 }
 
-// Populate city dropdowns
+// Credentials management
+function saveCredentials() {
+  if ($('saveCredentials').checked) {
+    const email = $('wizEmail').value.trim();
+    const pass = $('wizPass').value;
+    if (email && pass) {
+      localStorage.setItem('wz_email', btoa(email));
+      localStorage.setItem('wz_pass', btoa(pass));
+      L('Credentials saved');
+    }
+  }
+}
+
+function loadCredentials() {
+  try {
+    const email = localStorage.getItem('wz_email');
+    const pass = localStorage.getItem('wz_pass');
+    if (email && pass) {
+      $('wizEmail').value = atob(email);
+      $('wizPass').value = atob(pass);
+      $('saveCredentials').checked = true;
+      L('Credentials loaded');
+    }
+  } catch (e) {
+    LW('Failed to load credentials');
+  }
+}
+
+function clearCredentials() {
+  localStorage.removeItem('wz_email');
+  localStorage.removeItem('wz_pass');
+  $('wizEmail').value = '';
+  $('wizPass').value = '';
+  $('saveCredentials').checked = false;
+  LS('Credentials cleared');
+}
+
+// Populate city dropdowns with priority sorting
 function populateCityDropdowns() {
   const cities = new Map();
   Object.entries(AIRPORTS).forEach(([code, info]) => {
@@ -476,7 +540,16 @@ function populateCityDropdowns() {
     cities.get(key).push(code);
   });
 
-  const sortedCities = [...cities.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  const priorityCodes = getPriorityCities();
+
+  // Sort with priority cities first
+  const sortedCities = [...cities.entries()].sort((a, b) => {
+    const aHasPriority = a[1].some(c => priorityCodes.includes(c));
+    const bHasPriority = b[1].some(c => priorityCodes.includes(c));
+    if (aHasPriority && !bHasPriority) return -1;
+    if (!aHasPriority && bHasPriority) return 1;
+    return a[0].localeCompare(b[0]);
+  });
 
   // Origin dropdown - default TLV
   const originSel = $('filterOrigin');
@@ -533,7 +606,6 @@ async function px(url, opts = {}) {
     }
 
     const loc = resp.headers.get('X-Location');
-    const xStatus = resp.headers.get('X-Status');
     if (loc) {
       if (loc.startsWith('/')) currentUrl = new URL(currentUrl).origin + loc;
       else if (loc.startsWith('http')) currentUrl = loc;
@@ -541,7 +613,7 @@ async function px(url, opts = {}) {
       continue;
     }
 
-    const status = parseInt(xStatus) || resp.status;
+    const status = parseInt(resp.headers.get('X-Status')) || resp.status;
     const bodyText = await resp.text();
     L(`  ✓ ${status} | ${bodyText.length} bytes`);
 
@@ -601,334 +673,13 @@ function showMsg(type, msg) {
 function setProgress(p) { $('dlFill').style.width = Math.min(100, p) + '%'; }
 function showStatus(m) { $('dlStatus').textContent = m; }
 
-// Search flights
-async function searchFlights() {
-  if (searching) return;
-
-  const email = $('wizEmail').value.trim();
-  const pass = $('wizPass').value;
-  if (!email || !pass) { showMsg('e', 'Enter email and password.'); return; }
-  if (!getProxy()) { showMsg('e', 'Set up proxy first.'); return; }
-
-  const filterDate = $('filterDate').value;
-  const filterOrigin = $('filterOrigin').value;
-  const filterDest = $('filterDest').value;
-  const isRoundTrip = $('filterRoundTrip').value === 'yes';
-
-  if (!filterDate) { showMsg('e', 'Select departure date.'); return; }
-  if (!filterOrigin) { showMsg('e', 'Select origin city.'); return; }
-
-  const originCodes = filterOrigin.split(',');
-  const destCodes = filterDest ? filterDest.split(',') : null;
-
-  searching = true;
-  stopped = false;
-  cookieJar = '';
-  xsrfToken = '';
-  searchResults = [];
-
-  $('bSearch').disabled = true;
-  $('bStop').classList.remove('hd-n');
-  $('dlProg').classList.remove('hd-n');
-  showStatus('Connecting...');
-  setProgress(0);
-
-  try {
-    // Step 1: Login
-    L('═══ Step 1: Getting login page ═══');
-    showStatus('Getting login page...');
-
-    const loginR = await px('https://multipass.wizzair.com/w6/subscriptions/auth/login', { maxRedirects: 10 });
-    const loginHtml = loginR.bodyText;
-
-    const isKeycloak = loginR.url.includes('/auth/realms/') || loginHtml.includes('kc-form-login');
-    if (!isKeycloak) throw new Error('Could not reach login page');
-
-    // Step 2: Submit credentials
-    L('═══ Step 2: Submitting credentials ═══');
-    showStatus('Logging in...');
-
-    const formMatch = loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i) ||
-                      loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i);
-
-    if (!formMatch) throw new Error('Login form not found');
-
-    let formAction = formMatch[1].replace(/&amp;/g, '&');
-    if (formAction.startsWith('/')) formAction = 'https://multipass.wizzair.com' + formAction;
-
-    const authR = await px(formAction, {
-      method: 'POST',
-      contentType: 'application/x-www-form-urlencoded',
-      body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&credentialId=`,
-      maxRedirects: 10
-    });
-
-    if (authR.bodyText.includes('Invalid username or password')) {
-      throw new Error('Invalid username or password');
-    }
-
-    LS('Login successful!');
-
-    // Step 3: Get routes
-    L('═══ Step 3: Fetching routes ═══');
-    showStatus('Getting routes...');
-
-    const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
-    const walletsHtml = walletsR.bodyText;
-
-    // Parse routes - try multiple patterns
-    let routes = [];
-
-    // Method 1: Look for "routes" array
-    const routesMatch = walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
-    if (routesMatch) {
-      try {
-        routes = JSON.parse(routesMatch[1]);
-        L(`Found ${routes.length} routes via "routes" pattern`);
-      } catch (e) { LW(`Parse routes failed: ${e.message}`); }
-    }
-
-    // Method 2: Look for departureStation patterns
-    if (!routes.length) {
-      const stationMatches = walletsHtml.matchAll(/"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"/g);
-      const stationSet = new Set();
-      for (const m of stationMatches) {
-        stationSet.add(m[1]);
-      }
-      if (stationSet.size > 0) {
-        L(`Found ${stationSet.size} departure stations via pattern match`);
-        // For each station, find its arrival stations
-        for (const code of stationSet) {
-          const arrMatch = walletsHtml.match(new RegExp(`"departureStation"\\s*:\\s*\\{[^}]*"id"\\s*:\\s*"${code}"[^}]*\\}[^"]*"arrivalStations"\\s*:\\s*(\\[[^\\]]*\\])`, 's'));
-          if (arrMatch) {
-            try {
-              const arrivals = JSON.parse(arrMatch[1]);
-              routes.push({
-                departureStation: { id: code },
-                arrivalStations: arrivals
-              });
-            } catch (e) {}
-          }
-        }
-      }
-    }
-
-    // Method 3: Look for any 3-letter airport codes in route context
-    if (!routes.length) {
-      L('Trying fallback route extraction...');
-      const allCodes = new Set();
-      const codeMatches = walletsHtml.matchAll(/"id"\s*:\s*"([A-Z]{3})"/g);
-      for (const m of codeMatches) {
-        if (AIRPORTS[m[1]]) allCodes.add(m[1]);
-      }
-      L(`Found ${allCodes.size} known airport codes in response`);
-
-      // If we found TLV or other origin codes, assume all other codes are destinations
-      const foundOrigins = [...allCodes].filter(c => originCodes.includes(c));
-      if (foundOrigins.length > 0) {
-        const otherCodes = [...allCodes].filter(c => !originCodes.includes(c));
-        foundOrigins.forEach(o => {
-          routes.push({
-            departureStation: { id: o },
-            arrivalStations: otherCodes.map(c => ({ id: c }))
-          });
-        });
-        L(`Built ${routes.length} routes from ${foundOrigins.length} origins to ${otherCodes.length} destinations`);
-      }
-    }
-
-    L(`Total routes to process: ${routes.length}`);
-
-    const parsedRoutes = [];
-    routes.forEach(r => {
-      let origin = null, destinations = [];
-      if (r.departureStation && r.departureStation.id) {
-        origin = r.departureStation.id;
-        destinations = (r.arrivalStations || []).map(a => a.id || a).filter(Boolean);
-      } else if (r.origin) {
-        origin = r.origin;
-        destinations = r.destinations || [];
-      }
-      if (origin && destinations.length) {
-        // Filter by selected origin
-        if (!originCodes.includes(origin)) {
-          L(`Skipping origin ${origin} (not in filter: ${originCodes.join(',')})`);
-          return;
-        }
-        // Filter by destination if specified
-        if (destCodes) {
-          destinations = destinations.filter(d => destCodes.includes(d));
-        }
-        if (destinations.length) {
-          parsedRoutes.push({ origin, destinations });
-          L(`Added route: ${origin} -> ${destinations.length} destinations`);
-        }
-      }
-    });
-
-    if (!parsedRoutes.length) {
-      L(`DEBUG: originCodes = ${originCodes.join(',')}`);
-      L(`DEBUG: destCodes = ${destCodes ? destCodes.join(',') : 'ALL'}`);
-      L(`DEBUG: First 2000 chars of response: ${walletsHtml.substring(0, 2000)}`);
-      throw new Error('No routes found matching your filters');
-    }
-
-    L(`Found ${parsedRoutes.length} origin airports with destinations`);
-
-    // Step 4: Search flights
-    L('═══ Step 4: Searching flights ═══');
-
-    // Build date list - just the selected date for outbound
-    const outboundDates = [filterDate];
-
-    // If round trip, also get return dates (3-4 days later)
-    const returnDates = [];
-    if (isRoundTrip) {
-      const baseDate = new Date(filterDate);
-      for (let i = 3; i <= 4; i++) {
-        const rd = new Date(baseDate);
-        rd.setDate(rd.getDate() + i);
-        returnDates.push(formatDate(rd));
-      }
-    }
-
-    // Build tasks
-    const tasks = [];
-    const seen = new Set();
-
-    parsedRoutes.forEach(r => {
-      r.destinations.forEach(dest => {
-        // Outbound flights
-        outboundDates.forEach(dt => {
-          const k = `${r.origin}|${dest}|${dt}`;
-          if (!seen.has(k)) {
-            seen.add(k);
-            tasks.push({ o: r.origin, d: dest, dt, type: 'outbound' });
-          }
-        });
-
-        // Return flights (if round trip)
-        if (isRoundTrip) {
-          returnDates.forEach(dt => {
-            const k = `${dest}|${r.origin}|${dt}`;
-            if (!seen.has(k)) {
-              seen.add(k);
-              tasks.push({ o: dest, d: r.origin, dt, type: 'return' });
-            }
-          });
-        }
-      });
-    });
-
-    L(`${tasks.length} flight searches to perform`);
-    showStatus(`Searching ${tasks.length} routes...`);
-
-    let done = 0;
-    let rateLimitCount = 0;
-
-    for (let i = 0; i < tasks.length; i++) {
-      if (stopped) break;
-
-      const t = tasks[i];
-      setProgress((i / tasks.length) * 100);
-      const oInfo = getAirportInfo(t.o);
-      const dInfo = getAirportInfo(t.d);
-      showStatus(`${oInfo.city} → ${dInfo.city} [${i + 1}/${tasks.length}]`);
-
-      try {
-        await sleep(400 + Math.random() * 400);
-
-        const r = await px('https://multipass.wizzair.com/w6/subscriptions/json/flight-search', {
-          method: 'POST',
-          contentType: 'application/json',
-          body: JSON.stringify({
-            flightType: 'OW',
-            origin: t.o,
-            destination: t.d,
-            departure: t.dt,
-            arrival: '',
-            intervalSubtype: null
-          })
-        });
-
-        if (r.status === 429) {
-          rateLimitCount++;
-          if (rateLimitCount >= 3) {
-            showStatus('Rate limited — waiting 60s...');
-            await sleep(60000);
-            rateLimitCount = 0;
-          } else {
-            showStatus('Rate limited — waiting 15s...');
-            await sleep(15000);
-          }
-          i--;
-          continue;
-        }
-
-        rateLimitCount = 0;
-
-        if (r.status >= 200 && r.status < 300) {
-          const data = await r.json();
-          let fl = data.flightsOutbound || data.flights || data.outbound || [];
-          if (Array.isArray(data) && data.length > 0 && data[0].departure) fl = data;
-
-          fl.forEach(f => {
-            searchResults.push({
-              type: t.type,
-              originCode: t.o,
-              originCity: oInfo.city,
-              originCountry: oInfo.country,
-              originAirport: oInfo.airport,
-              destCode: t.d,
-              destCity: dInfo.city,
-              destCountry: dInfo.country,
-              destAirport: dInfo.airport,
-              date: t.dt,
-              departure: f.departure || f.departureTime || '',
-              arrival: f.arrival || f.arrivalTime || '',
-              flightNumber: f.flightCode || f.flightNumber || '',
-              bookingUrl: bookingUrl(t.o, t.d, t.dt)
-            });
-          });
-
-          done++;
-          if (fl.length > 0) L(`  ${t.o} → ${t.d}: ${fl.length} flights`);
-        }
-
-        if (done % 30 === 0 && i < tasks.length - 1) {
-          showStatus('Brief pause...');
-          await sleep(10000);
-        }
-      } catch (e) {
-        done++;
-        LW(`Error: ${e.message}`);
-      }
-    }
-
-    setProgress(100);
-    LS(`Done! Found ${searchResults.length} flights`);
-    showStatus(`Found ${searchResults.length} flights`);
-    showMsg('s', `Found ${searchResults.length} flights!`);
-
-    renderResults();
-
-  } catch (e) {
-    LE(`Failed: ${e.message}`);
-    showMsg('e', e.message);
-  } finally {
-    searching = false;
-    $('bSearch').disabled = false;
-    $('bStop').classList.add('hd-n');
-  }
-}
-
-// Render results table
+// Render results immediately
 function renderResults() {
   const area = $('resultsArea');
   $('resultsCount').textContent = `${searchResults.length} flights`;
 
   if (!searchResults.length) {
-    area.innerHTML = '<div class="mg mg-w">No flights found.</div>';
+    area.innerHTML = '<div class="mg mg-w">No flights found yet. Results will appear here as they are discovered.</div>';
     return;
   }
 
@@ -1040,6 +791,390 @@ function renderResults() {
   });
 }
 
+// Add single flight result and update display
+function addFlightResult(flight) {
+  searchResults.push(flight);
+  // Update count immediately
+  $('resultsCount').textContent = `${searchResults.length} flights`;
+  // Re-render every 5 flights or immediately for first few
+  if (searchResults.length <= 3 || searchResults.length % 5 === 0) {
+    renderResults();
+  }
+}
+
+// Search flights
+async function searchFlights() {
+  if (searching) return;
+
+  const email = $('wizEmail').value.trim();
+  const pass = $('wizPass').value;
+  if (!email || !pass) { showMsg('e', 'Enter email and password.'); return; }
+  if (!getProxy()) { showMsg('e', 'Set up proxy first.'); return; }
+
+  // Save credentials if checkbox is checked
+  saveCredentials();
+
+  const filterDate = $('filterDate').value;
+  const filterOrigin = $('filterOrigin').value;
+  const filterDest = $('filterDest').value;
+  const isRoundTrip = $('filterRoundTrip').value === 'yes';
+
+  if (!filterDate) { showMsg('e', 'Select departure date.'); return; }
+  if (!filterOrigin) { showMsg('e', 'Select origin city.'); return; }
+
+  const originCodes = filterOrigin.split(',');
+  const destCodes = filterDest ? filterDest.split(',') : null;
+
+  searching = true;
+  paused = false;
+  stopped = false;
+  cookieJar = '';
+  xsrfToken = '';
+  searchResults = [];
+  allDestinationsForReturn = new Set();
+
+  $('bSearch').disabled = true;
+  $('bPause').classList.remove('hd-n');
+  $('bStop').classList.remove('hd-n');
+  $('bResume').classList.add('hd-n');
+  $('dlProg').classList.remove('hd-n');
+  showStatus('Connecting...');
+  setProgress(0);
+  renderResults(); // Show empty state
+
+  try {
+    // Step 1: Login
+    L('═══ Step 1: Getting login page ═══');
+    showStatus('Getting login page...');
+
+    const loginR = await px('https://multipass.wizzair.com/w6/subscriptions/auth/login', { maxRedirects: 10 });
+    const loginHtml = loginR.bodyText;
+
+    const isKeycloak = loginR.url.includes('/auth/realms/') || loginHtml.includes('kc-form-login');
+    if (!isKeycloak) throw new Error('Could not reach login page');
+
+    // Step 2: Submit credentials
+    L('═══ Step 2: Submitting credentials ═══');
+    showStatus('Logging in...');
+
+    const formMatch = loginHtml.match(/<form[^>]*id="kc-form-login"[^>]*action="([^"]+)"/i) ||
+                      loginHtml.match(/<form[^>]*action="([^"]*login-actions[^"]*)"/i);
+
+    if (!formMatch) throw new Error('Login form not found');
+
+    let formAction = formMatch[1].replace(/&amp;/g, '&');
+    if (formAction.startsWith('/')) formAction = 'https://multipass.wizzair.com' + formAction;
+
+    const authR = await px(formAction, {
+      method: 'POST',
+      contentType: 'application/x-www-form-urlencoded',
+      body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}&credentialId=`,
+      maxRedirects: 10
+    });
+
+    if (authR.bodyText.includes('Invalid username or password')) {
+      throw new Error('Invalid username or password');
+    }
+
+    LS('Login successful!');
+
+    // Step 3: Get routes
+    L('═══ Step 3: Fetching routes ═══');
+    showStatus('Getting routes...');
+
+    const walletsR = await px('https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets', { maxRedirects: 10 });
+    const walletsHtml = walletsR.bodyText;
+
+    // Parse routes - try multiple patterns
+    let routes = [];
+
+    // Method 1: Look for "routes" array
+    const routesMatch = walletsHtml.match(/"routes"\s*:\s*(\[[\s\S]*?\])(?=\s*[,}])/);
+    if (routesMatch) {
+      try {
+        routes = JSON.parse(routesMatch[1]);
+        L(`Found ${routes.length} routes via "routes" pattern`);
+      } catch (e) { LW(`Parse routes failed: ${e.message}`); }
+    }
+
+    // Method 2: Look for departureStation patterns
+    if (!routes.length) {
+      const stationMatches = walletsHtml.matchAll(/"departureStation"\s*:\s*\{[^}]*"id"\s*:\s*"([A-Z]{3})"/g);
+      const stationSet = new Set();
+      for (const m of stationMatches) {
+        stationSet.add(m[1]);
+      }
+      if (stationSet.size > 0) {
+        L(`Found ${stationSet.size} departure stations via pattern match`);
+      }
+    }
+
+    // Method 3: Extract all airport codes and build routes
+    if (!routes.length) {
+      L('Trying fallback route extraction...');
+      const allCodes = new Set();
+      const codeMatches = walletsHtml.matchAll(/"id"\s*:\s*"([A-Z]{3})"/g);
+      for (const m of codeMatches) {
+        if (AIRPORTS[m[1]]) allCodes.add(m[1]);
+      }
+      L(`Found ${allCodes.size} known airport codes in response`);
+
+      // Build routes from all codes
+      if (allCodes.size > 0) {
+        const foundOrigins = [...allCodes].filter(c => originCodes.includes(c));
+        const otherCodes = [...allCodes].filter(c => !originCodes.includes(c));
+
+        if (foundOrigins.length > 0 && otherCodes.length > 0) {
+          foundOrigins.forEach(o => {
+            routes.push({
+              departureStation: { id: o },
+              arrivalStations: otherCodes.map(c => ({ id: c }))
+            });
+          });
+          L(`Built ${routes.length} routes from ${foundOrigins.length} origins to ${otherCodes.length} destinations`);
+        } else if (otherCodes.length > 0) {
+          // If no exact origin match, use all codes as potential destinations from selected origin
+          originCodes.forEach(o => {
+            routes.push({
+              departureStation: { id: o },
+              arrivalStations: [...allCodes].filter(c => c !== o).map(c => ({ id: c }))
+            });
+          });
+          L(`Built ${routes.length} routes using selected origin to ${allCodes.size} destinations`);
+        }
+      }
+    }
+
+    L(`Total routes to process: ${routes.length}`);
+
+    // Parse routes into usable format
+    const parsedRoutes = [];
+    routes.forEach(r => {
+      let origin = null, destinations = [];
+      if (r.departureStation && r.departureStation.id) {
+        origin = r.departureStation.id;
+        destinations = (r.arrivalStations || []).map(a => a.id || a).filter(Boolean);
+      } else if (r.origin) {
+        origin = r.origin;
+        destinations = r.destinations || [];
+      }
+      if (origin && destinations.length) {
+        // Filter by selected origin
+        if (!originCodes.includes(origin)) return;
+        // Filter by destination if specified
+        if (destCodes) {
+          destinations = destinations.filter(d => destCodes.includes(d));
+        }
+        if (destinations.length) {
+          parsedRoutes.push({ origin, destinations });
+          destinations.forEach(d => allDestinationsForReturn.add(d));
+        }
+      }
+    });
+
+    if (!parsedRoutes.length) {
+      LW('No routes matched filters, but continuing for diagnostics...');
+      L(`DEBUG: originCodes = ${originCodes.join(',')}`);
+      L(`DEBUG: destCodes = ${destCodes ? destCodes.join(',') : 'ALL'}`);
+      // Don't throw - let search continue with empty results for debugging
+    }
+
+    L(`Found ${parsedRoutes.length} origin airports with destinations`);
+    if (isRoundTrip) {
+      L(`Round trip enabled - will search returns from ${allDestinationsForReturn.size} destinations`);
+    }
+
+    // Step 4: Search flights
+    L('═══ Step 4: Searching flights ═══');
+
+    // Build date list
+    const outboundDates = [filterDate];
+    const returnDates = [];
+    if (isRoundTrip) {
+      const baseDate = new Date(filterDate);
+      for (let i = 3; i <= 4; i++) {
+        const rd = new Date(baseDate);
+        rd.setDate(rd.getDate() + i);
+        returnDates.push(formatDate(rd));
+      }
+      L(`Return dates: ${returnDates.join(', ')}`);
+    }
+
+    // Build tasks with priority sorting
+    const tasks = [];
+    const seen = new Set();
+    const priorityCodes = getPriorityCities();
+
+    // Sort parsedRoutes by priority
+    parsedRoutes.sort((a, b) => {
+      const aP = priorityCodes.indexOf(a.origin);
+      const bP = priorityCodes.indexOf(b.origin);
+      if (aP >= 0 && bP < 0) return -1;
+      if (aP < 0 && bP >= 0) return 1;
+      if (aP >= 0 && bP >= 0) return aP - bP;
+      return a.origin.localeCompare(b.origin);
+    });
+
+    parsedRoutes.forEach(r => {
+      // Sort destinations by priority
+      const sortedDests = [...r.destinations].sort((a, b) => {
+        const aP = priorityCodes.indexOf(a);
+        const bP = priorityCodes.indexOf(b);
+        if (aP >= 0 && bP < 0) return -1;
+        if (aP < 0 && bP >= 0) return 1;
+        return a.localeCompare(b);
+      });
+
+      sortedDests.forEach(dest => {
+        // Outbound flights
+        outboundDates.forEach(dt => {
+          const k = `${r.origin}|${dest}|${dt}`;
+          if (!seen.has(k)) {
+            seen.add(k);
+            tasks.push({ o: r.origin, d: dest, dt, type: 'outbound' });
+          }
+        });
+      });
+    });
+
+    // Add return flight tasks AFTER all outbound
+    if (isRoundTrip && allDestinationsForReturn.size > 0) {
+      const returnOrigins = [...allDestinationsForReturn];
+      returnOrigins.forEach(returnOrigin => {
+        originCodes.forEach(returnDest => {
+          returnDates.forEach(dt => {
+            const k = `${returnOrigin}|${returnDest}|${dt}`;
+            if (!seen.has(k)) {
+              seen.add(k);
+              tasks.push({ o: returnOrigin, d: returnDest, dt, type: 'return' });
+            }
+          });
+        });
+      });
+    }
+
+    L(`${tasks.length} flight searches to perform (${tasks.filter(t => t.type === 'outbound').length} outbound, ${tasks.filter(t => t.type === 'return').length} return)`);
+    showStatus(`Searching ${tasks.length} routes...`);
+
+    let done = 0;
+    let rateLimitCount = 0;
+
+    for (let i = 0; i < tasks.length; i++) {
+      // Check for stop/pause
+      if (stopped) {
+        L('Search stopped by user');
+        break;
+      }
+
+      while (paused && !stopped) {
+        showStatus('Paused...');
+        await sleep(500);
+      }
+
+      if (stopped) break;
+
+      const t = tasks[i];
+      setProgress((i / tasks.length) * 100);
+      const oInfo = getAirportInfo(t.o);
+      const dInfo = getAirportInfo(t.d);
+      showStatus(`${t.type === 'return' ? '↩️' : '✈️'} ${oInfo.city} → ${dInfo.city} [${i + 1}/${tasks.length}]`);
+
+      try {
+        await sleep(400 + Math.random() * 400);
+
+        const r = await px('https://multipass.wizzair.com/w6/subscriptions/json/flight-search', {
+          method: 'POST',
+          contentType: 'application/json',
+          body: JSON.stringify({
+            flightType: 'OW',
+            origin: t.o,
+            destination: t.d,
+            departure: t.dt,
+            arrival: '',
+            intervalSubtype: null
+          })
+        });
+
+        if (r.status === 429) {
+          rateLimitCount++;
+          if (rateLimitCount >= 3) {
+            showStatus('Rate limited — waiting 60s...');
+            await sleep(60000);
+            rateLimitCount = 0;
+          } else {
+            showStatus('Rate limited — waiting 15s...');
+            await sleep(15000);
+          }
+          i--;
+          continue;
+        }
+
+        rateLimitCount = 0;
+
+        if (r.status >= 200 && r.status < 300) {
+          const data = await r.json();
+          let fl = data.flightsOutbound || data.flights || data.outbound || [];
+          if (Array.isArray(data) && data.length > 0 && data[0].departure) fl = data;
+
+          fl.forEach(f => {
+            addFlightResult({
+              type: t.type,
+              originCode: t.o,
+              originCity: oInfo.city,
+              originCountry: oInfo.country,
+              originAirport: oInfo.airport,
+              destCode: t.d,
+              destCity: dInfo.city,
+              destCountry: dInfo.country,
+              destAirport: dInfo.airport,
+              date: t.dt,
+              departure: f.departure || f.departureTime || '',
+              arrival: f.arrival || f.arrivalTime || '',
+              flightNumber: f.flightCode || f.flightNumber || '',
+              bookingUrl: bookingUrl(t.o, t.d, t.dt)
+            });
+          });
+
+          done++;
+          if (fl.length > 0) L(`  ${t.o} → ${t.d} (${t.type}): ${fl.length} flights`);
+        }
+
+        if (done % 30 === 0 && i < tasks.length - 1) {
+          showStatus('Brief pause...');
+          await sleep(10000);
+        }
+      } catch (e) {
+        done++;
+        LW(`Error: ${e.message}`);
+      }
+    }
+
+    setProgress(100);
+    LS(`Done! Found ${searchResults.length} flights`);
+    showStatus(`Found ${searchResults.length} flights`);
+
+    if (searchResults.length > 0) {
+      showMsg('s', `Found ${searchResults.length} flights!`);
+    } else {
+      showMsg('w', 'No flights found. Check the debug log for details.');
+    }
+
+    renderResults();
+
+  } catch (e) {
+    LE(`Failed: ${e.message}`);
+    showMsg('e', e.message);
+    renderResults(); // Show whatever we have
+  } finally {
+    searching = false;
+    paused = false;
+    $('bSearch').disabled = false;
+    $('bPause').classList.add('hd-n');
+    $('bResume').classList.add('hd-n');
+    $('bStop').classList.add('hd-n');
+  }
+}
+
 // Export results
 function exportResults() {
   if (!searchResults.length) {
@@ -1106,6 +1241,12 @@ function init() {
     $('loginCard').style.opacity = '.5';
   }
 
+  // Load saved credentials
+  loadCredentials();
+
+  // Load priority cities
+  $('priorityCities').value = localStorage.getItem('wz_priority_cities') || 'TLV';
+
   // Set default date to today
   $('filterDate').value = formatDate(new Date());
   $('filterDate').min = formatDate(new Date());
@@ -1166,9 +1307,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Search
+  // Search controls
   $('bSearch').onclick = searchFlights;
-  $('bStop').onclick = () => { stopped = true; };
+  $('bPause').onclick = () => {
+    paused = true;
+    $('bPause').classList.add('hd-n');
+    $('bResume').classList.remove('hd-n');
+    L('Search paused');
+  };
+  $('bResume').onclick = () => {
+    paused = false;
+    $('bResume').classList.add('hd-n');
+    $('bPause').classList.remove('hd-n');
+    L('Search resumed');
+  };
+  $('bStop').onclick = () => {
+    stopped = true;
+    paused = false;
+  };
 
   // Results
   $('bExportResults').onclick = exportResults;
@@ -1190,6 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('bSettings').onclick = () => $('mSettings').classList.add('op');
   $('bCloseSettings').onclick = () => $('mSettings').classList.remove('op');
   $('mSettings').onclick = e => { if (e.target === $('mSettings')) $('mSettings').classList.remove('op'); };
+
   $('bSaveSettingsProxy').onclick = () => {
     const u = $('settingsProxy').value.trim();
     if (u) {
@@ -1198,6 +1355,18 @@ document.addEventListener('DOMContentLoaded', () => {
       $('proxySetup').classList.add('hd-n');
       $('loginCard').style.opacity = '1';
     }
+  };
+
+  $('bSavePriority').onclick = () => {
+    const val = $('priorityCities').value.trim().toUpperCase();
+    localStorage.setItem('wz_priority_cities', val);
+    populateCityDropdowns(); // Refresh dropdowns with new priority
+    LS('Priority cities saved');
+  };
+
+  $('bClearCredentials').onclick = () => {
+    clearCredentials();
+    showMsg('s', 'Credentials cleared');
   };
 
   // Log modal
