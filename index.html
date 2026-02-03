@@ -328,7 +328,16 @@ td{color:var(--tx)}
 //  With verbose logging for troubleshooting
 // ══════════════════════════════════════════════════════
 
-const VERSION = '4.5.0';
+const VERSION = '4.7.0';
+
+// UUID v4 generator for availability API
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 // Airport Database
 const AIRPORTS = {
@@ -1337,7 +1346,15 @@ async function searchFlights() {
 
         LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
 
-        const r = await px('https://multipass.wizzair.com/en/w6/subscriptions/json/flight-search', {
+        // Generate unique session ID for this search
+        const searchUUID = generateUUID();
+        LV(`Generated search UUID: ${searchUUID}`);
+
+        // Step 1: Create availability session
+        const sessionUrl = `https://multipass.wizzair.com/en/w6/subscriptions/availability/${searchUUID}`;
+        LV(`Creating availability session: ${sessionUrl}`);
+
+        const sessionResult = await px(sessionUrl, {
           method: 'POST',
           contentType: 'application/json',
           body: JSON.stringify({
@@ -1348,6 +1365,22 @@ async function searchFlights() {
             arrival: '',
             intervalSubtype: null
           })
+        });
+
+        if (sessionResult.status !== 200) {
+          LW(`Session creation failed with status ${sessionResult.status}`);
+          errorCount++;
+          continue;
+        }
+
+        LV(`Session created successfully, fetching availability data...`);
+        await sleep(100); // Small delay before fetching data
+
+        // Step 2: Fetch availability JSON data
+        const r = await px(`https://multipass.wizzair.com/en/w6/subscriptions/json/availability/${searchUUID}`, {
+          method: 'POST',
+          contentType: 'application/json',
+          body: JSON.stringify({})
         });
 
         if (r.status === 429) {
