@@ -270,9 +270,9 @@ td{color:var(--tx)}
 
 <!-- LLM Flight Search Prompt Generator -->
 <div class="cd" id="llmCard">
-  <div class="cd-t">🤖 LLM Flight Search</div>
+  <div class="cd-t">🤖 LLM Flight & Hostel Search</div>
   <p style="font-size:.75rem;color:var(--tx2);margin-bottom:10px">
-    Generate a prompt for ChatGPT, Perplexity or any LLM with flight search to find connecting one-way flights from your Wizz search results to a final destination.
+    Generate prompts for ChatGPT, Gemini, Claude or any LLM to search for connecting flights (and hostels for round trips) based on your Wizz search results.
   </p>
 
   <div id="llmSearchInfo" style="font-size:.75rem;color:var(--tx3);margin-bottom:10px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);display:none">
@@ -314,12 +314,23 @@ td{color:var(--tx)}
   </div>
 
   <div class="rw" style="margin-top:14px;gap:8px">
-    <button class="bt bt-p" id="bGenPrompt">🤖 Generate Prompt</button>
-    <button class="bt bt-g hd-n" id="bCopyPrompt">📋 Copy Prompt</button>
+    <button class="bt bt-p" id="bGenPrompt">🤖 Generate Prompts</button>
   </div>
 
-  <div id="llmPromptArea" class="hd-n" style="margin-top:12px">
-    <textarea class="ip" id="llmPromptText" readonly rows="12" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical"></textarea>
+  <div id="llmFlightPromptArea" class="hd-n" style="margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:.78rem;font-weight:700;color:var(--acc)">✈️ Flight Search Prompt</span>
+      <button class="bt bt-g" id="bCopyFlightPrompt" style="font-size:.7rem;padding:4px 10px">📋 Copy</button>
+    </div>
+    <textarea class="ip" id="llmFlightPromptText" readonly rows="12" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical"></textarea>
+  </div>
+
+  <div id="llmHostelPromptArea" class="hd-n" style="margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:.78rem;font-weight:700;color:#e8a040">🏨 Hostel Search Prompt</span>
+      <button class="bt bt-g" id="bCopyHostelPrompt" style="font-size:.7rem;padding:4px 10px">📋 Copy</button>
+    </div>
+    <textarea class="ip" id="llmHostelPromptText" readonly rows="12" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical"></textarea>
   </div>
 </div>
 
@@ -1910,19 +1921,57 @@ async function searchFlights() {
 
 // LLM Flight Search Prompt Generator
 function getLLMSearchData() {
-  // Extract unique destination cities and dates from outbound search results
-  const destCities = new Map(); // city -> Set of codes
+  const hasRoundTrip = searchResults.some(r => r.type === 'return');
+  const outboundFlights = searchResults.filter(r => r.type === 'outbound');
+  const returnFlights = searchResults.filter(r => r.type === 'return');
+
+  // Build rich destination info from outbound flights
+  const destInfo = new Map(); // destCode -> {code, city, country, airport, outDates, returnDates}
+  const destCities = new Map(); // city -> Set of codes (for display)
   const dates = new Set();
-  searchResults.forEach(r => {
-    if (r.type === 'outbound') {
-      if (!destCities.has(r.destCity)) destCities.set(r.destCity, new Set());
-      destCities.get(r.destCity).add(r.destCode);
-      dates.add(r.date);
+
+  outboundFlights.forEach(r => {
+    if (!destInfo.has(r.destCode)) {
+      destInfo.set(r.destCode, {
+        code: r.destCode, city: r.destCity,
+        country: r.destCountry, airport: r.destAirport,
+        outDates: new Set(), returnDates: new Set()
+      });
+    }
+    destInfo.get(r.destCode).outDates.add(r.date);
+    if (!destCities.has(r.destCity)) destCities.set(r.destCity, new Set());
+    destCities.get(r.destCity).add(r.destCode);
+    dates.add(r.date);
+  });
+
+  // Add return dates (return flights: originCode = the Wizz destination)
+  returnFlights.forEach(r => {
+    if (destInfo.has(r.originCode)) {
+      destInfo.get(r.originCode).returnDates.add(r.date);
     }
   });
+
+  // Compute trip durations per destination for hostel night calculation
+  const tripDurations = new Map();
+  if (hasRoundTrip) {
+    destInfo.forEach((info, code) => {
+      if (info.outDates.size > 0 && info.returnDates.size > 0) {
+        const earliestOut = [...info.outDates].sort()[0];
+        const latestRet = [...info.returnDates].sort().pop();
+        const nights = Math.round((new Date(latestRet) - new Date(earliestOut)) / 86400000);
+        if (nights > 0) {
+          tripDurations.set(code, {
+            nights, checkIn: earliestOut, checkOut: latestRet,
+            city: info.city, country: info.country
+          });
+        }
+      }
+    });
+  }
+
   const origins = [...destCities.entries()].map(([city, codes]) => `${city} (${[...codes].join('/')})`);
   const sortedDates = [...dates].sort();
-  return { origins, dates: sortedDates, destCities };
+  return { origins, dates: sortedDates, destCities, hasRoundTrip, destInfo, tripDurations };
 }
 
 function updateLLMSearchInfo() {
@@ -1938,7 +1987,17 @@ function updateLLMSearchInfo() {
     return;
   }
   const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
-  infoDiv.innerHTML = `<strong>✈️ From search results:</strong> ${data.origins.length} destination${data.origins.length > 1 ? 's' : ''}: ${data.origins.join(', ')}<br><strong>📅 Dates:</strong> ${datesFormatted}<br><strong>🔄 Trip type:</strong> One-way`;
+  const tripType = data.hasRoundTrip ? 'Round trip' : 'One-way';
+  let html = `<strong>✈️ From search results:</strong> ${data.origins.length} destination${data.origins.length > 1 ? 's' : ''}: ${data.origins.join(', ')}<br>`;
+  html += `<strong>📅 Dates:</strong> ${datesFormatted}<br>`;
+  html += `<strong>🔄 Trip type:</strong> ${tripType}`;
+  if (data.hasRoundTrip && data.tripDurations.size > 0) {
+    const durStr = [...data.tripDurations.values()]
+      .map(d => `${d.city}: ${d.nights} night${d.nights !== 1 ? 's' : ''} (${formatDateDMY(d.checkIn)} → ${formatDateDMY(d.checkOut)})`)
+      .join(', ');
+    html += `<br><strong>🏨 Trip duration:</strong> ${durStr}`;
+  }
+  infoDiv.innerHTML = html;
   infoDiv.style.display = 'block';
 }
 
@@ -1957,48 +2016,114 @@ function generateLLMPrompt() {
   if ($('llmMinLayover').checked) prefs.push('minimum layover time');
   if ($('llmMinTrip').checked) prefs.push('minimum total trip time');
   if ($('llmMinPrice').checked) prefs.push('lowest price');
-
-  const originsList = data.origins.join(', ');
-  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
   const prefsText = prefs.length ? prefs.join(', ') : 'best overall value';
 
-  const prompt = `Search for one-way flights to ${endDest} on ${datesFormatted} departing from each of these cities: ${originsList}.
+  // Build detailed origin list with full airport info
+  const originDetails = [...data.destInfo.values()].map(d =>
+    `${d.city}, ${d.country} - ${d.airport} (${d.code})`
+  );
+  const originsList = originDetails.join('\n  - ');
+  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
 
-For each origin city, find the best connecting flights to ${endDest} with the goal of finding options with ${prefsText}.
+  const prompt = `Search for one-way flights to ${endDest} on the following dates: ${datesFormatted}.
 
-Present ALL results in a single HTML table with these columns:
-- Origin City (the departure city)
-- Route (e.g. "Rome FCO → Istanbul → ${endDest}")
-- Airlines
-- Departure Date
-- Departure Time (from origin, local time)
-- Arrival Time (at ${endDest}, local time)
-- Total Trip Time
-- Number of Stops
-- Layover Time (total wait between connections)
-- Approximate Price (USD)
+Departing from each of these cities (intermediate cities I fly Wizz Air to first):
+  - ${originsList}
 
-Sort the table by Total Trip Time ascending by default.
+For each origin city, find the best connecting flights to ${endDest} optimizing for: ${prefsText}.
 
-Make the table interactive with:
-- Sortable columns (click header to sort ascending/descending)
-- Filter input below each column header to filter rows
-- Highlight the best overall option row in green
+Present ALL results as a beautiful, interactive HTML mini-app that I can browse on my mobile phone. The app should include:
+- A sortable & filterable table
+- Click any column header to sort ascending/descending
+- A search/filter input to narrow down results
+- Clean, mobile-friendly design with readable fonts
+
+Table columns MUST include:
+1. Origin (Country, City, Airport Name & Code - e.g. "Italy, Rome - Fiumicino (FCO)")
+2. Destination (Country, City, Airport Name & Code)
+3. Departure (HH:MM DD/MM/YYYY format, local time)
+4. Arrival (HH:MM DD/MM/YYYY format, local time)
+5. Route (full route with connections, e.g. "FCO > IST > BKK")
+6. Airlines (all carriers in the journey)
+7. Total Trip Time (e.g. "14h 30m")
+8. Stops (number)
+9. Layover (total wait between connections, e.g. "2h 15m")
+10. Price (approximate, USD)
+11. Book (clickable link to Google Flights or airline website for that specific route & date)
+
+Sort by Total Trip Time ascending by default.
+Highlight the best overall option row in green.
 
 Important guidelines:
 - Search for ACTUAL available flights on ${datesFormatted}
 - Include budget airlines (Ryanair, EasyJet, AirAsia, etc.) and full-service carriers
 - Show at least 3 options per origin city if available
 - For layovers, prefer connections under 4 hours when possible
-- Include the full route with all connection cities`;
+- Include the full route with all connection cities
+- Each "Book" link should open Google Flights or the airline's booking page for that specific route and date`;
 
-  $('llmPromptText').value = prompt;
-  $('llmPromptArea').classList.remove('hd-n');
-  $('bCopyPrompt').classList.remove('hd-n');
-  showMsg('s', 'Prompt generated! Click Copy to copy it to clipboard.');
+  $('llmFlightPromptText').value = prompt;
+  $('llmFlightPromptArea').classList.remove('hd-n');
+
+  // Generate hostel prompt if round trip
+  if (data.hasRoundTrip && data.tripDurations.size > 0) {
+    generateHostelPrompt(data, endDest);
+    $('llmHostelPromptArea').classList.remove('hd-n');
+  } else {
+    $('llmHostelPromptArea').classList.add('hd-n');
+  }
+
+  showMsg('s', data.hasRoundTrip ? 'Flight & hostel prompts generated! Copy each to your LLM app.' : 'Flight prompt generated! Click Copy to copy it to clipboard.');
 }
 
-// autoPopulateLLMOrigins replaced by updateLLMSearchInfo() above
+function generateHostelPrompt(data, endDest) {
+  const destinations = [...data.tripDurations.values()];
+  const destSummary = destinations.map(d =>
+    `${d.city}, ${d.country}: depart ${formatDateDMY(d.checkIn)}, return ${formatDateDMY(d.checkOut)} (${d.nights} night${d.nights !== 1 ? 's' : ''})`
+  ).join('\n  - ');
+
+  // Use the max trip duration for the hostel stay at the final destination
+  const maxNights = Math.max(...destinations.map(d => d.nights));
+  const earliestCheckIn = destinations.map(d => d.checkIn).sort()[0];
+  const latestCheckOut = destinations.map(d => d.checkOut).sort().pop();
+
+  const prompt = `Search for hostels/budget accommodation on Booking.com in ${endDest}.
+
+My trip details (flying via Wizz Air through these intermediate cities):
+  - ${destSummary}
+
+I need accommodation in ${endDest}. Determine the appropriate check-in and check-out dates based on when I'll arrive at and depart from ${endDest} (accounting for connecting flight times from the intermediate cities). Estimated stay: approximately ${maxNights} nights (between ${formatDateDMY(earliestCheckIn)} and ${formatDateDMY(latestCheckOut)}).
+
+Search Criteria:
+- BEST VALUE FOR MONEY (not necessarily cheapest - best quality/price ratio)
+- Location: City Center or the trendy/hipster neighborhood (every city has one - like Kreuzberg/Friedrichshain in Berlin, Le Marais in Paris, Shimokitazawa in Tokyo, Khao San Road area in Bangkok, Trastevere in Rome, etc.)
+- Room type: PRIVATE ROOM only (shared bathroom is OK)
+- No breakfast needed
+- Minimum rating: 8.0/10 and above on Booking.com
+- Sort by: Best reviewed + lowest price combination
+
+Present the results as a beautiful, interactive HTML mini-app for my mobile phone with:
+
+For EACH hostel/accommodation, show:
+1. Name of the place
+2. Photos (include actual image URLs from Booking.com listings)
+3. Full address
+4. Neighborhood (1-line description - what's the vibe of this area?)
+5. Rating (out of 10) and number of reviews
+6. Price per night (USD) and total price for the full stay
+7. Room type details (private room, shared/private bathroom, bed type)
+8. Key amenities (WiFi, kitchen, locker, AC, laundry, common area, etc.)
+9. Distance to city center / main attractions
+10. Direct Booking.com link (with check-in/check-out dates pre-filled in the URL)
+
+Show at least 5 options, sorted by value score (rating x affordability).
+Highlight the best overall pick in green.
+Make it filterable by price range and rating.
+
+Important: Use ACTUAL Booking.com availability and pricing for my specific dates. Each booking link should go directly to the property page with my dates pre-selected.`;
+
+  $('llmHostelPromptText').value = prompt;
+}
 
 // Export/Import
 function exportResults() {
@@ -2175,13 +2300,19 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSort = { field: null, asc: true };
     $('resultsArea').innerHTML = '<div class="mg mg-i">No results yet.</div>';
     $('resultsCount').textContent = '0 flights';
+    $('llmFlightPromptArea').classList.add('hd-n');
+    $('llmHostelPromptArea').classList.add('hd-n');
   };
 
   // LLM Flight Search handlers
   $('bGenPrompt').onclick = generateLLMPrompt;
-  $('bCopyPrompt').onclick = () => {
-    navigator.clipboard.writeText($('llmPromptText').value);
-    showMsg('s', 'Prompt copied to clipboard!');
+  $('bCopyFlightPrompt').onclick = () => {
+    navigator.clipboard.writeText($('llmFlightPromptText').value);
+    showMsg('s', 'Flight prompt copied to clipboard!');
+  };
+  $('bCopyHostelPrompt').onclick = () => {
+    navigator.clipboard.writeText($('llmHostelPromptText').value);
+    showMsg('s', 'Hostel prompt copied to clipboard!');
   };
   $('llmDestPreset').addEventListener('change', () => {
     if ($('llmDestPreset').value) $('llmDestCustom').value = '';
