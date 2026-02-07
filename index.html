@@ -913,14 +913,13 @@ function renderGroupedResults(area, flights) {
 
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
-  const filtered = filterTooSoonFlights(flights);
   let html = '<div class="tbl-wrap"><table><thead><tr>';
   html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th>';
   html += '</tr></thead><tbody>';
 
-  filtered.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
+  flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
 
-  filtered.forEach(f => {
+  flights.forEach(f => {
     html += `<tr>`;
     html += `<td class="mono">${formatDateDMY(f.date)}</td>`;
     html += `<td>${f.originAirport} (${f.originCode})</td>`;
