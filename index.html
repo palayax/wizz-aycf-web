@@ -237,7 +237,7 @@ td{color:var(--tx)}
       <option value="no">No</option>
       <option value="yes">Yes</option>
     </select>
-    <span style="font-size:.72rem;color:var(--tx3)">(Returns 2-4 days after each outbound)</span>
+    <span style="font-size:.72rem;color:var(--tx3)">(Returns 3-4 days from today)</span>
   </div>
 
   <div class="rw" style="margin-top:14px">
@@ -581,6 +581,24 @@ function groupByDestination(results) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Wake Lock - prevent screen from turning off during search (mobile)
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { L('🔓 Wake lock released'); });
+      L('🔒 Wake lock acquired - screen will stay on');
+    }
+  } catch (e) { LW('Wake lock not available: ' + e.message); }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+
 function getProxy() { return localStorage.getItem('wz_proxy') || ''; }
 function getPriorityCities() {
   const saved = localStorage.getItem('wz_priority_cities') || 'TLV';
@@ -1100,6 +1118,7 @@ async function searchFlights() {
   if (!selectedOrigins.length) { showMsg('e', 'Select at least one origin city.'); return; }
 
   searching = true;
+  await requestWakeLock();
   paused = false;
   stopped = false;
   cookieJar = '';
@@ -1479,6 +1498,7 @@ async function searchFlights() {
 
     showStatus(`Searching ${tasks.length} outbound routes...`);
 
+    const todayStr = formatDate(new Date());
     let rateLimitCount = 0;
     let successCount = 0;
     let errorCount = 0;
@@ -1585,7 +1605,7 @@ async function searchFlights() {
                     foundOutboundFlights.set(t.d, new Set());
                   }
                   foundOutboundFlights.get(t.d).add(t.dt);
-                  L(`  📝 Queued return search: ${t.d} → origin on ${addDays(t.dt, 3)} and ${addDays(t.dt, 4)}`);
+                  L(`  📝 Queued return search: ${t.d} → origin on ${addDays(todayStr, 3)} and ${addDays(todayStr, 4)}`);
                 }
 
                 fl.forEach(f => {
@@ -1654,36 +1674,33 @@ async function searchFlights() {
     }
 
     // ═══════════════════════════════════════════════════
-    // STEP 5: Search Return Flights (3 & 4 days after each found outbound)
+    // STEP 5: Search Return Flights (3 & 4 days from today)
     // ═══════════════════════════════════════════════════
     if (isRoundTrip && foundOutboundFlights.size > 0 && !stopped) {
       L('');
       L('═══ STEP 5: SEARCH RETURN FLIGHTS ═══');
       L(`Found outbound flights to ${foundOutboundFlights.size} destinations`);
 
-      // Build return tasks: for each destination and each outbound date, search +3 and +4 days
+      // Build return tasks: for each destination with outbound flights, search 3 and 4 days from today
       const returnTasks = [];
+      const returnDates = [3, 4].map(d => addDays(todayStr, d));
 
       foundOutboundFlights.forEach((outboundDates, returnOrigin) => {
         L(`  ${returnOrigin}: outbound dates ${[...outboundDates].join(', ')}`);
 
-        outboundDates.forEach(outboundDate => {
-          // Search returns 2, 3, and 4 days after each outbound date
-          [2, 3, 4].forEach(daysAfter => {
-            const returnDate = addDays(outboundDate, daysAfter);
-            selectedOrigins.forEach(returnDest => {
-              const k = `${returnOrigin}|${returnDest}|${returnDate}|return`;
-              if (!seen.has(k)) {
-                seen.add(k);
-                returnTasks.push({
-                  o: returnOrigin,
-                  d: returnDest,
-                  dt: returnDate,
-                  type: 'return',
-                  linkedOutboundDate: outboundDate  // Track which outbound this is for
-                });
-              }
-            });
+        returnDates.forEach(returnDate => {
+          selectedOrigins.forEach(returnDest => {
+            const k = `${returnOrigin}|${returnDest}|${returnDate}|return`;
+            if (!seen.has(k)) {
+              seen.add(k);
+              returnTasks.push({
+                o: returnOrigin,
+                d: returnDest,
+                dt: returnDate,
+                type: 'return',
+                linkedOutboundDate: [...outboundDates][0]
+              });
+            }
           });
         });
       });
@@ -1821,6 +1838,7 @@ async function searchFlights() {
     renderResults();
   } finally {
     searching = false;
+    releaseWakeLock();
     paused = false;
     $('bSearch').disabled = false;
     $('bPause').classList.add('hd-n');
@@ -2040,6 +2058,13 @@ document.addEventListener('DOMContentLoaded', () => {
     $('logArea').innerHTML = 'Log cleared.';
     $('lCnt').textContent = '(0)';
   };
+
+  // Re-acquire wake lock when tab becomes visible (some browsers release it on hide)
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && searching) {
+      await requestWakeLock();
+    }
+  });
 
   init();
 });
