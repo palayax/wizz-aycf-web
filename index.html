@@ -272,8 +272,11 @@ td{color:var(--tx)}
 <div class="cd" id="llmCard">
   <div class="cd-t">🤖 LLM Flight Search</div>
   <p style="font-size:.75rem;color:var(--tx2);margin-bottom:10px">
-    Generate a prompt for ChatGPT, Perplexity or any LLM with flight search to find connecting flights from Wizz destinations to your final destination.
+    Generate a prompt for ChatGPT, Perplexity or any LLM with flight search to find connecting one-way flights from your Wizz search results to a final destination.
   </p>
+
+  <div id="llmSearchInfo" style="font-size:.75rem;color:var(--tx3);margin-bottom:10px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);display:none">
+  </div>
 
   <div class="filter-row">
     <label>End Destination:</label>
@@ -299,28 +302,6 @@ td{color:var(--tx)}
       </select>
       <input class="ip" id="llmDestCustom" placeholder="Or type any city, country (e.g. Bali, Indonesia)">
     </div>
-  </div>
-
-  <div class="filter-row">
-    <label>Travel Date:</label>
-    <input type="date" class="ip" id="llmDate" style="max-width:200px">
-  </div>
-
-  <div class="filter-row">
-    <label>Fly From (Wizz):</label>
-    <div style="flex:1">
-      <select class="ip" id="llmOrigins" multiple size="3"></select>
-      <div class="chips" id="llmOriginChips"></div>
-      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Select Wizz destinations to search connecting flights from. Hold Ctrl/Cmd for multiple.</div>
-    </div>
-  </div>
-
-  <div class="filter-row">
-    <label>Trip Type:</label>
-    <select class="ip" id="llmTripType" style="max-width:180px">
-      <option value="one-way">One Way</option>
-      <option value="round-trip">Round Trip</option>
-    </select>
   </div>
 
   <div class="filter-row">
@@ -776,15 +757,6 @@ function populateCityDropdowns() {
     `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
   ).join('');
   updateChips('filterDest', 'destChips');
-
-  // Populate LLM origins dropdown with the same cities
-  const llmSel = $('llmOrigins');
-  if (llmSel) {
-    llmSel.innerHTML = sortedCities.map(([city, codes]) =>
-      `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
-    ).join('');
-    updateChips('llmOrigins', 'llmOriginChips');
-  }
 }
 
 // Proxy fetch with verbose logging
@@ -1913,7 +1885,7 @@ async function searchFlights() {
     showMsg(searchResults.length > 0 ? 's' : 'w',
       searchResults.length > 0 ? `Found ${searchResults.length} flights!` : 'No flights found. Check debug log for details.');
     renderResults();
-    autoPopulateLLMOrigins();
+    updateLLMSearchInfo();
 
   } catch (e) {
     LE(`SEARCH FAILED: ${e.message}`);
@@ -1937,30 +1909,60 @@ async function searchFlights() {
 }
 
 // LLM Flight Search Prompt Generator
+function getLLMSearchData() {
+  // Extract unique destination cities and dates from outbound search results
+  const destCities = new Map(); // city -> Set of codes
+  const dates = new Set();
+  searchResults.forEach(r => {
+    if (r.type === 'outbound') {
+      if (!destCities.has(r.destCity)) destCities.set(r.destCity, new Set());
+      destCities.get(r.destCity).add(r.destCode);
+      dates.add(r.date);
+    }
+  });
+  const origins = [...destCities.entries()].map(([city, codes]) => `${city} (${[...codes].join('/')})`);
+  const sortedDates = [...dates].sort();
+  return { origins, dates: sortedDates, destCities };
+}
+
+function updateLLMSearchInfo() {
+  const infoDiv = $('llmSearchInfo');
+  if (!infoDiv) return;
+  if (!searchResults.length) {
+    infoDiv.style.display = 'none';
+    return;
+  }
+  const data = getLLMSearchData();
+  if (!data.origins.length) {
+    infoDiv.style.display = 'none';
+    return;
+  }
+  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
+  infoDiv.innerHTML = `<strong>✈️ From search results:</strong> ${data.origins.length} destination${data.origins.length > 1 ? 's' : ''}: ${data.origins.join(', ')}<br><strong>📅 Dates:</strong> ${datesFormatted}<br><strong>🔄 Trip type:</strong> One-way`;
+  infoDiv.style.display = 'block';
+}
+
 function generateLLMPrompt() {
   const preset = $('llmDestPreset').value;
   const custom = $('llmDestCustom').value.trim();
   const endDest = custom || preset;
   if (!endDest) { showMsg('e', 'Select or type an end destination.'); return; }
 
-  const date = $('llmDate').value;
-  if (!date) { showMsg('e', 'Select a travel date.'); return; }
+  if (!searchResults.length) { showMsg('e', 'Run a flight search first to populate origins and dates.'); return; }
 
-  const origins = Array.from($('llmOrigins').selectedOptions).map(o => o.text);
-  if (!origins.length) { showMsg('e', 'Select at least one Wizz origin city.'); return; }
+  const data = getLLMSearchData();
+  if (!data.origins.length) { showMsg('e', 'No outbound flights found in search results.'); return; }
 
-  const tripType = $('llmTripType').value;
   const prefs = [];
   if ($('llmMinLayover').checked) prefs.push('minimum layover time');
   if ($('llmMinTrip').checked) prefs.push('minimum total trip time');
   if ($('llmMinPrice').checked) prefs.push('lowest price');
 
-  const dateFormatted = formatDateDMY(date);
-  const originsList = origins.join(', ');
+  const originsList = data.origins.join(', ');
+  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
   const prefsText = prefs.length ? prefs.join(', ') : 'best overall value';
-  const tripTypeText = tripType === 'round-trip' ? 'round trip' : 'one-way';
 
-  const prompt = `Search for ${tripTypeText} flights to ${endDest} on ${dateFormatted} departing from each of these cities: ${originsList}.
+  const prompt = `Search for one-way flights to ${endDest} on ${datesFormatted} departing from each of these cities: ${originsList}.
 
 For each origin city, find the best connecting flights to ${endDest} with the goal of finding options with ${prefsText}.
 
@@ -1968,6 +1970,7 @@ Present ALL results in a single HTML table with these columns:
 - Origin City (the departure city)
 - Route (e.g. "Rome FCO → Istanbul → ${endDest}")
 - Airlines
+- Departure Date
 - Departure Time (from origin, local time)
 - Arrival Time (at ${endDest}, local time)
 - Total Trip Time
@@ -1983,7 +1986,7 @@ Make the table interactive with:
 - Highlight the best overall option row in green
 
 Important guidelines:
-- Search for ACTUAL available flights on ${dateFormatted}
+- Search for ACTUAL available flights on ${datesFormatted}
 - Include budget airlines (Ryanair, EasyJet, AirAsia, etc.) and full-service carriers
 - Show at least 3 options per origin city if available
 - For layovers, prefer connections under 4 hours when possible
@@ -1995,23 +1998,7 @@ Important guidelines:
   showMsg('s', 'Prompt generated! Click Copy to copy it to clipboard.');
 }
 
-function autoPopulateLLMOrigins() {
-  if (!searchResults.length) return;
-  const destCities = new Set();
-  searchResults.forEach(r => {
-    if (r.type === 'outbound') {
-      destCities.add(r.destCity);
-    }
-  });
-  if (!destCities.size) return;
-
-  const sel = $('llmOrigins');
-  Array.from(sel.options).forEach(o => {
-    const cityName = o.text.split(' (')[0];
-    o.selected = destCities.has(cityName);
-  });
-  updateChips('llmOrigins', 'llmOriginChips');
-}
+// autoPopulateLLMOrigins replaced by updateLLMSearchInfo() above
 
 // Export/Import
 function exportResults() {
@@ -2196,18 +2183,12 @@ document.addEventListener('DOMContentLoaded', () => {
     navigator.clipboard.writeText($('llmPromptText').value);
     showMsg('s', 'Prompt copied to clipboard!');
   };
-  $('llmOrigins').addEventListener('change', () => updateChips('llmOrigins', 'llmOriginChips'));
   $('llmDestPreset').addEventListener('change', () => {
     if ($('llmDestPreset').value) $('llmDestCustom').value = '';
   });
   $('llmDestCustom').addEventListener('input', () => {
     if ($('llmDestCustom').value.trim()) $('llmDestPreset').value = '';
   });
-  // Sync LLM date with search filter date
-  $('filterDate').addEventListener('change', () => {
-    $('llmDate').value = $('filterDate').value;
-  });
-
   $('bSettings').onclick = () => $('mSettings').classList.add('op');
   $('bCloseSettings').onclick = () => $('mSettings').classList.remove('op');
   $('mSettings').onclick = e => { if (e.target === $('mSettings')) $('mSettings').classList.remove('op'); };
