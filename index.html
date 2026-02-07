@@ -839,23 +839,20 @@ function showStatus(m) { $('dlStatus').textContent = m; }
 // Render results - supports both flat and grouped (round trip) display
 function renderResults() {
   const area = $('resultsArea');
+  $('resultsCount').textContent = `${searchResults.length} flights`;
 
-  // Apply 3-hour filter for today's flights (display only, keeps all data in searchResults)
-  const displayResults = filterTooSoonFlights(searchResults);
-  $('resultsCount').textContent = `${displayResults.length} flights`;
-
-  if (!displayResults.length) {
+  if (!searchResults.length) {
     area.innerHTML = '<div class="mg mg-w">No flights found yet.</div>';
     return;
   }
 
   // Check if we have round trip results (both outbound and return)
-  const hasRoundTrip = displayResults.some(r => r.type === 'return');
+  const hasRoundTrip = searchResults.some(r => r.type === 'return');
 
   if (hasRoundTrip) {
-    renderGroupedResults(area, displayResults);
+    renderGroupedResults(area, searchResults);
   } else {
-    renderFlatResults(area, displayResults);
+    renderFlatResults(area, filterTooSoonFlights(searchResults));
   }
 }
 
@@ -916,13 +913,14 @@ function renderGroupedResults(area, flights) {
 
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
+  const filtered = filterTooSoonFlights(flights);
   let html = '<div class="tbl-wrap"><table><thead><tr>';
   html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th>';
   html += '</tr></thead><tbody>';
 
-  flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
+  filtered.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
 
-  flights.forEach(f => {
+  filtered.forEach(f => {
     html += `<tr>`;
     html += `<td class="mono">${formatDateDMY(f.date)}</td>`;
     html += `<td>${f.originAirport} (${f.originCode})</td>`;
