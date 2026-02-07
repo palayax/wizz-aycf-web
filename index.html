@@ -850,7 +850,7 @@ function renderResults() {
   const hasRoundTrip = searchResults.some(r => r.type === 'return');
 
   if (hasRoundTrip) {
-    renderGroupedResults(area, searchResults);
+    renderGroupedResults(area, filterTooSoonFlights(searchResults));
   } else {
     renderFlatResults(area, filterTooSoonFlights(searchResults));
   }
@@ -1047,6 +1047,18 @@ function filterTooSoonFlights(flights) {
   });
 }
 
+// Get cutoff info for today's date filtering
+function getTodayCutoffInfo(dateStr) {
+  const today = formatDate(new Date());
+  if (dateStr !== today) return { isToday: false };
+  const now = new Date();
+  const cutoffMinutes = (now.getHours() * 60 + now.getMinutes()) + 180;
+  const cutoffH = Math.floor(Math.min(cutoffMinutes, 1440) / 60);
+  const cutoffM = Math.min(cutoffMinutes, 1440) % 60;
+  const cutoffTimeStr = String(cutoffH).padStart(2, '0') + ':' + String(cutoffM).padStart(2, '0');
+  return { isToday: true, cutoffMinutes, cutoffTimeStr };
+}
+
 // Main search function
 async function searchFlights() {
   if (searching) return;
@@ -1094,6 +1106,7 @@ async function searchFlights() {
   xsrfToken = '';
   searchResults = [];
   foundOutboundFlights = new Map();  // Reset: destination -> Set of dates
+  let filteredTodayRoutes = [];  // Track routes where all flights were too soon
   verboseMode = $('verboseLog').checked;
 
   $('bSearch').disabled = true;
@@ -1545,42 +1558,65 @@ async function searchFlights() {
             }
 
             if (fl && fl.length > 0) {
-              successCount++;
-              L(`✈️ ${t.o} → ${t.d} on ${t.dt}: ${fl.length} flights found`);
+              // Apply 3-hour cutoff filter for today's flights
+              const cutoffInfo = getTodayCutoffInfo(t.dt);
+              const originalCount = fl.length;
 
-              // Track this destination+date for round trip return search
-              if (isRoundTrip) {
-                if (!foundOutboundFlights.has(t.d)) {
-                  foundOutboundFlights.set(t.d, new Set());
+              if (cutoffInfo.isToday) {
+                fl = fl.filter(f => {
+                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
+                  const depFormatted = formatTime(depTime);
+                  if (!depTime || depFormatted === '--:--') return true;
+                  const [dh, dm] = depFormatted.split(':').map(Number);
+                  return (dh * 60 + dm) >= cutoffInfo.cutoffMinutes;
+                });
+                if (fl.length < originalCount) {
+                  L(`  ⏰ Filtered ${originalCount - fl.length}/${originalCount} too-soon flights (cutoff ${cutoffInfo.cutoffTimeStr})`);
                 }
-                foundOutboundFlights.get(t.d).add(t.dt);
-                L(`  📝 Queued return search: ${t.d} → origin on ${addDays(t.dt, 3)} and ${addDays(t.dt, 4)}`);
               }
 
-              fl.forEach(f => {
-                const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
-                const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
-                const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
+              if (fl.length > 0) {
+                successCount++;
+                L(`✈️ ${t.o} → ${t.d} on ${t.dt}: ${fl.length} flights found`);
 
-                LV(`  Flight: dep=${depTime}, arr=${arrTime}, code=${flightNum}`);
+                // Track this destination+date for round trip return search
+                if (isRoundTrip) {
+                  if (!foundOutboundFlights.has(t.d)) {
+                    foundOutboundFlights.set(t.d, new Set());
+                  }
+                  foundOutboundFlights.get(t.d).add(t.dt);
+                  L(`  📝 Queued return search: ${t.d} → origin on ${addDays(t.dt, 3)} and ${addDays(t.dt, 4)}`);
+                }
 
-                addFlightResult({
-                  type: 'outbound',
-                  originCode: t.o,
-                  originCity: oInfo.city,
-                  originCountry: oInfo.country,
-                  originAirport: oInfo.airport,
-                  destCode: t.d,
-                  destCity: dInfo.city,
-                  destCountry: dInfo.country,
-                  destAirport: dInfo.airport,
-                  date: t.dt,
-                  departure: depTime,
-                  arrival: arrTime,
-                  flightNumber: flightNum,
-                  bookingUrl: bookingUrl(t.o, t.d, t.dt)
+                fl.forEach(f => {
+                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
+                  const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
+                  const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
+
+                  LV(`  Flight: dep=${depTime}, arr=${arrTime}, code=${flightNum}`);
+
+                  addFlightResult({
+                    type: 'outbound',
+                    originCode: t.o,
+                    originCity: oInfo.city,
+                    originCountry: oInfo.country,
+                    originAirport: oInfo.airport,
+                    destCode: t.d,
+                    destCity: dInfo.city,
+                    destCountry: dInfo.country,
+                    destAirport: dInfo.airport,
+                    date: t.dt,
+                    departure: depTime,
+                    arrival: arrTime,
+                    flightNumber: flightNum,
+                    bookingUrl: bookingUrl(t.o, t.d, t.dt)
+                  });
                 });
-              });
+              } else {
+                // ALL flights filtered out - too soon to depart
+                L(`  ⏰ All ${originalCount} flights to ${dInfo.city} on ${t.dt} depart before ${cutoffInfo.cutoffTimeStr} - skipped`);
+                filteredTodayRoutes.push({ destCity: dInfo.city, date: t.dt, cutoffTime: cutoffInfo.cutoffTimeStr });
+              }
             } else {
               LV(`No flights found in parsed response for ${t.o}->${t.d}`);
             }
@@ -1602,6 +1638,19 @@ async function searchFlights() {
         errorCount++;
         LE(`Search error for ${t.o}->${t.d}: ${e.message}`);
       }
+    }
+
+    // Show message for routes where all flights were filtered (too soon today)
+    if (filteredTodayRoutes.length > 0) {
+      const uniqueDests = [...new Set(filteredTodayRoutes.map(r => r.destCity))];
+      const cutoffTime = filteredTodayRoutes[0].cutoffTime;
+      const dateStr = formatDateDMY(filteredTodayRoutes[0].date);
+      if (uniqueDests.length <= 3) {
+        showMsg('w', `No flights to ${uniqueDests.join(', ')} on ${dateStr} from ${cutoffTime} Today`);
+      } else {
+        showMsg('w', `No flights to ${uniqueDests.length} destinations on ${dateStr} from ${cutoffTime} Today`);
+      }
+      L(`⏰ ${filteredTodayRoutes.length} route(s) filtered: all flights depart before ${cutoffTime}`);
     }
 
     // ═══════════════════════════════════════════════════
