@@ -588,7 +588,7 @@ function getPriorityCities() {
 }
 
 function bookingUrl(o, d, dt) {
-  return `https://multipass.wizzair.com/en/w6/subscriptions/spa/private-page/flight-search?origin=${o}&destination=${d}&departureDate=${dt}`;
+  return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets`;
 }
 
 // Credentials
@@ -911,7 +911,7 @@ function renderGroupedResults(area) {
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-  html += '<th>Date</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Book</th>';
+  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Book</th>';
   html += '</tr></thead><tbody>';
 
   flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
@@ -919,6 +919,8 @@ function renderFlightTable(flights) {
   flights.forEach(f => {
     html += `<tr>`;
     html += `<td class="mono">${formatDateDMY(f.date)}</td>`;
+    html += `<td>${f.originAirport} (${f.originCode})</td>`;
+    html += `<td>${f.destAirport} (${f.destCode})</td>`;
     html += `<td class="mono">${formatTime(f.departure)}</td>`;
     html += `<td class="mono">${formatTime(f.arrival)}</td>`;
     html += `<td class="mono">${f.flightNumber || '-'}</td>`;
