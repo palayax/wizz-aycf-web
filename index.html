@@ -132,6 +132,13 @@ td{color:var(--tx)}
 .rt-pair-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
 .rt-pair-title{font-weight:700;color:var(--acc);font-size:.9rem}
 .rt-pair-dates{font-size:.75rem;color:var(--tx2)}
+
+/* Weather badges */
+.wx-badge{display:inline-flex;align-items:center;gap:3px;font-size:.72rem;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.wx-hi{color:var(--ylw);font-weight:600}
+.wx-lo{color:var(--acc);font-weight:600}
+.wx-na{color:var(--tx3);font-size:.68rem}
+.wx-group{display:inline-flex;align-items:center;margin-left:12px;padding:3px 8px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.15);border-radius:var(--rs);font-size:.75rem;color:var(--tx2)}
 </style>
 </head>
 <body>
@@ -530,6 +537,11 @@ let searchResults = [];
 let currentSort = { field: null, asc: true };
 let verboseMode = true;
 
+// Weather caches
+const weatherGeoCache = new Map();
+const weatherForecastCache = new Map();
+const WEATHER_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours
+
 // NEW: Track outbound flights with their specific dates for round trip
 // Map: destination -> Map(outboundDate -> [flight objects])
 let foundOutboundFlights = new Map();
@@ -617,6 +629,85 @@ function addDays(dateStr, days) {
   const date = new Date(y, m - 1, d);
   date.setDate(date.getDate() + days);
   return formatDate(date);
+}
+
+// Weather functions (Open-Meteo API - free, no key needed)
+async function getGeoLocation(cityName) {
+  const key = cityName.toLowerCase();
+  if (weatherGeoCache.has(key)) return weatherGeoCache.get(key);
+  try {
+    const resp = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en`);
+    const data = await resp.json();
+    if (data.results && data.results.length > 0) {
+      const loc = { lat: data.results[0].latitude, lon: data.results[0].longitude };
+      weatherGeoCache.set(key, loc);
+      return loc;
+    }
+  } catch (e) { LW('Weather geocoding failed for ' + cityName + ': ' + e.message); }
+  return null;
+}
+
+async function getWeatherForecast(lat, lon) {
+  const key = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+  const cached = weatherForecastCache.get(key);
+  if (cached && (Date.now() - cached.timestamp) < WEATHER_CACHE_TTL) return cached.data;
+  try {
+    const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=16`);
+    const data = await resp.json();
+    if (data.daily) {
+      weatherForecastCache.set(key, { data: data.daily, timestamp: Date.now() });
+      return data.daily;
+    }
+  } catch (e) { LW('Weather forecast failed: ' + e.message); }
+  return null;
+}
+
+async function getWeatherForCity(cityName) {
+  const loc = await getGeoLocation(cityName);
+  if (!loc) return null;
+  return await getWeatherForecast(loc.lat, loc.lon);
+}
+
+function getWeatherForDate(forecast, dateStr) {
+  if (!forecast || !forecast.time) return null;
+  const idx = forecast.time.indexOf(dateStr);
+  if (idx === -1) return null;
+  return { max: Math.round(forecast.temperature_2m_max[idx]), min: Math.round(forecast.temperature_2m_min[idx]) };
+}
+
+function formatWeatherBadge(weather) {
+  if (!weather) return '<span class="wx-badge wx-na">--</span>';
+  return '<span class="wx-badge">🌡️ <span class="wx-hi">' + weather.max + '°</span>/<span class="wx-lo">' + weather.min + '°</span></span>';
+}
+
+async function fetchAndRenderWeather(flights) {
+  const cities = new Set();
+  flights.forEach(f => cities.add(f.destCity));
+  const weatherMap = new Map();
+  await Promise.all([...cities].map(async (city) => {
+    const forecast = await getWeatherForCity(city);
+    if (forecast) weatherMap.set(city, forecast);
+  }));
+  document.querySelectorAll('[data-weather-city]').forEach(el => {
+    const city = el.dataset.weatherCity;
+    const date = el.dataset.weatherDate;
+    const forecast = weatherMap.get(city);
+    const weather = forecast ? getWeatherForDate(forecast, date) : null;
+    el.innerHTML = formatWeatherBadge(weather);
+  });
+  document.querySelectorAll('[data-weather-group]').forEach(el => {
+    const city = el.dataset.weatherGroup;
+    const forecast = weatherMap.get(city);
+    if (forecast) {
+      const temps = forecast.temperature_2m_max.filter(t => t !== null);
+      const lows = forecast.temperature_2m_min.filter(t => t !== null);
+      const lo = Math.round(Math.min(...lows));
+      const hi = Math.round(Math.max(...temps));
+      el.innerHTML = '🌡️ ' + lo + '°–' + hi + '°C';
+    } else {
+      el.innerHTML = '--';
+    }
+  });
 }
 
 // Group results by destination city for round trip display
@@ -933,11 +1024,13 @@ function renderResults() {
   // Check if we have round trip results (both outbound and return)
   const hasRoundTrip = searchResults.some(r => r.type === 'return');
 
+  const filtered = filterTooSoonFlights(searchResults);
   if (hasRoundTrip) {
-    renderGroupedResults(area, filterTooSoonFlights(searchResults));
+    renderGroupedResults(area, filtered);
   } else {
-    renderFlatResults(area, filterTooSoonFlights(searchResults));
+    renderFlatResults(area, filtered);
   }
+  fetchAndRenderWeather(filtered);
 }
 
 // Render results grouped by destination city (for round trips)
@@ -968,6 +1061,7 @@ function renderGroupedResults(area, flights) {
     html += `🔄 Round Trip: ${originCity} ↔ ${group.city}, ${group.country}</span>`;
     html += `<span style="margin-left:16px;font-size:.78rem;color:var(--tx2);">`;
     html += `${group.outbound.length} outbound, ${group.returns.length} return</span>`;
+    html += `<span class="wx-group" data-weather-group="${group.city}"><span class="sp-n" style="width:12px;height:12px;border-width:1.5px;"></span></span>`;
     html += `</div>`;
     html += `<a href="${bookingUrl()}" target="_blank" class="link-btn" style="font-size:.78rem;padding:6px 12px;">🎫 Book on Wizz</a>`;
     html += `</div>`;
@@ -998,7 +1092,7 @@ function renderGroupedResults(area, flights) {
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th>';
+  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Weather</th>';
   html += '</tr></thead><tbody>';
 
   flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
@@ -1011,6 +1105,7 @@ function renderFlightTable(flights) {
     html += `<td class="mono">${formatTime(f.departure)}</td>`;
     html += `<td class="mono">${formatTime(f.arrival)}</td>`;
     html += `<td class="mono">${f.flightNumber || '-'}</td>`;
+    html += `<td><span data-weather-city="${f.destCity}" data-weather-date="${f.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>`;
     html += `</tr>`;
   });
 
@@ -1058,6 +1153,7 @@ function renderFlatResults(area, flights) {
     html += `<span class="th-filter"><input type="text" data-filter="${col.key}" placeholder="Filter..."></span>`;
     html += '</th>';
   });
+  html += '<th>Weather</th>';
   html += '</tr></thead><tbody>';
 
   sorted.forEach((r, idx) => {
@@ -1073,6 +1169,7 @@ function renderFlatResults(area, flights) {
       <td class="mono">${formatDateDMY(r.date)}</td>
       <td class="mono">${formatTime(r.departure)}</td>
       <td class="mono">${formatTime(r.arrival)}</td>
+      <td><span data-weather-city="${r.destCity}" data-weather-date="${r.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
