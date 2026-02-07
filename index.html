@@ -878,11 +878,14 @@ function renderGroupedResults(area) {
     validGroups++;
 
     html += `<div style="margin-bottom:20px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;">`;
-    html += `<div style="background:var(--s2);padding:12px 16px;border-bottom:1px solid var(--bdr);">`;
+    html += `<div style="background:var(--s2);padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">`;
+    html += `<div>`;
     html += `<span style="font-size:1rem;font-weight:700;color:var(--acc);">`;
     html += `🔄 Round Trip: ${originCity} ↔ ${group.city}, ${group.country}</span>`;
     html += `<span style="margin-left:16px;font-size:.78rem;color:var(--tx2);">`;
     html += `${group.outbound.length} outbound, ${group.returns.length} return</span>`;
+    html += `</div>`;
+    html += `<a href="${bookingUrl()}" target="_blank" class="link-btn" style="font-size:.78rem;padding:6px 12px;">🎫 Book on Wizz</a>`;
     html += `</div>`;
 
     // Outbound flights section
@@ -911,7 +914,7 @@ function renderGroupedResults(area) {
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Book</th>';
+  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th>';
   html += '</tr></thead><tbody>';
 
   flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
@@ -924,7 +927,6 @@ function renderFlightTable(flights) {
     html += `<td class="mono">${formatTime(f.departure)}</td>`;
     html += `<td class="mono">${formatTime(f.arrival)}</td>`;
     html += `<td class="mono">${f.flightNumber || '-'}</td>`;
-    html += `<td><a href="${f.bookingUrl}" target="_blank" class="link-btn">Book</a></td>`;
     html += `</tr>`;
   });
 
@@ -958,17 +960,18 @@ function renderFlatResults(area) {
     { key: 'flightNumber', label: 'Flight #' },
     { key: 'date', label: 'Date' },
     { key: 'departure', label: 'Departure' },
-    { key: 'arrival', label: 'Arrival' },
-    { key: 'bookingUrl', label: 'Book' }
+    { key: 'arrival', label: 'Arrival' }
   ];
 
-  let html = '<div class="tbl-wrap"><table><thead><tr>';
+  let html = `<div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">`;
+  html += `<span style="font-size:.9rem;font-weight:700;color:var(--acc);">✈️ Flights Found</span>`;
+  html += `<a href="${bookingUrl()}" target="_blank" class="link-btn" style="font-size:.78rem;padding:6px 12px;">🎫 Book on Wizz</a>`;
+  html += `</div>`;
+  html += '<div class="tbl-wrap"><table><thead><tr>';
   columns.forEach(col => {
     const sortClass = currentSort.field === col.key ? (currentSort.asc ? 'sorted-asc' : 'sorted-desc') : '';
     html += `<th class="${sortClass}" data-sort="${col.key}">${col.label}`;
-    if (col.key !== 'bookingUrl') {
-      html += `<span class="th-filter"><input type="text" data-filter="${col.key}" placeholder="Filter..."></span>`;
-    }
+    html += `<span class="th-filter"><input type="text" data-filter="${col.key}" placeholder="Filter..."></span>`;
     html += '</th>';
   });
   html += '</tr></thead><tbody>';
@@ -986,7 +989,6 @@ function renderFlatResults(area) {
       <td class="mono">${formatDateDMY(r.date)}</td>
       <td class="mono">${formatTime(r.departure)}</td>
       <td class="mono">${formatTime(r.arrival)}</td>
-      <td><a href="${r.bookingUrl}" target="_blank" class="link-btn">Book</a></td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -997,7 +999,6 @@ function renderFlatResults(area) {
     th.addEventListener('click', e => {
       if (e.target.tagName === 'INPUT') return;
       const field = th.dataset.sort;
-      if (field === 'bookingUrl') return;
       if (currentSort.field === field) currentSort.asc = !currentSort.asc;
       else { currentSort.field = field; currentSort.asc = true; }
       renderResults();
@@ -1026,6 +1027,21 @@ function renderFlatResults(area) {
 }
 
 function addFlightResult(flight) {
+  // Filter out today's flights departing within the next 3 hours
+  const today = formatDate(new Date());
+  if (flight.date === today && flight.departure) {
+    const depFormatted = formatTime(flight.departure);
+    if (depFormatted !== '--:--') {
+      const [dh, dm] = depFormatted.split(':').map(Number);
+      const now = new Date();
+      const cutoffMinutes = (now.getHours() * 60 + now.getMinutes()) + 180;
+      const depMinutes = dh * 60 + dm;
+      if (depMinutes < cutoffMinutes) {
+        LV(`Skipping ${flight.originCode}->${flight.destCode} dep ${depFormatted} (too soon, cutoff ${String(Math.floor(cutoffMinutes/60)).padStart(2,'0')}:${String(cutoffMinutes%60).padStart(2,'0')})`);
+        return;
+      }
+    }
+  }
   searchResults.push(flight);
   $('resultsCount').textContent = `${searchResults.length} flights`;
   if (searchResults.length <= 3 || searchResults.length % 10 === 0) renderResults();
