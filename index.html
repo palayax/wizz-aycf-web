@@ -839,30 +839,33 @@ function showStatus(m) { $('dlStatus').textContent = m; }
 // Render results - supports both flat and grouped (round trip) display
 function renderResults() {
   const area = $('resultsArea');
-  $('resultsCount').textContent = `${searchResults.length} flights`;
 
-  if (!searchResults.length) {
+  // Apply 3-hour filter for today's flights (display only, keeps all data in searchResults)
+  const displayResults = filterTooSoonFlights(searchResults);
+  $('resultsCount').textContent = `${displayResults.length} flights`;
+
+  if (!displayResults.length) {
     area.innerHTML = '<div class="mg mg-w">No flights found yet.</div>';
     return;
   }
 
   // Check if we have round trip results (both outbound and return)
-  const hasRoundTrip = searchResults.some(r => r.type === 'return');
+  const hasRoundTrip = displayResults.some(r => r.type === 'return');
 
   if (hasRoundTrip) {
-    renderGroupedResults(area);
+    renderGroupedResults(area, displayResults);
   } else {
-    renderFlatResults(area);
+    renderFlatResults(area, displayResults);
   }
 }
 
 // Render results grouped by destination city (for round trips)
-function renderGroupedResults(area) {
-  const groups = groupByDestination(searchResults);
+function renderGroupedResults(area, flights) {
+  const groups = groupByDestination(flights);
   let html = '';
 
   // Get the origin city from the first outbound flight
-  const firstOutbound = searchResults.find(r => r.type === 'outbound');
+  const firstOutbound = flights.find(r => r.type === 'outbound');
   const originCity = firstOutbound ? firstOutbound.originCity : 'Origin';
 
   // Count valid round trips (destinations with BOTH outbound AND return)
@@ -935,8 +938,8 @@ function renderFlightTable(flights) {
 }
 
 // Render flat results table (for one-way flights)
-function renderFlatResults(area) {
-  let sorted = [...searchResults];
+function renderFlatResults(area, flights) {
+  let sorted = [...flights];
   if (currentSort.field) {
     sorted.sort((a, b) => {
       let va = a[currentSort.field] || '';
@@ -1014,7 +1017,7 @@ function renderFlatResults(area) {
       });
       area.querySelectorAll('tbody tr').forEach(tr => {
         const idx = parseInt(tr.dataset.idx);
-        const row = searchResults[idx];
+        const row = sorted[idx];
         let show = true;
         for (const [key, val] of Object.entries(filters)) {
           const cellVal = String(row[key] || '').toLowerCase();
@@ -1027,24 +1030,24 @@ function renderFlatResults(area) {
 }
 
 function addFlightResult(flight) {
-  // Filter out today's flights departing within the next 3 hours
-  const today = formatDate(new Date());
-  if (flight.date === today && flight.departure) {
-    const depFormatted = formatTime(flight.departure);
-    if (depFormatted !== '--:--') {
-      const [dh, dm] = depFormatted.split(':').map(Number);
-      const now = new Date();
-      const cutoffMinutes = (now.getHours() * 60 + now.getMinutes()) + 180;
-      const depMinutes = dh * 60 + dm;
-      if (depMinutes < cutoffMinutes) {
-        LV(`Skipping ${flight.originCode}->${flight.destCode} dep ${depFormatted} (too soon, cutoff ${String(Math.floor(cutoffMinutes/60)).padStart(2,'0')}:${String(cutoffMinutes%60).padStart(2,'0')})`);
-        return;
-      }
-    }
-  }
   searchResults.push(flight);
   $('resultsCount').textContent = `${searchResults.length} flights`;
   if (searchResults.length <= 3 || searchResults.length % 10 === 0) renderResults();
+}
+
+// Filter out today's flights departing within the next 3 hours
+function filterTooSoonFlights(flights) {
+  const today = formatDate(new Date());
+  const now = new Date();
+  const cutoffMinutes = (now.getHours() * 60 + now.getMinutes()) + 180;
+  return flights.filter(f => {
+    if (f.date !== today || !f.departure) return true;
+    const depFormatted = formatTime(f.departure);
+    if (depFormatted === '--:--') return true;
+    const [dh, dm] = depFormatted.split(':').map(Number);
+    const depMinutes = dh * 60 + dm;
+    return depMinutes >= cutoffMinutes;
+  });
 }
 
 // Main search function
