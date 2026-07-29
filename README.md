@@ -1,15 +1,15 @@
-# Wizz AYCF Route Finder — Mobile Web v3.0
+# Wizz AYCF Route Finder — Mobile Web v5.2.0
 
 A mobile-friendly web app for searching Wizz Air All-You-Can-Fly routes. Works on any device.
 
-## What's New in v3.0
+## What's New in v5.2.0
 
-- **🚀 Data Collector Bookmarklet** — Download flights directly from Wizz Air without the Chrome extension
-- **☁️ GitHub Storage** — Save/load flight databases to your GitHub repo with timestamps
-- **🔄 Round Trip Search** — Find round trips from anywhere to anywhere in cached data
-- **🗓️ Multi-Hop Trips** — Plan multi-city itineraries (A→B→C→A)
-- **🔧 Built-in Debug Log** — Full logging with export capability
-- **📱 Mobile First** — Designed for phones, works great on desktop too
+- **🌍 ANY city option** — Origin and Destination pickers now include an "ANY" entry at the top of each list; selecting it (or selecting nothing) means "no restriction" on that end
+- **🔀 Layover search** — When there's no direct flight for an origin→destination→date, optionally search for a 1-stop connection through a hub airport
+- **📅 Expanded Search Range** — Exact Date, +1/+2/+3 day windows, or "All Available" (scans 14 days forward)
+- **🗂️ Sort Cities By** — Order the city pickers by name or by country, with the choice remembered on your device
+- **🎫 Book buttons** — Every result row links straight to the Wizz Multipass booking page for that flight (or each leg, for layovers)
+- **🧹 Removed the LLM prompt generator** — The old "LLM Flight & Hostel Search" section is gone; the app is purely a flight finder now
 
 ## How It Works
 
@@ -57,6 +57,33 @@ Save your flight databases to your GitHub repo:
 | **To Destination** | All routes to selected airports |
 | **Round Trip** | Outbound + return from any origin to any destination |
 | **Multi-Hop** | Round trips with extra stops (A→B→C→A) |
+
+### Origin / Destination
+
+Pick one or more cities on each side, or leave a side unset — or pick **🌍 ANY** — to mean "no restriction" there. City lists can be sorted **A→Z by name** or **grouped by country**, per the "Sort Cities By" control; your choice is saved in the browser (`localStorage`) for next time. Priority Cities configured in Settings (⚙️) always float to the top of both lists regardless of sort order.
+
+### Search Range
+
+| Option | Meaning |
+|--------|---------|
+| **Exact Date Only** | Just the selected departure date |
+| **Exact Date +1/+2/+3 Day(s)** | Selected date plus the next 1–3 days |
+| **All Available** | Scans 14 days forward from the selected date |
+
+### Layover
+
+Off by default. When set to **Yes**, any origin→destination→date combination that has no direct flight is retried as a 1-stop connection through a hub airport:
+
+- Layover time must be between 90 minutes and 24 hours
+- Up to 25 candidate hub airports are probed per route
+- Both same-day and overnight (next-day) second legs are considered
+- The best 10 connections per route are kept and shown
+
+Layover search requires specific destination cities — with **ANY** destination there's always a direct flight somewhere, so the layover pass is skipped automatically. Each leg of a layover connection is a separate booking (self-transfer), not a protected connection — mind the connection time and airport if you book one.
+
+### Booking links
+
+Every result row has a **🎫 Book** button (layover rows get separate **Leg 1** / **Leg 2** buttons) linking to the Wizz Multipass booking page with the origin, destination, date, and flight number pre-filled in the query string. Multipass doesn't publish a documented deep-link format, so those parameters may be ignored by their single-page app — but the link reliably lands you on the correct AYCF booking page to finish manually.
 
 ## Disclaimer
 

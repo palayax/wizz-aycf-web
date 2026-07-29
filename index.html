@@ -210,13 +210,20 @@ td{color:var(--tx)}
 
   <div class="filter-row">
     <label>Search Range:</label>
-    <select class="ip" id="filterDateFlex" style="max-width:180px">
+    <select class="ip" id="filterDateFlex" style="max-width:200px">
       <option value="1">Exact Date Only</option>
-      <option value="2">Next 2 Days</option>
-      <option value="3">Next 3 Days</option>
-      <option value="7">Next 7 Days</option>
-      <option value="14">Next 14 Days</option>
-      <option value="30">Next 30 Days</option>
+      <option value="2">Exact Date +1 Day</option>
+      <option value="3">Exact Date +2 Days</option>
+      <option value="4">Exact Date +3 Days</option>
+      <option value="all">All Available</option>
+    </select>
+  </div>
+
+  <div class="filter-row">
+    <label>Sort Cities By:</label>
+    <select class="ip" id="citySortMode" style="max-width:200px">
+      <option value="city">City name (A→Z)</option>
+      <option value="country">Country, then city</option>
     </select>
   </div>
 
@@ -225,7 +232,7 @@ td{color:var(--tx)}
     <div style="flex:1">
       <select class="ip" id="filterOrigin" multiple size="1"></select>
       <div class="chips" id="originChips"></div>
-      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Hold Ctrl/Cmd to select multiple</div>
+      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Hold Ctrl/Cmd to select multiple — or pick 🌍 ANY</div>
     </div>
   </div>
 
@@ -234,7 +241,7 @@ td{color:var(--tx)}
     <div style="flex:1">
       <select class="ip" id="filterDest" multiple size="1"></select>
       <div class="chips" id="destChips"></div>
-      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">Leave empty for ALL destinations</div>
+      <div style="font-size:.65rem;color:var(--tx3);margin-top:4px">🌍 ANY (or empty) = all destinations</div>
     </div>
   </div>
 
@@ -245,6 +252,15 @@ td{color:var(--tx)}
       <option value="yes">Yes</option>
     </select>
     <span style="font-size:.72rem;color:var(--tx3)">(Returns 3-4 days from today)</span>
+  </div>
+
+  <div class="filter-row">
+    <label>Layover:</label>
+    <select class="ip" id="filterLayover" style="max-width:120px">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+    <span style="font-size:.72rem;color:var(--tx3)">If no direct flight exists, look for a 1-stop connection (needs specific destinations)</span>
   </div>
 
   <div class="rw" style="margin-top:14px">
@@ -272,72 +288,6 @@ td{color:var(--tx)}
 
   <div id="resultsArea">
     <div class="mg mg-i">No results yet. Search for flights above.</div>
-  </div>
-</div>
-
-<!-- LLM Flight Search Prompt Generator -->
-<div class="cd" id="llmCard">
-  <div class="cd-t">🤖 LLM Flight & Hostel Search</div>
-  <p style="font-size:.75rem;color:var(--tx2);margin-bottom:10px">
-    Generate prompts for ChatGPT, Gemini, Claude or any LLM to search for connecting flights (and hostels for round trips) based on your Wizz search results.
-  </p>
-
-  <div id="llmSearchInfo" style="font-size:.75rem;color:var(--tx3);margin-bottom:10px;padding:8px 10px;background:var(--s2);border-radius:var(--rs);display:none">
-  </div>
-
-  <div class="filter-row">
-    <label>End Destination:</label>
-    <div style="flex:1">
-      <select class="ip" id="llmDestPreset" style="margin-bottom:6px">
-        <option value="">-- Popular Destinations --</option>
-        <option value="Bangkok, Thailand">Bangkok, Thailand</option>
-        <option value="Tokyo, Japan">Tokyo, Japan</option>
-        <option value="New York, USA">New York, USA</option>
-        <option value="Bali, Indonesia">Bali, Indonesia</option>
-        <option value="Dubai, UAE">Dubai, UAE</option>
-        <option value="Maldives">Maldives</option>
-        <option value="Singapore">Singapore</option>
-        <option value="Cancun, Mexico">Cancun, Mexico</option>
-        <option value="Phuket, Thailand">Phuket, Thailand</option>
-        <option value="Goa, India">Goa, India</option>
-        <option value="Kuala Lumpur, Malaysia">Kuala Lumpur, Malaysia</option>
-        <option value="Mumbai, India">Mumbai, India</option>
-        <option value="Hong Kong">Hong Kong</option>
-        <option value="Sydney, Australia">Sydney, Australia</option>
-        <option value="Cape Town, South Africa">Cape Town, South Africa</option>
-        <option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
-      </select>
-      <input class="ip" id="llmDestCustom" placeholder="Or type any city, country (e.g. Bali, Indonesia)">
-    </div>
-  </div>
-
-  <div class="filter-row">
-    <label>Optimize For:</label>
-    <div style="flex:1">
-      <div class="chk-row"><input type="checkbox" id="llmMinLayover" checked><label for="llmMinLayover">Minimum layover time</label></div>
-      <div class="chk-row"><input type="checkbox" id="llmMinTrip" checked><label for="llmMinTrip">Minimum total trip time</label></div>
-      <div class="chk-row"><input type="checkbox" id="llmMinPrice" checked><label for="llmMinPrice">Lowest price</label></div>
-    </div>
-  </div>
-
-  <div class="rw" style="margin-top:14px;gap:8px">
-    <button class="bt bt-p" id="bGenPrompt">🤖 Generate Prompts</button>
-  </div>
-
-  <div id="llmFlightPromptArea" class="hd-n" style="margin-top:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:.78rem;font-weight:700;color:var(--acc)">✈️ Flight Search Prompt</span>
-      <button class="bt bt-g" id="bCopyFlightPrompt" style="font-size:.7rem;padding:4px 10px">📋 Copy</button>
-    </div>
-    <textarea class="ip" id="llmFlightPromptText" readonly rows="12" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical"></textarea>
-  </div>
-
-  <div id="llmHostelPromptArea" class="hd-n" style="margin-top:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:.78rem;font-weight:700;color:#e8a040">🏨 Hostel Search Prompt</span>
-      <button class="bt bt-g" id="bCopyHostelPrompt" style="font-size:.7rem;padding:4px 10px">📋 Copy</button>
-    </div>
-    <textarea class="ip" id="llmHostelPromptText" readonly rows="12" style="font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical"></textarea>
   </div>
 </div>
 
@@ -415,7 +365,16 @@ td{color:var(--tx)}
 //  Round Trip: searches returns 2, 3 & 4 days after each found outbound
 // ══════════════════════════════════════════════════════
 
-const VERSION = '5.0.0';
+const VERSION = '5.2.0';
+
+// "All Available" search range: how many days forward from the selected date.
+// AYCF availability rarely extends past two weeks, so 14 covers the bookable window.
+const ALL_AVAILABLE_DAYS = 14;
+
+// Layover (1-stop connection) tuning
+const LAYOVER_MIN_MINUTES = 90;      // shortest connection we consider realistic
+const LAYOVER_MAX_MINUTES = 24 * 60; // longest wait we still call a "connection"
+const LAYOVER_MAX_HUBS = 25;         // cap hub probing so a search cannot explode
 
 // UUID v4 generator for availability API
 function generateUUID() {
@@ -534,8 +493,16 @@ let stopped = false;
 let cookieJar = '';
 let xsrfToken = '';
 let searchResults = [];
+let layoverResults = [];
 let currentSort = { field: null, asc: true };
 let verboseMode = true;
+
+// Full origin -> Set(destination) graph from the AYCF route list, before user filters.
+// Used to pick candidate hubs for the layover search.
+let routeGraph = new Map();
+
+// Availability lookups cached for this search session: "O|D|YYYY-MM-DD" -> [flight,...]
+let flightCache = new Map();
 
 // Weather caches
 const weatherGeoCache = new Map();
@@ -798,8 +765,35 @@ function getPriorityCities() {
   return saved.split(',').map(c => c.trim().toUpperCase()).filter(c => c.length === 3);
 }
 
-function bookingUrl(o, d, dt) {
-  return `https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets`;
+// Purchase link — lands on the AYCF Multipass booking page with the leg described in the
+// query string. Multipass publishes no deep-link format, so the params are a hint the SPA
+// may ignore; the page itself is always the right place to complete an AYCF booking.
+const MULTIPASS_BOOK_URL = 'https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets';
+
+function bookingUrl(o, d, dt, flightNum) {
+  if (!o || !d || !dt) return MULTIPASS_BOOK_URL;
+  const p = new URLSearchParams({ origin: o, destination: d, departure: dt });
+  if (flightNum) p.set('flight', flightNum);
+  return `${MULTIPASS_BOOK_URL}?${p.toString()}`;
+}
+
+// Small green "Book" button used across the results tables
+function bookBtn(o, d, dt, flightNum, label) {
+  return `<a href="${bookingUrl(o, d, dt, flightNum)}" target="_blank" rel="noopener" class="link-btn">${label || '🎫 Book'}</a>`;
+}
+
+// Minutes since midnight from any time shape the API returns; null if unparseable
+function timeToMinutes(t) {
+  const f = formatTime(t);
+  if (f === '--:--') return null;
+  const [h, m] = f.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function formatDuration(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
 }
 
 // Credentials
@@ -861,40 +855,75 @@ function updateChips(selectId, chipsId) {
   });
 }
 
-// Populate dropdowns
+// Sentinel value for the "ANY" entry in the city selects
+const ANY_CITY = 'ANY';
+
+function getCitySortMode() {
+  return localStorage.getItem('wz_city_sort') === 'country' ? 'country' : 'city';
+}
+
+// Populate dropdowns. Priority cities always float to the top; everything below is
+// ordered either by city name or grouped by country, per the Sort Cities By control.
 function populateCityDropdowns() {
+  const mode = getCitySortMode();
+
   const cities = new Map();
   Object.entries(AIRPORTS).forEach(([code, info]) => {
     const key = `${info.city}, ${info.country}`;
-    if (!cities.has(key)) cities.set(key, []);
-    cities.get(key).push(code);
+    if (!cities.has(key)) cities.set(key, { city: info.city, country: info.country, codes: [] });
+    cities.get(key).codes.push(code);
   });
 
   const priorityCodes = getPriorityCities();
-  const sortedCities = [...cities.entries()].sort((a, b) => {
-    const aHasPriority = a[1].some(c => priorityCodes.includes(c));
-    const bHasPriority = b[1].some(c => priorityCodes.includes(c));
+  const sortedCities = [...cities.values()].sort((a, b) => {
+    const aHasPriority = a.codes.some(c => priorityCodes.includes(c));
+    const bHasPriority = b.codes.some(c => priorityCodes.includes(c));
     if (aHasPriority && !bHasPriority) return -1;
     if (!aHasPriority && bHasPriority) return 1;
-    return a[0].localeCompare(b[0]);
+    if (mode === 'country') {
+      const byCountry = a.country.localeCompare(b.country);
+      if (byCountry !== 0) return byCountry;
+    }
+    return a.city.localeCompare(b.city);
   });
 
-  const originSel = $('filterOrigin');
-  originSel.innerHTML = sortedCities.map(([city, codes]) =>
-    `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
-  ).join('');
+  const label = c => mode === 'country'
+    ? `${c.country} — ${c.city} (${c.codes.join('/')})`
+    : `${c.city}, ${c.country} (${c.codes.join('/')})`;
 
-  // Pre-select TLV
-  Array.from(originSel.options).forEach(o => {
-    if (o.value.includes('TLV')) o.selected = true;
+  const anyOption = txt => `<option value="${ANY_CITY}">🌍 ANY — ${txt}</option>`;
+  const cityOptions = sortedCities.map(c => `<option value="${c.codes.join(',')}">${label(c)}</option>`).join('');
+
+  // Preserve the user's picks across a re-sort
+  const remember = sel => new Set(Array.from(sel.selectedOptions).map(o => o.value));
+  const restore = (sel, prev, fallback) => {
+    let any = false;
+    Array.from(sel.options).forEach(o => { if (prev.has(o.value)) { o.selected = true; any = true; } });
+    if (!any && fallback) fallback(sel);
+  };
+
+  const originSel = $('filterOrigin');
+  const prevOrigin = remember(originSel);
+  originSel.innerHTML = anyOption('every origin in your subscription') + cityOptions;
+  restore(originSel, prevOrigin, sel => {
+    // First render: default to TLV
+    Array.from(sel.options).forEach(o => { if (o.value.split(',').includes('TLV')) o.selected = true; });
   });
   updateChips('filterOrigin', 'originChips');
 
   const destSel = $('filterDest');
-  destSel.innerHTML = sortedCities.map(([city, codes]) =>
-    `<option value="${codes.join(',')}">${city} (${codes.join('/')})</option>`
-  ).join('');
+  const prevDest = remember(destSel);
+  destSel.innerHTML = anyOption('every destination') + cityOptions;
+  restore(destSel, prevDest, null);
   updateChips('filterDest', 'destChips');
+}
+
+// Read a city multi-select into airport codes. Returns [] when ANY (or nothing) is
+// selected, which every caller treats as "no restriction".
+function readCitySelection(selectId) {
+  const values = Array.from($(selectId).selectedOptions).map(o => o.value);
+  if (values.includes(ANY_CITY)) return [];
+  return values.flatMap(v => v.split(',')).filter(Boolean);
 }
 
 // Proxy fetch with verbose logging
@@ -1050,9 +1079,11 @@ function showStatus(m) { $('dlStatus').textContent = m; }
 // Render results - supports both flat and grouped (round trip) display
 function renderResults() {
   const area = $('resultsArea');
-  $('resultsCount').textContent = `${searchResults.length} flights`;
+  const countBits = [`${searchResults.length} flights`];
+  if (layoverResults.length) countBits.push(`${layoverResults.length} connections`);
+  $('resultsCount').textContent = countBits.join(' · ');
 
-  if (!searchResults.length) {
+  if (!searchResults.length && !layoverResults.length) {
     area.innerHTML = '<div class="mg mg-w">No flights found yet.</div>';
     return;
   }
@@ -1061,12 +1092,66 @@ function renderResults() {
   const hasRoundTrip = searchResults.some(r => r.type === 'return');
 
   const filtered = filterTooSoonFlights(searchResults);
-  if (hasRoundTrip) {
+  if (!searchResults.length) {
+    area.innerHTML = '<div class="mg mg-w">No direct flights found — see the connections below.</div>';
+  } else if (hasRoundTrip) {
     renderGroupedResults(area, filtered);
   } else {
     renderFlatResults(area, filtered);
   }
+
+  if (layoverResults.length) area.insertAdjacentHTML('beforeend', renderLayoverResults());
+
   fetchAndRenderWeather(filtered);
+}
+
+// 1-stop connections, grouped by origin → destination
+function renderLayoverResults() {
+  const groups = new Map();
+  layoverResults.forEach(c => {
+    const key = `${c.originCode}|${c.destCode}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(c);
+  });
+
+  let html = `<div style="margin-top:20px">`;
+  html += `<div style="font-size:.9rem;font-weight:700;color:var(--acc2);margin-bottom:4px">🔀 Connections (1 stop)</div>`;
+  html += `<div style="font-size:.72rem;color:var(--tx3);margin-bottom:10px">Routes with no direct flight. Each leg is booked separately on Multipass — layover of at least ${formatDuration(LAYOVER_MIN_MINUTES)}. Times are local; self-transfer risk is yours.</div>`;
+
+  groups.forEach(connections => {
+    const c0 = connections[0];
+    html += `<div style="margin-bottom:16px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden">`;
+    html += `<div style="background:var(--s2);padding:10px 14px;border-bottom:1px solid var(--bdr);font-size:.85rem;font-weight:700;color:var(--acc2)">`;
+    html += `${c0.originCity} (${c0.originCode}) → ${c0.destCity} (${c0.destCode})`;
+    html += `<span style="margin-left:12px;font-size:.72rem;font-weight:400;color:var(--tx2)">${connections.length} option${connections.length === 1 ? '' : 's'}</span>`;
+    html += `</div>`;
+
+    html += '<div class="tbl-wrap"><table><thead><tr>';
+    html += '<th>Date</th><th>Via</th><th>Leg 1</th><th>Leg 2</th><th>Layover</th><th>Book</th>';
+    html += '</tr></thead><tbody>';
+
+    connections.forEach(c => {
+      const l1 = `${c.originCode} ${formatTime(c.leg1.departure)} → ${c.hubCode} ${formatTime(c.leg1.arrival)}${c.leg1.flightNumber ? ` <span style="color:var(--tx3)">${c.leg1.flightNumber}</span>` : ''}`;
+      const l2 = `${c.hubCode} ${formatTime(c.leg2.departure)} → ${c.destCode} ${formatTime(c.leg2.arrival)}${c.leg2.flightNumber ? ` <span style="color:var(--tx3)">${c.leg2.flightNumber}</span>` : ''}`;
+      html += `<tr>`;
+      html += `<td class="mono">${formatDateDMY(c.date)}</td>`;
+      html += `<td>${c.hubCity} (${c.hubCode})</td>`;
+      html += `<td class="mono">${l1}</td>`;
+      html += `<td class="mono">${l2}${c.overnight ? ' <span style="color:var(--ylw)">+1d</span>' : ''}</td>`;
+      html += `<td class="mono">${formatDuration(c.layoverMinutes)}</td>`;
+      html += `<td style="white-space:nowrap">`;
+      html += bookBtn(c.originCode, c.hubCode, c.leg1.date, c.leg1.flightNumber, '🎫 Leg 1');
+      html += ' ';
+      html += bookBtn(c.hubCode, c.destCode, c.leg2.date, c.leg2.flightNumber, '🎫 Leg 2');
+      html += `</td>`;
+      html += `</tr>`;
+    });
+
+    html += '</tbody></table></div></div>';
+  });
+
+  html += `</div>`;
+  return html;
 }
 
 // Render results grouped by destination city (for round trips)
@@ -1128,7 +1213,7 @@ function renderGroupedResults(area, flights) {
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Weather</th>';
+  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Weather</th><th>Book</th>';
   html += '</tr></thead><tbody>';
 
   flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
@@ -1142,6 +1227,7 @@ function renderFlightTable(flights) {
     html += `<td class="mono">${formatTime(f.arrival)}</td>`;
     html += `<td class="mono">${f.flightNumber || '-'}</td>`;
     html += `<td><span data-weather-city="${f.destCity}" data-weather-date="${f.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>`;
+    html += `<td>${bookBtn(f.originCode, f.destCode, f.date, f.flightNumber)}</td>`;
     html += `</tr>`;
   });
 
@@ -1189,7 +1275,7 @@ function renderFlatResults(area, flights) {
     html += `<span class="th-filter"><input type="text" data-filter="${col.key}" placeholder="Filter..."></span>`;
     html += '</th>';
   });
-  html += '<th>Weather</th>';
+  html += '<th>Weather</th><th>Book</th>';
   html += '</tr></thead><tbody>';
 
   sorted.forEach((r, idx) => {
@@ -1206,6 +1292,7 @@ function renderFlatResults(area, flights) {
       <td class="mono">${formatTime(r.departure)}</td>
       <td class="mono">${formatTime(r.arrival)}</td>
       <td><span data-weather-city="${r.destCity}" data-weather-date="${r.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>
+      <td>${bookBtn(r.originCode, r.destCode, r.date, r.flightNumber)}</td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -1276,6 +1363,257 @@ function getTodayCutoffInfo(dateStr) {
   return { isToday: true, cutoffMinutes, cutoffTimeStr };
 }
 
+// Pull the flight array out of an availability response, whatever shape it arrives in
+function extractFlights(data) {
+  if (!data) return [];
+  if (Array.isArray(data.flightsOutbound)) return data.flightsOutbound;
+  if (Array.isArray(data.flights)) return data.flights;
+  if (Array.isArray(data.outbound)) return data.outbound;
+  if (Array.isArray(data.outboundFlights)) return data.outboundFlights;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.result)) return data.result;
+  if (Array.isArray(data.data)) return data.data;
+  if (data.data && data.data.flights) return data.data.flights;
+  if (data.response && data.response.flights) return data.response.flights;
+  if (data.departure || data.departureTime || data.flightCode) return [data];
+  return [];
+}
+
+// Normalise one raw API flight into the fields the rest of the app uses
+function normalizeFlight(f) {
+  return {
+    departure: f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '',
+    arrival: f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '',
+    flightNumber: f.flightCode || f.flightNumber || f.flight || f.carrierCode || ''
+  };
+}
+
+// Drop today's flights that leave inside the 3-hour booking cutoff
+function applyCutoff(flights, dateStr) {
+  const cutoff = getTodayCutoffInfo(dateStr);
+  if (!cutoff.isToday) return { flights, cutoff, dropped: 0 };
+  const kept = flights.filter(f => {
+    const mins = timeToMinutes(f.departure);
+    return mins === null ? true : mins >= cutoff.cutoffMinutes;
+  });
+  return { flights: kept, cutoff, dropped: flights.length - kept.length };
+}
+
+// Why the most recent fetchFlights() came back empty — lets callers tell
+// "no such flight" apart from "they all depart too soon today".
+let lastFetchMeta = { rawCount: 0, dropped: 0, cutoffTimeStr: '' };
+
+// One availability lookup, cached per session and shared by the outbound, return and
+// layover passes. Returns normalised flights (cutoff already applied), or null on error.
+// Handles 429 by backing off, and honours pause/stop.
+async function fetchFlights(o, d, dt) {
+  lastFetchMeta = { rawCount: 0, dropped: 0, cutoffTimeStr: '' };
+
+  const key = `${o}|${d}|${dt}`;
+  if (flightCache.has(key)) {
+    LV(`Cache hit: ${key}`);
+    return flightCache.get(key);
+  }
+
+  const searchUrl = dynamicSearchUrl || 'https://multipass.wizzair.com/w6/subscriptions/json/availability';
+  let rateLimitHits = 0;
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (stopped) return null;
+    while (paused && !stopped) { showStatus('Paused...'); await sleep(500); }
+    if (stopped) return null;
+
+    await sleep(300 + Math.random() * 200);
+
+    try {
+      const r = await px(searchUrl, {
+        method: 'POST',
+        contentType: 'application/json',
+        body: JSON.stringify({
+          flightType: 'OW',
+          origin: o,
+          destination: d,
+          departure: dt,
+          arrival: '',
+          intervalSubtype: null
+        })
+      });
+
+      if (r.status === 429) {
+        rateLimitHits++;
+        const waitTime = rateLimitHits >= 3 ? 60000 : 15000;
+        LW(`Rate limited on ${key}! Waiting ${waitTime / 1000}s...`);
+        showStatus(`Rate limited — waiting ${waitTime / 1000}s...`);
+        await sleep(waitTime);
+        continue;
+      }
+
+      if (r.status === 400) {
+        LV(`No route available: ${key} (HTTP 400)`);
+        flightCache.set(key, []);
+        return [];
+      }
+
+      if (r.status < 200 || r.status >= 300) {
+        LW(`HTTP ${r.status} for ${key}`);
+        LV(`Error response body: ${r.bodyText.substring(0, 500)}`);
+        return null;
+      }
+
+      const raw = extractFlights(r.json());
+      const normalized = raw.map(normalizeFlight);
+      const { flights, cutoff, dropped } = applyCutoff(normalized, dt);
+      if (dropped > 0) {
+        L(`  ⏰ Filtered ${dropped}/${normalized.length} too-soon flights on ${key} (cutoff ${cutoff.cutoffTimeStr})`);
+      }
+      lastFetchMeta = { rawCount: normalized.length, dropped, cutoffTimeStr: cutoff.cutoffTimeStr };
+      flightCache.set(key, flights);
+      return flights;
+    } catch (e) {
+      LE(`Search error for ${key}: ${e.message}`);
+      return null;
+    }
+  }
+
+  LW(`Giving up on ${key} after repeated rate limits`);
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════
+// Layover search — 1 stop, used only where no direct flight exists
+// ═══════════════════════════════════════════════════════
+
+// Candidate hubs for origin -> dest: somewhere we can fly from the origin that also
+// has a route onward to the destination. Verified edges come first; when the route
+// graph is incomplete (synthetic fallback routes) we probe unverified hubs too.
+function candidateHubs(o, d) {
+  const fromOrigin = routeGraph.has(o) ? [...routeGraph.get(o)] : [];
+  const pool = fromOrigin.length ? fromOrigin : Object.keys(AIRPORTS);
+  const priority = getPriorityCities();
+
+  const scored = pool
+    .filter(h => h !== o && h !== d)
+    .map(h => {
+      const onward = routeGraph.get(h);
+      return { hub: h, verified: onward ? onward.has(d) : false, known: !!onward };
+    })
+    // A hub with a known route list that does NOT reach the destination is a dead end
+    .filter(h => h.verified || !h.known);
+
+  scored.sort((a, b) => {
+    if (a.verified !== b.verified) return a.verified ? -1 : 1;
+    const ap = priority.includes(a.hub), bp = priority.includes(b.hub);
+    if (ap !== bp) return ap ? -1 : 1;
+    return a.hub.localeCompare(b.hub);
+  });
+
+  return scored.slice(0, LAYOVER_MAX_HUBS).map(h => h.hub);
+}
+
+// Pair up two legs through a hub. secondLegDayOffset is 0 for a same-day connection,
+// 1 when the onward flight leaves the next morning.
+function pairLegs(leg1Flights, leg2Flights, secondLegDayOffset) {
+  const pairs = [];
+  leg1Flights.forEach(f1 => {
+    const arr1 = timeToMinutes(f1.arrival);
+    if (arr1 === null) return;
+    leg2Flights.forEach(f2 => {
+      const dep2 = timeToMinutes(f2.departure);
+      if (dep2 === null) return;
+      const wait = dep2 + secondLegDayOffset * 1440 - arr1;
+      if (wait < LAYOVER_MIN_MINUTES || wait > LAYOVER_MAX_MINUTES) return;
+      pairs.push({ f1, f2, wait, dayOffset: secondLegDayOffset });
+    });
+  });
+  return pairs;
+}
+
+// For every origin/destination/date with no direct flight, look for a single-stop
+// connection. progressStart is where this pass begins on the progress bar (to 100%).
+async function searchLayovers(noDirectLegs, progressStart) {
+  L('');
+  L('═══ STEP 6: LAYOVER SEARCH (1 STOP) ═══');
+
+  if (!noDirectLegs.length) {
+    L('Every requested route had a direct flight — nothing to connect');
+    return;
+  }
+
+  L(`Routes without a direct flight: ${noDirectLegs.length}`);
+  const span = 100 - progressStart;
+
+  for (let i = 0; i < noDirectLegs.length; i++) {
+    if (stopped) { L('Layover search stopped by user'); break; }
+    while (paused && !stopped) { showStatus('Paused...'); await sleep(500); }
+    if (stopped) break;
+
+    const leg = noDirectLegs[i];
+    setProgress(progressStart + (i / noDirectLegs.length) * span);
+
+    const oInfo = getAirportInfo(leg.o);
+    const dInfo = getAirportInfo(leg.d);
+    const hubs = candidateHubs(leg.o, leg.d);
+
+    L(`🔀 ${leg.o} → ${leg.d} on ${leg.dt}: probing ${hubs.length} hub(s)`);
+    if (!hubs.length) continue;
+
+    const found = [];
+
+    for (let h = 0; h < hubs.length; h++) {
+      if (stopped) break;
+      const hub = hubs[h];
+      const hInfo = getAirportInfo(hub);
+      showStatus(`🔀 ${oInfo.city} → ${hInfo.city} → ${dInfo.city} [${i + 1}/${noDirectLegs.length}]`);
+
+      // Leg 1 is often already cached from the direct-flight pass
+      const leg1 = await fetchFlights(leg.o, hub, leg.dt);
+      if (!leg1 || !leg1.length) continue;
+
+      // Same day first, then an overnight stop at the hub
+      for (const dayOffset of [0, 1]) {
+        if (stopped) break;
+        const leg2Date = addDays(leg.dt, dayOffset);
+        const leg2 = await fetchFlights(hub, leg.d, leg2Date);
+        if (!leg2 || !leg2.length) continue;
+
+        pairLegs(leg1, leg2, dayOffset).forEach(p => {
+          found.push({
+            date: leg.dt,
+            originCode: leg.o,
+            originCity: oInfo.city,
+            originCountry: oInfo.country,
+            originAirport: oInfo.airport,
+            hubCode: hub,
+            hubCity: hInfo.city,
+            hubCountry: hInfo.country,
+            destCode: leg.d,
+            destCity: dInfo.city,
+            destCountry: dInfo.country,
+            destAirport: dInfo.airport,
+            leg1: { date: leg.dt, departure: p.f1.departure, arrival: p.f1.arrival, flightNumber: p.f1.flightNumber },
+            leg2: { date: leg2Date, departure: p.f2.departure, arrival: p.f2.arrival, flightNumber: p.f2.flightNumber },
+            layoverMinutes: p.wait,
+            overnight: p.dayOffset === 1
+          });
+        });
+      }
+    }
+
+    if (found.length) {
+      // Shortest connections first, and keep the list readable
+      found.sort((a, b) => a.layoverMinutes - b.layoverMinutes);
+      const kept = found.slice(0, 10);
+      layoverResults.push(...kept);
+      L(`  ✅ ${found.length} connection(s) found via ${new Set(found.map(f => f.hubCode)).size} hub(s), keeping best ${kept.length}`);
+      renderResults();
+    } else {
+      L(`  ❌ No 1-stop connection ${leg.o} → ${leg.d} on ${leg.dt}`);
+    }
+  }
+
+  L(`Layover search complete: ${layoverResults.length} connection(s)`);
+}
+
 // Main search function
 async function searchFlights() {
   if (searching) return;
@@ -1299,22 +1637,29 @@ async function searchFlights() {
   const filterDate = $('filterDate').value;
   const filterDateFlex = $('filterDateFlex').value;
 
-  // Get selected origins and destinations
-  const originSel = $('filterOrigin');
-  const destSel = $('filterDest');
-
-  const selectedOrigins = Array.from(originSel.selectedOptions).flatMap(o => o.value.split(','));
-  const selectedDests = Array.from(destSel.selectedOptions).flatMap(o => o.value.split(','));
+  // An empty selection (or 🌍 ANY) means "no restriction" at that end
+  const selectedOrigins = readCitySelection('filterOrigin');
+  const selectedDests = readCitySelection('filterDest');
+  const anyOrigin = selectedOrigins.length === 0;
+  const anyDest = selectedDests.length === 0;
 
   const isRoundTrip = $('filterRoundTrip').value === 'yes';
+  const wantLayover = $('filterLayover').value === 'yes';
+  // With ANY destination there is always a direct flight somewhere, so a layover
+  // fallback has nothing to fall back from.
+  const runLayover = wantLayover && !anyDest;
 
-  L(`Filter date: ${filterDate} (flex: ${filterDateFlex})`);
-  L(`Selected origins: ${selectedOrigins.join(', ')}`);
-  L(`Selected destinations: ${selectedDests.length ? selectedDests.join(', ') : 'ALL'}`);
+  L(`Filter date: ${filterDate} (range: ${filterDateFlex})`);
+  L(`Selected origins: ${anyOrigin ? 'ANY' : selectedOrigins.join(', ')}`);
+  L(`Selected destinations: ${anyDest ? 'ANY' : selectedDests.join(', ')}`);
   L(`Round trip: ${isRoundTrip}`);
+  L(`Layover fallback: ${runLayover}`);
 
   if (!filterDate) { showMsg('e', 'Select departure date.'); return; }
-  if (!selectedOrigins.length) { showMsg('e', 'Select at least one origin city.'); return; }
+  if (wantLayover && anyDest) {
+    LW('Layover requested with ANY destination — skipping the layover pass');
+    showMsg('w', 'Layover search needs specific destination cities — searching direct flights only.');
+  }
 
   searching = true;
   await requestWakeLock();
@@ -1323,8 +1668,12 @@ async function searchFlights() {
   cookieJar = '';
   xsrfToken = '';
   searchResults = [];
+  layoverResults = [];
+  flightCache = new Map();
+  routeGraph = new Map();
   foundOutboundFlights = new Map();  // Reset: destination -> Set of dates
   let filteredTodayRoutes = [];  // Track routes where all flights were too soon
+  const noDirectLegs = [];       // origin/dest/date combos with no direct flight
   verboseMode = $('verboseLog').checked;
 
   $('bSearch').disabled = true;
@@ -1581,7 +1930,7 @@ async function searchFlights() {
       L(`Found ${allCodes.size} known airport codes: ${[...allCodes].join(', ')}`);
 
       if (allCodes.size > 0) {
-        selectedOrigins.forEach(o => {
+        (anyOrigin ? [...allCodes] : selectedOrigins).forEach(o => {
           const dests = [...allCodes].filter(c => c !== o);
           if (dests.length) {
             routes.push({
@@ -1598,7 +1947,7 @@ async function searchFlights() {
     if (!routes.length) {
       L('Trying Method 4: Using all known AIRPORTS as fallback...');
       const allAirportCodes = Object.keys(AIRPORTS);
-      selectedOrigins.forEach(o => {
+      (anyOrigin ? allAirportCodes : selectedOrigins).forEach(o => {
         const dests = allAirportCodes.filter(c => c !== o);
         routes.push({
           departureStation: { id: o },
@@ -1627,14 +1976,19 @@ async function searchFlights() {
       LV(`Route ${idx}: origin=${origin}, destinations=${destinations.length}`);
 
       if (origin && destinations.length) {
-        // Filter by selected origins
-        if (!selectedOrigins.includes(origin)) {
+        // Record the unfiltered route graph first — the layover search needs every
+        // edge, not just the ones matching the user's origin/destination filters.
+        if (!routeGraph.has(origin)) routeGraph.set(origin, new Set());
+        destinations.forEach(d => routeGraph.get(origin).add(d));
+
+        // Filter by selected origins (ANY keeps all)
+        if (!anyOrigin && !selectedOrigins.includes(origin)) {
           LV(`  Skipping - origin ${origin} not in selected: ${selectedOrigins.join(',')}`);
           return;
         }
 
-        // Filter by selected destinations (if any)
-        if (selectedDests.length > 0) {
+        // Filter by selected destinations (ANY keeps all)
+        if (!anyDest) {
           const before = destinations.length;
           destinations = destinations.filter(d => selectedDests.includes(d));
           LV(`  Filtered destinations: ${before} -> ${destinations.length}`);
@@ -1647,6 +2001,7 @@ async function searchFlights() {
       }
     });
 
+    L(`Route graph: ${routeGraph.size} origins with outbound routes`);
     L(`Parsed routes: ${parsedRoutes.length}`);
 
     if (!parsedRoutes.length) {
@@ -1664,13 +2019,13 @@ async function searchFlights() {
     L('');
     L('═══ STEP 4: SEARCH OUTBOUND FLIGHTS ═══');
 
-    // Build dates - generate N days forward from selected date
-    const daysAhead = parseInt(filterDateFlex, 10) || 1;
+    // Build dates - N days forward from the selected date ("all" = full availability window)
+    const daysAhead = filterDateFlex === 'all' ? ALL_AVAILABLE_DAYS : (parseInt(filterDateFlex, 10) || 1);
     const outboundDates = [];
     for (let i = 0; i < daysAhead; i++) {
       outboundDates.push(addDays(filterDate, i));
     }
-    L(`Outbound dates (${daysAhead} days): ${outboundDates.join(', ')}`);
+    L(`Outbound dates (${daysAhead} day${daysAhead === 1 ? '' : 's'}): ${outboundDates.join(', ')}`);
 
     // Build outbound tasks only
     const tasks = [];
@@ -1698,9 +2053,11 @@ async function searchFlights() {
     showStatus(`Searching ${tasks.length} outbound routes...`);
 
     const todayStr = formatDate(new Date());
-    let rateLimitCount = 0;
     let successCount = 0;
     let errorCount = 0;
+
+    // Outbound owns the whole bar unless a second pass (returns or layovers) follows
+    const outboundShare = (isRoundTrip || runLayover) ? 50 : 100;
 
     // Search outbound flights
     for (let i = 0; i < tasks.length; i++) {
@@ -1709,153 +2066,58 @@ async function searchFlights() {
       if (stopped) break;
 
       const t = tasks[i];
-      setProgress((i / tasks.length) * (isRoundTrip ? 50 : 100));  // 0-50% for outbound if round trip
+      setProgress((i / tasks.length) * outboundShare);
       const oInfo = getAirportInfo(t.o);
       const dInfo = getAirportInfo(t.d);
       showStatus(`✈️ ${oInfo.city} → ${dInfo.city} [${i + 1}/${tasks.length}]`);
 
-      try {
-        await sleep(300 + Math.random() * 200);
+      LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
+      const fl = await fetchFlights(t.o, t.d, t.dt);
 
-        LV(`Searching: ${t.o} -> ${t.d} on ${t.dt}`);
-
-        const searchUrl = dynamicSearchUrl || 'https://multipass.wizzair.com/w6/subscriptions/json/availability';
-        LV(`Using search URL: ${searchUrl}`);
-
-        const r = await px(searchUrl, {
-          method: 'POST',
-          contentType: 'application/json',
-          body: JSON.stringify({
-            flightType: 'OW',
-            origin: t.o,
-            destination: t.d,
-            departure: t.dt,
-            arrival: '',
-            intervalSubtype: null
-          })
-        });
-
-        if (r.status === 429) {
-          rateLimitCount++;
-          const waitTime = rateLimitCount >= 3 ? 60000 : 15000;
-          LW(`Rate limited! Waiting ${waitTime/1000}s...`);
-          showStatus(`Rate limited — waiting ${waitTime/1000}s...`);
-          await sleep(waitTime);
-          if (rateLimitCount >= 3) rateLimitCount = 0;
-          i--;
-          continue;
-        }
-
-        rateLimitCount = 0;
-
-        if (r.status >= 200 && r.status < 300) {
-          const data = r.json();
-
-          if (data) {
-            LV(`Response data keys: ${Object.keys(data).join(', ')}`);
-            LV(`Full response structure: ${JSON.stringify(data).substring(0, 1000)}`);
-
-            // Try multiple possible flight array locations
-            let fl = [];
-
-            if (data.flightsOutbound && Array.isArray(data.flightsOutbound)) fl = data.flightsOutbound;
-            else if (data.flights && Array.isArray(data.flights)) fl = data.flights;
-            else if (data.outbound && Array.isArray(data.outbound)) fl = data.outbound;
-            else if (data.outboundFlights && Array.isArray(data.outboundFlights)) fl = data.outboundFlights;
-            else if (Array.isArray(data)) fl = data;
-            else if (data.result && Array.isArray(data.result)) fl = data.result;
-            else if (data.data && Array.isArray(data.data)) fl = data.data;
-            else if (data.data && data.data.flights) fl = data.data.flights;
-            else if (data.response && data.response.flights) fl = data.response.flights;
-            else if (data.departure || data.departureTime || data.flightCode) fl = [data];
-
-            LV(`Extracted ${fl.length} flights using parsing methods`);
-
-            if (fl.length > 0) {
-              LV(`First flight object keys: ${Object.keys(fl[0]).join(', ')}`);
-              LV(`First flight raw: ${JSON.stringify(fl[0])}`);
-            }
-
-            if (fl && fl.length > 0) {
-              // Apply 3-hour cutoff filter for today's flights
-              const cutoffInfo = getTodayCutoffInfo(t.dt);
-              const originalCount = fl.length;
-
-              if (cutoffInfo.isToday) {
-                fl = fl.filter(f => {
-                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
-                  const depFormatted = formatTime(depTime);
-                  if (!depTime || depFormatted === '--:--') return true;
-                  const [dh, dm] = depFormatted.split(':').map(Number);
-                  return (dh * 60 + dm) >= cutoffInfo.cutoffMinutes;
-                });
-                if (fl.length < originalCount) {
-                  L(`  ⏰ Filtered ${originalCount - fl.length}/${originalCount} too-soon flights (cutoff ${cutoffInfo.cutoffTimeStr})`);
-                }
-              }
-
-              if (fl.length > 0) {
-                successCount++;
-                L(`✈️ ${t.o} → ${t.d} on ${t.dt}: ${fl.length} flights found`);
-
-                // Track this destination+date for round trip return search
-                if (isRoundTrip) {
-                  if (!foundOutboundFlights.has(t.d)) {
-                    foundOutboundFlights.set(t.d, new Set());
-                  }
-                  foundOutboundFlights.get(t.d).add(t.dt);
-                  L(`  📝 Queued return search: ${t.d} → origin on ${addDays(todayStr, 3)} and ${addDays(todayStr, 4)}`);
-                }
-
-                fl.forEach(f => {
-                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
-                  const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
-                  const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
-
-                  LV(`  Flight: dep=${depTime}, arr=${arrTime}, code=${flightNum}`);
-
-                  addFlightResult({
-                    type: 'outbound',
-                    originCode: t.o,
-                    originCity: oInfo.city,
-                    originCountry: oInfo.country,
-                    originAirport: oInfo.airport,
-                    destCode: t.d,
-                    destCity: dInfo.city,
-                    destCountry: dInfo.country,
-                    destAirport: dInfo.airport,
-                    date: t.dt,
-                    departure: depTime,
-                    arrival: arrTime,
-                    flightNumber: flightNum,
-                    bookingUrl: bookingUrl(t.o, t.d, t.dt)
-                  });
-                });
-              } else {
-                // ALL flights filtered out - too soon to depart
-                L(`  ⏰ All ${originalCount} flights to ${dInfo.city} on ${t.dt} depart before ${cutoffInfo.cutoffTimeStr} - skipped`);
-                filteredTodayRoutes.push({ destCity: dInfo.city, date: t.dt, cutoffTime: cutoffInfo.cutoffTimeStr });
-              }
-            } else {
-              LV(`No flights found in parsed response for ${t.o}->${t.d}`);
-            }
-          } else {
-            LW(`Could not parse response as JSON for ${t.o}->${t.d}`);
-            LV(`Raw response body: ${r.bodyText.substring(0, 500)}`);
-          }
-        } else {
-          errorCount++;
-          LW(`HTTP ${r.status} for ${t.o}->${t.d}`);
-          LV(`Error response body: ${r.bodyText.substring(0, 500)}`);
-        }
-
-        if (i > 0 && i % 50 === 0 && i < tasks.length - 1) {
-          showStatus('Brief pause...');
-          await sleep(3000);
-        }
-      } catch (e) {
+      if (fl === null) {
         errorCount++;
-        LE(`Search error for ${t.o}->${t.d}: ${e.message}`);
+      } else if (fl.length > 0) {
+        successCount++;
+        L(`✈️ ${t.o} → ${t.d} on ${t.dt}: ${fl.length} flights found`);
+
+        // Track this destination+date for the round trip return search
+        if (isRoundTrip) {
+          if (!foundOutboundFlights.has(t.d)) foundOutboundFlights.set(t.d, new Set());
+          foundOutboundFlights.get(t.d).add(t.dt);
+          L(`  📝 Queued return search: ${t.d} → origin on ${addDays(todayStr, 3)} and ${addDays(todayStr, 4)}`);
+        }
+
+        fl.forEach(f => {
+          LV(`  Flight: dep=${f.departure}, arr=${f.arrival}, code=${f.flightNumber}`);
+          addFlightResult({
+            type: 'outbound',
+            originCode: t.o,
+            originCity: oInfo.city,
+            originCountry: oInfo.country,
+            originAirport: oInfo.airport,
+            destCode: t.d,
+            destCity: dInfo.city,
+            destCountry: dInfo.country,
+            destAirport: dInfo.airport,
+            date: t.dt,
+            departure: f.departure,
+            arrival: f.arrival,
+            flightNumber: f.flightNumber,
+            bookingUrl: bookingUrl(t.o, t.d, t.dt, f.flightNumber)
+          });
+        });
+      } else if (lastFetchMeta.rawCount > 0 && lastFetchMeta.dropped === lastFetchMeta.rawCount) {
+        // Everything the API returned departs inside today's cutoff
+        L(`  ⏰ All ${lastFetchMeta.rawCount} flights to ${dInfo.city} on ${t.dt} depart before ${lastFetchMeta.cutoffTimeStr} - skipped`);
+        filteredTodayRoutes.push({ destCity: dInfo.city, date: t.dt, cutoffTime: lastFetchMeta.cutoffTimeStr });
+      } else {
+        LV(`No flights found for ${t.o}->${t.d} on ${t.dt}`);
+        noDirectLegs.push({ o: t.o, d: t.d, dt: t.dt });
+      }
+
+      if (i > 0 && i % 50 === 0 && i < tasks.length - 1) {
+        showStatus('Brief pause...');
+        await sleep(3000);
       }
     }
 
@@ -1913,99 +2175,50 @@ async function searchFlights() {
         if (stopped) break;
 
         const t = returnTasks[i];
-        setProgress(50 + (i / returnTasks.length) * 50);  // Progress 50-100% for returns
+        setProgress(50 + (i / returnTasks.length) * (runLayover ? 25 : 50));
         const oInfo = getAirportInfo(t.o);
         const dInfo = getAirportInfo(t.d);
         showStatus(`↩️ ${oInfo.city} → ${dInfo.city} (${formatDateDMY(t.dt)}) [${i + 1}/${returnTasks.length}]`);
 
-        try {
-          await sleep(300 + Math.random() * 200);
+        LV(`Searching return: ${t.o} -> ${t.d} on ${t.dt} (for outbound ${t.linkedOutboundDate})`);
+        const fl = await fetchFlights(t.o, t.d, t.dt);
 
-          LV(`Searching return: ${t.o} -> ${t.d} on ${t.dt} (for outbound ${t.linkedOutboundDate})`);
-
-          const searchUrl = dynamicSearchUrl || 'https://multipass.wizzair.com/w6/subscriptions/json/availability';
-
-          const r = await px(searchUrl, {
-            method: 'POST',
-            contentType: 'application/json',
-            body: JSON.stringify({
-              flightType: 'OW',
-              origin: t.o,
-              destination: t.d,
-              departure: t.dt,
-              arrival: '',
-              intervalSubtype: null
-            })
-          });
-
-          if (r.status === 429) {
-            rateLimitCount++;
-            const waitTime = rateLimitCount >= 3 ? 60000 : 15000;
-            LW(`Rate limited! Waiting ${waitTime/1000}s...`);
-            showStatus(`Rate limited — waiting ${waitTime/1000}s...`);
-            await sleep(waitTime);
-            if (rateLimitCount >= 3) rateLimitCount = 0;
-            i--;
-            continue;
-          }
-
-          rateLimitCount = 0;
-
-          if (r.status >= 200 && r.status < 300) {
-            const data = r.json();
-
-            if (data) {
-              let fl = [];
-              if (data.flightsOutbound && Array.isArray(data.flightsOutbound)) fl = data.flightsOutbound;
-              else if (data.flights && Array.isArray(data.flights)) fl = data.flights;
-              else if (data.outbound && Array.isArray(data.outbound)) fl = data.outbound;
-              else if (data.outboundFlights && Array.isArray(data.outboundFlights)) fl = data.outboundFlights;
-              else if (Array.isArray(data)) fl = data;
-              else if (data.result && Array.isArray(data.result)) fl = data.result;
-              else if (data.data && Array.isArray(data.data)) fl = data.data;
-
-              if (fl && fl.length > 0) {
-                successCount++;
-                L(`↩️ ${t.o} → ${t.d} on ${t.dt} (return for outbound ${t.linkedOutboundDate}): ${fl.length} flights found`);
-
-                fl.forEach(f => {
-                  const depTime = f.departure || f.departureTime || f.departureDateTime || f.depTime || f.std || '';
-                  const arrTime = f.arrival || f.arrivalTime || f.arrivalDateTime || f.arrTime || f.sta || '';
-                  const flightNum = f.flightCode || f.flightNumber || f.flight || f.carrierCode || '';
-
-                  addFlightResult({
-                    type: 'return',
-                    originCode: t.o,
-                    originCity: oInfo.city,
-                    originCountry: oInfo.country,
-                    originAirport: oInfo.airport,
-                    destCode: t.d,
-                    destCity: dInfo.city,
-                    destCountry: dInfo.country,
-                    destAirport: dInfo.airport,
-                    date: t.dt,
-                    departure: depTime,
-                    arrival: arrTime,
-                    flightNumber: flightNum,
-                    bookingUrl: bookingUrl(t.o, t.d, t.dt),
-                    linkedOutboundDate: t.linkedOutboundDate
-                  });
-                });
-              }
-            }
-          } else if (r.status === 400) {
-            LV(`No return route available: ${t.o}->${t.d} on ${t.dt} (HTTP 400)`);
-          } else {
-            errorCount++;
-            LW(`HTTP ${r.status} for return ${t.o}->${t.d}`);
-          }
-        } catch (e) {
+        if (fl === null) {
           errorCount++;
-          LE(`Return search error for ${t.o}->${t.d}: ${e.message}`);
+        } else if (fl.length > 0) {
+          successCount++;
+          L(`↩️ ${t.o} → ${t.d} on ${t.dt} (return for outbound ${t.linkedOutboundDate}): ${fl.length} flights found`);
+
+          fl.forEach(f => {
+            addFlightResult({
+              type: 'return',
+              originCode: t.o,
+              originCity: oInfo.city,
+              originCountry: oInfo.country,
+              originAirport: oInfo.airport,
+              destCode: t.d,
+              destCity: dInfo.city,
+              destCountry: dInfo.country,
+              destAirport: dInfo.airport,
+              date: t.dt,
+              departure: f.departure,
+              arrival: f.arrival,
+              flightNumber: f.flightNumber,
+              bookingUrl: bookingUrl(t.o, t.d, t.dt, f.flightNumber),
+              linkedOutboundDate: t.linkedOutboundDate
+            });
+          });
         }
       }
     } else if (isRoundTrip) {
       L('No outbound flights found - skipping return search');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // STEP 6: Layover Search (1 stop, only where no direct flight exists)
+    // ═══════════════════════════════════════════════════
+    if (runLayover && !stopped) {
+      await searchLayovers(noDirectLegs, isRoundTrip ? 75 : 50);
     }
 
     // ═══════════════════════════════════════════════════
@@ -2024,12 +2237,17 @@ async function searchFlights() {
       L(`  Return flights: ${returnCount}`);
     }
 
+    if (layoverResults.length) L(`  1-stop connections: ${layoverResults.length}`);
+
     setProgress(100);
-    showStatus(`Found ${searchResults.length} flights`);
-    showMsg(searchResults.length > 0 ? 's' : 'w',
-      searchResults.length > 0 ? `Found ${searchResults.length} flights!` : 'No flights found. Check debug log for details.');
+    const totalFound = searchResults.length + layoverResults.length;
+    const summary = layoverResults.length
+      ? `Found ${searchResults.length} flights and ${layoverResults.length} 1-stop connections!`
+      : `Found ${searchResults.length} flights!`;
+    showStatus(`Found ${searchResults.length} flights${layoverResults.length ? ` + ${layoverResults.length} connections` : ''}`);
+    showMsg(totalFound > 0 ? 's' : 'w',
+      totalFound > 0 ? summary : 'No flights found. Check debug log for details.');
     renderResults();
-    updateLLMSearchInfo();
 
   } catch (e) {
     LE(`SEARCH FAILED: ${e.message}`);
@@ -2052,220 +2270,15 @@ async function searchFlights() {
   }
 }
 
-// LLM Flight Search Prompt Generator
-function getLLMSearchData() {
-  const hasRoundTrip = searchResults.some(r => r.type === 'return');
-  const outboundFlights = searchResults.filter(r => r.type === 'outbound');
-  const returnFlights = searchResults.filter(r => r.type === 'return');
-
-  // Build rich destination info from outbound flights
-  const destInfo = new Map(); // destCode -> {code, city, country, airport, outDates, returnDates}
-  const destCities = new Map(); // city -> Set of codes (for display)
-  const dates = new Set();
-
-  outboundFlights.forEach(r => {
-    if (!destInfo.has(r.destCode)) {
-      destInfo.set(r.destCode, {
-        code: r.destCode, city: r.destCity,
-        country: r.destCountry, airport: r.destAirport,
-        outDates: new Set(), returnDates: new Set()
-      });
-    }
-    destInfo.get(r.destCode).outDates.add(r.date);
-    if (!destCities.has(r.destCity)) destCities.set(r.destCity, new Set());
-    destCities.get(r.destCity).add(r.destCode);
-    dates.add(r.date);
-  });
-
-  // Add return dates (return flights: originCode = the Wizz destination)
-  returnFlights.forEach(r => {
-    if (destInfo.has(r.originCode)) {
-      destInfo.get(r.originCode).returnDates.add(r.date);
-    }
-  });
-
-  // Compute trip durations per destination for hostel night calculation
-  const tripDurations = new Map();
-  if (hasRoundTrip) {
-    destInfo.forEach((info, code) => {
-      if (info.outDates.size > 0 && info.returnDates.size > 0) {
-        const earliestOut = [...info.outDates].sort()[0];
-        const latestRet = [...info.returnDates].sort().pop();
-        const nights = Math.round((new Date(latestRet) - new Date(earliestOut)) / 86400000);
-        if (nights > 0) {
-          tripDurations.set(code, {
-            nights, checkIn: earliestOut, checkOut: latestRet,
-            city: info.city, country: info.country
-          });
-        }
-      }
-    });
-  }
-
-  const origins = [...destCities.entries()].map(([city, codes]) => `${city} (${[...codes].join('/')})`);
-  const sortedDates = [...dates].sort();
-  return { origins, dates: sortedDates, destCities, hasRoundTrip, destInfo, tripDurations };
-}
-
-function updateLLMSearchInfo() {
-  const infoDiv = $('llmSearchInfo');
-  if (!infoDiv) return;
-  if (!searchResults.length) {
-    infoDiv.style.display = 'none';
-    return;
-  }
-  const data = getLLMSearchData();
-  if (!data.origins.length) {
-    infoDiv.style.display = 'none';
-    return;
-  }
-  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
-  const tripType = data.hasRoundTrip ? 'Round trip' : 'One-way';
-  let html = `<strong>✈️ From search results:</strong> ${data.origins.length} destination${data.origins.length > 1 ? 's' : ''}: ${data.origins.join(', ')}<br>`;
-  html += `<strong>📅 Dates:</strong> ${datesFormatted}<br>`;
-  html += `<strong>🔄 Trip type:</strong> ${tripType}`;
-  if (data.hasRoundTrip && data.tripDurations.size > 0) {
-    const durStr = [...data.tripDurations.values()]
-      .map(d => `${d.city}: ${d.nights} night${d.nights !== 1 ? 's' : ''} (${formatDateDMY(d.checkIn)} → ${formatDateDMY(d.checkOut)})`)
-      .join(', ');
-    html += `<br><strong>🏨 Trip duration:</strong> ${durStr}`;
-  }
-  infoDiv.innerHTML = html;
-  infoDiv.style.display = 'block';
-}
-
-function generateLLMPrompt() {
-  const preset = $('llmDestPreset').value;
-  const custom = $('llmDestCustom').value.trim();
-  const endDest = custom || preset;
-  if (!endDest) { showMsg('e', 'Select or type an end destination.'); return; }
-
-  if (!searchResults.length) { showMsg('e', 'Run a flight search first to populate origins and dates.'); return; }
-
-  const data = getLLMSearchData();
-  if (!data.origins.length) { showMsg('e', 'No outbound flights found in search results.'); return; }
-
-  const prefs = [];
-  if ($('llmMinLayover').checked) prefs.push('minimum layover time');
-  if ($('llmMinTrip').checked) prefs.push('minimum total trip time');
-  if ($('llmMinPrice').checked) prefs.push('lowest price');
-  const prefsText = prefs.length ? prefs.join(', ') : 'best overall value';
-
-  // Build detailed origin list with full airport info
-  const originDetails = [...data.destInfo.values()].map(d =>
-    `${d.city}, ${d.country} - ${d.airport} (${d.code})`
-  );
-  const originsList = originDetails.join('\n  - ');
-  const datesFormatted = data.dates.map(d => formatDateDMY(d)).join(', ');
-
-  const prompt = `Search for one-way flights to ${endDest} on the following dates: ${datesFormatted}.
-
-Departing from each of these cities (intermediate cities I fly Wizz Air to first):
-  - ${originsList}
-
-For each origin city, find the best connecting flights to ${endDest} optimizing for: ${prefsText}.
-
-Present ALL results as a beautiful, interactive HTML mini-app that I can browse on my mobile phone. The app should include:
-- A sortable & filterable table
-- Click any column header to sort ascending/descending
-- A search/filter input to narrow down results
-- Clean, mobile-friendly design with readable fonts
-
-Table columns MUST include:
-1. Origin (Country, City, Airport Name & Code - e.g. "Italy, Rome - Fiumicino (FCO)")
-2. Destination (Country, City, Airport Name & Code)
-3. Departure (HH:MM DD/MM/YYYY format, local time)
-4. Arrival (HH:MM DD/MM/YYYY format, local time)
-5. Route (full route with connections, e.g. "FCO > IST > BKK")
-6. Airlines (all carriers in the journey)
-7. Total Trip Time (e.g. "14h 30m")
-8. Stops (number)
-9. Layover (total wait between connections, e.g. "2h 15m")
-10. Price (approximate, USD)
-11. Book (clickable link to Google Flights or airline website for that specific route & date)
-
-Sort by Total Trip Time ascending by default.
-Highlight the best overall option row in green.
-
-Important guidelines:
-- Search for ACTUAL available flights on ${datesFormatted}
-- Include budget airlines (Ryanair, EasyJet, AirAsia, etc.) and full-service carriers
-- Show at least 3 options per origin city if available
-- For layovers, prefer connections under 4 hours when possible
-- Include the full route with all connection cities
-- Each "Book" link should open Google Flights or the airline's booking page for that specific route and date`;
-
-  $('llmFlightPromptText').value = prompt;
-  $('llmFlightPromptArea').classList.remove('hd-n');
-
-  // Generate hostel prompt if round trip
-  if (data.hasRoundTrip && data.tripDurations.size > 0) {
-    generateHostelPrompt(data, endDest);
-    $('llmHostelPromptArea').classList.remove('hd-n');
-  } else {
-    $('llmHostelPromptArea').classList.add('hd-n');
-  }
-
-  showMsg('s', data.hasRoundTrip ? 'Flight & hostel prompts generated! Copy each to your LLM app.' : 'Flight prompt generated! Click Copy to copy it to clipboard.');
-}
-
-function generateHostelPrompt(data, endDest) {
-  const destinations = [...data.tripDurations.values()];
-  const destSummary = destinations.map(d =>
-    `${d.city}, ${d.country}: depart ${formatDateDMY(d.checkIn)}, return ${formatDateDMY(d.checkOut)} (${d.nights} night${d.nights !== 1 ? 's' : ''})`
-  ).join('\n  - ');
-
-  // Use the max trip duration for the hostel stay at the final destination
-  const maxNights = Math.max(...destinations.map(d => d.nights));
-  const earliestCheckIn = destinations.map(d => d.checkIn).sort()[0];
-  const latestCheckOut = destinations.map(d => d.checkOut).sort().pop();
-
-  const prompt = `Search for hostels/budget accommodation on Booking.com in ${endDest}.
-
-My trip details (flying via Wizz Air through these intermediate cities):
-  - ${destSummary}
-
-I need accommodation in ${endDest}. Determine the appropriate check-in and check-out dates based on when I'll arrive at and depart from ${endDest} (accounting for connecting flight times from the intermediate cities). Estimated stay: approximately ${maxNights} nights (between ${formatDateDMY(earliestCheckIn)} and ${formatDateDMY(latestCheckOut)}).
-
-Search Criteria:
-- BEST VALUE FOR MONEY (not necessarily cheapest - best quality/price ratio)
-- Location: City Center or the trendy/hipster neighborhood (every city has one - like Kreuzberg/Friedrichshain in Berlin, Le Marais in Paris, Shimokitazawa in Tokyo, Khao San Road area in Bangkok, Trastevere in Rome, etc.)
-- Room type: PRIVATE ROOM only (shared bathroom is OK)
-- No breakfast needed
-- Minimum rating: 8.0/10 and above on Booking.com
-- Sort by: Best reviewed + lowest price combination
-
-Present the results as a beautiful, interactive HTML mini-app for my mobile phone with:
-
-For EACH hostel/accommodation, show:
-1. Name of the place
-2. Photos (include actual image URLs from Booking.com listings)
-3. Full address
-4. Neighborhood (1-line description - what's the vibe of this area?)
-5. Rating (out of 10) and number of reviews
-6. Price per night (USD) and total price for the full stay
-7. Room type details (private room, shared/private bathroom, bed type)
-8. Key amenities (WiFi, kitchen, locker, AC, laundry, common area, etc.)
-9. Distance to city center / main attractions
-10. Direct Booking.com link (with check-in/check-out dates pre-filled in the URL)
-
-Show at least 5 options, sorted by value score (rating x affordability).
-Highlight the best overall pick in green.
-Make it filterable by price range and rating.
-
-Important: Use ACTUAL Booking.com availability and pricing for my specific dates. Each booking link should go directly to the property page with my dates pre-selected.`;
-
-  $('llmHostelPromptText').value = prompt;
-}
-
 // Export/Import
 function exportResults() {
-  if (!searchResults.length) { showMsg('w', 'No results to export'); return; }
+  if (!searchResults.length && !layoverResults.length) { showMsg('w', 'No results to export'); return; }
   const data = {
     version: VERSION,
     exportDate: new Date().toISOString(),
     count: searchResults.length,
-    flights: searchResults
+    flights: searchResults,
+    connections: layoverResults
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -2286,8 +2299,9 @@ function importResults(file) {
       const data = JSON.parse(e.target.result);
       if (!data.flights || !Array.isArray(data.flights)) throw new Error('Invalid format');
       searchResults = data.flights;
+      layoverResults = Array.isArray(data.connections) ? data.connections : [];
       renderResults();
-      showMsg('s', `Imported ${searchResults.length} flights!`);
+      showMsg('s', `Imported ${searchResults.length} flights${layoverResults.length ? ` and ${layoverResults.length} connections` : ''}!`);
     } catch (err) {
       showMsg('e', 'Import failed: ' + err.message);
     }
@@ -2352,11 +2366,19 @@ function init() {
   updateDateDisplay();
   $('filterDate').addEventListener('change', updateDateDisplay);
 
+  $('citySortMode').value = getCitySortMode();
   populateCityDropdowns();
 
   // Multi-select change handlers
   $('filterOrigin').addEventListener('change', () => updateChips('filterOrigin', 'originChips'));
   $('filterDest').addEventListener('change', () => updateChips('filterDest', 'destChips'));
+
+  // Re-order both city lists when the sort mode changes (selections are preserved)
+  $('citySortMode').addEventListener('change', () => {
+    localStorage.setItem('wz_city_sort', $('citySortMode').value);
+    populateCityDropdowns();
+    L(`City list sorted by ${$('citySortMode').value}`);
+  });
 
   $('workerCode').textContent = workerCode();
 
@@ -2430,29 +2452,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   $('bClearResults').onclick = () => {
     searchResults = [];
+    layoverResults = [];
     currentSort = { field: null, asc: true };
     $('resultsArea').innerHTML = '<div class="mg mg-i">No results yet.</div>';
     $('resultsCount').textContent = '0 flights';
-    $('llmFlightPromptArea').classList.add('hd-n');
-    $('llmHostelPromptArea').classList.add('hd-n');
   };
 
-  // LLM Flight Search handlers
-  $('bGenPrompt').onclick = generateLLMPrompt;
-  $('bCopyFlightPrompt').onclick = () => {
-    navigator.clipboard.writeText($('llmFlightPromptText').value);
-    showMsg('s', 'Flight prompt copied to clipboard!');
-  };
-  $('bCopyHostelPrompt').onclick = () => {
-    navigator.clipboard.writeText($('llmHostelPromptText').value);
-    showMsg('s', 'Hostel prompt copied to clipboard!');
-  };
-  $('llmDestPreset').addEventListener('change', () => {
-    if ($('llmDestPreset').value) $('llmDestCustom').value = '';
-  });
-  $('llmDestCustom').addEventListener('input', () => {
-    if ($('llmDestCustom').value.trim()) $('llmDestPreset').value = '';
-  });
   $('bSettings').onclick = () => $('mSettings').classList.add('op');
   $('bCloseSettings').onclick = () => $('mSettings').classList.remove('op');
   $('mSettings').onclick = e => { if (e.target === $('mSettings')) $('mSettings').classList.remove('op'); };
