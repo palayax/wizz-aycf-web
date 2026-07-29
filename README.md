@@ -1,14 +1,15 @@
-# Wizz AYCF Route Finder — Mobile Web v5.2.0
+# Wizz AYCF Route Finder — Mobile Web v5.2.1
 
 A mobile-friendly web app for searching Wizz Air All-You-Can-Fly routes. Works on any device.
 
-## What's New in v5.2.0
+## What's New
 
 - **🌍 ANY city option** — Origin and Destination pickers now include an "ANY" entry at the top of each list; selecting it (or selecting nothing) means "no restriction" on that end
 - **🔀 Layover search** — When there's no direct flight for an origin→destination→date, optionally search for a 1-stop connection through a hub airport
-- **📅 Expanded Search Range** — Exact Date, +1/+2/+3 day windows, or "All Available" (scans 14 days forward)
+- **📅 Search Range** — Exact Date, or +1/+2/+3 day windows; "+3 Days" covers the full bookable window, since Wizz only releases AYCF seats 3 days ahead
 - **🗂️ Sort Cities By** — Order the city pickers by name or by country, with the choice remembered on your device
-- **🎫 Book buttons** — Every result row links straight to the Wizz Multipass booking page for that flight (or each leg, for layovers)
+- **🎫 One booking link per results block** — Wizz Multipass has no per-flight deep link, so instead of a button on every row there's a single "Book on Wizz" link above each results table/group, taking you to the AYCF portal to finish manually
+- **🔢 Accurate results count** — The counter reports what's actually shown on screen (flights, connections, and any hidden because they depart too soon to book), not the raw number found
 - **🧹 Removed the LLM prompt generator** — The old "LLM Flight & Hostel Search" section is gone; the app is purely a flight finder now
 
 ## How It Works
@@ -67,8 +68,9 @@ Pick one or more cities on each side, or leave a side unset — or pick **🌍 A
 | Option | Meaning |
 |--------|---------|
 | **Exact Date Only** | Just the selected departure date |
-| **Exact Date +1/+2/+3 Day(s)** | Selected date plus the next 1–3 days |
-| **All Available** | Scans 14 days forward from the selected date |
+| **Exact Date +1 Day** | Selected date plus the next day |
+| **Exact Date +2 Days** | Selected date plus the next 2 days |
+| **Exact Date +3 Days** | Selected date plus the next 3 days — 4 dates total, covering the full AYCF booking window (Wizz only releases AYCF seats 3 days ahead) |
 
 ### Layover
 
@@ -83,7 +85,11 @@ Layover search requires specific destination cities — with **ANY** destination
 
 ### Booking links
 
-Every result row has a **🎫 Book** button (layover rows get separate **Leg 1** / **Leg 2** buttons) linking to the Wizz Multipass booking page with the origin, destination, date, and flight number pre-filled in the query string. Multipass doesn't publish a documented deep-link format, so those parameters may be ignored by their single-page app — but the link reliably lands you on the correct AYCF booking page to finish manually.
+Wizz Multipass has no per-flight deep link — query parameters are ignored and you always land on the general AYCF portal — so there's no point linking each row separately. Instead, a single **🎫 Book on Wizz** link appears once per results block: above the flights table, once per destination group for round trips, and once per origin→destination group in the Connections section. Use the on-screen flight details to find and select the matching flight once you're on the Multipass site.
+
+### Results count
+
+The counter above the results (e.g. `3 flights · 2 connections · 4 too soon to book`) reflects what's actually rendered, not the raw number of flights the search turned up. Today's flights departing within the next 3 hours are excluded from the table — AYCF won't let you book that close to departure — and counted separately as "too soon to book" instead. If every flight found falls inside that cutoff, the results area explains that directly instead of showing an empty table.
 
 ## Disclaimer
 

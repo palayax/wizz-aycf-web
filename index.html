@@ -215,8 +215,8 @@ td{color:var(--tx)}
       <option value="2">Exact Date +1 Day</option>
       <option value="3">Exact Date +2 Days</option>
       <option value="4">Exact Date +3 Days</option>
-      <option value="all">All Available</option>
     </select>
+    <span style="font-size:.72rem;color:var(--tx3)">Wizz only releases AYCF seats 3 days ahead</span>
   </div>
 
   <div class="filter-row">
@@ -365,11 +365,7 @@ td{color:var(--tx)}
 //  Round Trip: searches returns 2, 3 & 4 days after each found outbound
 // ══════════════════════════════════════════════════════
 
-const VERSION = '5.2.0';
-
-// "All Available" search range: how many days forward from the selected date.
-// AYCF availability rarely extends past two weeks, so 14 covers the bookable window.
-const ALL_AVAILABLE_DAYS = 14;
+const VERSION = '5.2.1';
 
 // Layover (1-stop connection) tuning
 const LAYOVER_MIN_MINUTES = 90;      // shortest connection we consider realistic
@@ -765,21 +761,13 @@ function getPriorityCities() {
   return saved.split(',').map(c => c.trim().toUpperCase()).filter(c => c.length === 3);
 }
 
-// Purchase link — lands on the AYCF Multipass booking page with the leg described in the
-// query string. Multipass publishes no deep-link format, so the params are a hint the SPA
-// may ignore; the page itself is always the right place to complete an AYCF booking.
+// Purchase link. Multipass has no per-flight deep link — any query string is ignored and
+// you land on the AYCF portal regardless — so we link the portal once per results block
+// rather than pretending each row goes straight to that flight.
 const MULTIPASS_BOOK_URL = 'https://multipass.wizzair.com/w6/subscriptions/spa/private-page/wallets';
 
-function bookingUrl(o, d, dt, flightNum) {
-  if (!o || !d || !dt) return MULTIPASS_BOOK_URL;
-  const p = new URLSearchParams({ origin: o, destination: d, departure: dt });
-  if (flightNum) p.set('flight', flightNum);
-  return `${MULTIPASS_BOOK_URL}?${p.toString()}`;
-}
-
-// Small green "Book" button used across the results tables
-function bookBtn(o, d, dt, flightNum, label) {
-  return `<a href="${bookingUrl(o, d, dt, flightNum)}" target="_blank" rel="noopener" class="link-btn">${label || '🎫 Book'}</a>`;
+function bookingUrl() {
+  return MULTIPASS_BOOK_URL;
 }
 
 // Minutes since midnight from any time shape the API returns; null if unparseable
@@ -1079,9 +1067,9 @@ function showStatus(m) { $('dlStatus').textContent = m; }
 // Render results - supports both flat and grouped (round trip) display
 function renderResults() {
   const area = $('resultsArea');
-  const countBits = [`${searchResults.length} flights`];
-  if (layoverResults.length) countBits.push(`${layoverResults.length} connections`);
-  $('resultsCount').textContent = countBits.join(' · ');
+
+  const filtered = filterTooSoonFlights(searchResults);
+  updateResultsCount();
 
   if (!searchResults.length && !layoverResults.length) {
     area.innerHTML = '<div class="mg mg-w">No flights found yet.</div>';
@@ -1091,7 +1079,12 @@ function renderResults() {
   // Check if we have round trip results (both outbound and return)
   const hasRoundTrip = searchResults.some(r => r.type === 'return');
 
-  const filtered = filterTooSoonFlights(searchResults);
+  if (!filtered.length && !layoverResults.length) {
+    const n = searchResults.length;
+    area.innerHTML = `<div class="mg mg-w">${n === 1 ? 'The only flight found departs' : `All ${n} flights found depart`} within the next 3 hours — too soon to book on AYCF. Try a later date.</div>`;
+    return;
+  }
+
   if (!searchResults.length) {
     area.innerHTML = '<div class="mg mg-w">No direct flights found — see the connections below.</div>';
   } else if (hasRoundTrip) {
@@ -1121,13 +1114,16 @@ function renderLayoverResults() {
   groups.forEach(connections => {
     const c0 = connections[0];
     html += `<div style="margin-bottom:16px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden">`;
-    html += `<div style="background:var(--s2);padding:10px 14px;border-bottom:1px solid var(--bdr);font-size:.85rem;font-weight:700;color:var(--acc2)">`;
+    html += `<div style="background:var(--s2);padding:10px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">`;
+    html += `<div style="font-size:.85rem;font-weight:700;color:var(--acc2)">`;
     html += `${c0.originCity} (${c0.originCode}) → ${c0.destCity} (${c0.destCode})`;
     html += `<span style="margin-left:12px;font-size:.72rem;font-weight:400;color:var(--tx2)">${connections.length} option${connections.length === 1 ? '' : 's'}</span>`;
     html += `</div>`;
+    html += `<a href="${bookingUrl()}" target="_blank" rel="noopener" class="link-btn" style="font-size:.78rem;padding:6px 12px">🎫 Book on Wizz</a>`;
+    html += `</div>`;
 
     html += '<div class="tbl-wrap"><table><thead><tr>';
-    html += '<th>Date</th><th>Via</th><th>Leg 1</th><th>Leg 2</th><th>Layover</th><th>Book</th>';
+    html += '<th>Date</th><th>Via</th><th>Leg 1</th><th>Leg 2</th><th>Layover</th>';
     html += '</tr></thead><tbody>';
 
     connections.forEach(c => {
@@ -1139,11 +1135,6 @@ function renderLayoverResults() {
       html += `<td class="mono">${l1}</td>`;
       html += `<td class="mono">${l2}${c.overnight ? ' <span style="color:var(--ylw)">+1d</span>' : ''}</td>`;
       html += `<td class="mono">${formatDuration(c.layoverMinutes)}</td>`;
-      html += `<td style="white-space:nowrap">`;
-      html += bookBtn(c.originCode, c.hubCode, c.leg1.date, c.leg1.flightNumber, '🎫 Leg 1');
-      html += ' ';
-      html += bookBtn(c.hubCode, c.destCode, c.leg2.date, c.leg2.flightNumber, '🎫 Leg 2');
-      html += `</td>`;
       html += `</tr>`;
     });
 
@@ -1213,7 +1204,7 @@ function renderGroupedResults(area, flights) {
 // Render a simple table for a list of flights (used in grouped view)
 function renderFlightTable(flights) {
   let html = '<div class="tbl-wrap"><table><thead><tr>';
-  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Weather</th><th>Book</th>';
+  html += '<th>Date</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Flight #</th><th>Weather</th>';
   html += '</tr></thead><tbody>';
 
   flights.sort((a, b) => a.date.localeCompare(b.date) || (a.departure || '').localeCompare(b.departure || ''));
@@ -1227,7 +1218,6 @@ function renderFlightTable(flights) {
     html += `<td class="mono">${formatTime(f.arrival)}</td>`;
     html += `<td class="mono">${f.flightNumber || '-'}</td>`;
     html += `<td><span data-weather-city="${f.destCity}" data-weather-date="${f.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>`;
-    html += `<td>${bookBtn(f.originCode, f.destCode, f.date, f.flightNumber)}</td>`;
     html += `</tr>`;
   });
 
@@ -1275,7 +1265,7 @@ function renderFlatResults(area, flights) {
     html += `<span class="th-filter"><input type="text" data-filter="${col.key}" placeholder="Filter..."></span>`;
     html += '</th>';
   });
-  html += '<th>Weather</th><th>Book</th>';
+  html += '<th>Weather</th>';
   html += '</tr></thead><tbody>';
 
   sorted.forEach((r, idx) => {
@@ -1292,7 +1282,6 @@ function renderFlatResults(area, flights) {
       <td class="mono">${formatTime(r.departure)}</td>
       <td class="mono">${formatTime(r.arrival)}</td>
       <td><span data-weather-city="${r.destCity}" data-weather-date="${r.date}"><span class="sp-n" style="width:10px;height:10px;border-width:1.5px;"></span></span></td>
-      <td>${bookBtn(r.originCode, r.destCode, r.date, r.flightNumber)}</td>
     </tr>`;
   });
   html += '</tbody></table></div>';
@@ -1330,9 +1319,21 @@ function renderFlatResults(area, flights) {
   });
 }
 
+// Today's flights inside the 3-hour booking cutoff never reach the table, so the count
+// has to describe the rows actually on screen — not the raw result list.
+function updateResultsCount() {
+  const shown = filterTooSoonFlights(searchResults).length;
+  const hidden = searchResults.length - shown;
+
+  const bits = [`${shown} flight${shown === 1 ? '' : 's'}`];
+  if (layoverResults.length) bits.push(`${layoverResults.length} connection${layoverResults.length === 1 ? '' : 's'}`);
+  if (hidden > 0) bits.push(`${hidden} too soon to book`);
+  $('resultsCount').textContent = bits.join(' · ');
+}
+
 function addFlightResult(flight) {
   searchResults.push(flight);
-  $('resultsCount').textContent = `${searchResults.length} flights`;
+  updateResultsCount();
   if (searchResults.length <= 3 || searchResults.length % 10 === 0) renderResults();
 }
 
@@ -2019,8 +2020,8 @@ async function searchFlights() {
     L('');
     L('═══ STEP 4: SEARCH OUTBOUND FLIGHTS ═══');
 
-    // Build dates - N days forward from the selected date ("all" = full availability window)
-    const daysAhead = filterDateFlex === 'all' ? ALL_AVAILABLE_DAYS : (parseInt(filterDateFlex, 10) || 1);
+    // Build dates - N days forward from the selected date (AYCF releases seats 3 days out)
+    const daysAhead = parseInt(filterDateFlex, 10) || 1;
     const outboundDates = [];
     for (let i = 0; i < daysAhead; i++) {
       outboundDates.push(addDays(filterDate, i));
@@ -2240,13 +2241,17 @@ async function searchFlights() {
     if (layoverResults.length) L(`  1-stop connections: ${layoverResults.length}`);
 
     setProgress(100);
-    const totalFound = searchResults.length + layoverResults.length;
-    const summary = layoverResults.length
-      ? `Found ${searchResults.length} flights and ${layoverResults.length} 1-stop connections!`
-      : `Found ${searchResults.length} flights!`;
-    showStatus(`Found ${searchResults.length} flights${layoverResults.length ? ` + ${layoverResults.length} connections` : ''}`);
+    const bookable = filterTooSoonFlights(searchResults).length;
+    const tooSoon = searchResults.length - bookable;
+    const totalFound = bookable + layoverResults.length;
+
+    let summary = `Found ${bookable} flights`;
+    if (layoverResults.length) summary += ` and ${layoverResults.length} 1-stop connections`;
+    if (tooSoon > 0) summary += ` (${tooSoon} more depart within 3 hours — too soon to book)`;
+
+    showStatus(`Found ${bookable} flights${layoverResults.length ? ` + ${layoverResults.length} connections` : ''}`);
     showMsg(totalFound > 0 ? 's' : 'w',
-      totalFound > 0 ? summary : 'No flights found. Check debug log for details.');
+      totalFound > 0 ? summary + '!' : 'No flights found. Check debug log for details.');
     renderResults();
 
   } catch (e) {
